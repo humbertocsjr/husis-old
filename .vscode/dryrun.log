@@ -1,0 +1,6 @@
+make --dry-run --always-make --keep-going --print-directory
+make: Entering directory `/Users/humberto/Documents/HUSIS'
+make -C ./Codigo all
+make imagem
+make: Leaving directory `/Users/humberto/Documents/HUSIS'
+ 

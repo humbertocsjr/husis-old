@@ -1,8 +1,27 @@
-cpu 8086
-org 0x100
+; =================
+;  Nucleo do HUSIS
+; =================
+;
+; Prototipo........: 16/08/2022
+; Versao Inicial...: 17/08/2022
+; Autor............: Humberto Costa dos Santos Junior
+;
+; Funcao...........: Nucleo do HUSIS
+;
+; Limitacoes.......: 
+;
+; Historico........:
+;
+; - 16/08/2022 - Humberto - Prototipo inicial
 
-Inicial:
-    mov ah, 0xe
-    mov al, '0'
-    int 0x10
-    retf
+
+cpu 8086
+
+%include '../Incluir/Prog.asm'
+
+%include 'Principal.asm'
+%include 'Terminal.asm'
+%include 'Memoria.asm'
+%include 'Disco.asm'
+
+

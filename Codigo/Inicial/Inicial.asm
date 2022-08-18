@@ -15,6 +15,7 @@
 ;
 ; - 16/08/2022 - Humberto - Prototipo inicial
 ; - 17/08/2022 - Humberto - Versao inicial funcional com limitacao de 6 KiB
+; - 17/08/2022 - Humberto - Avisa caso tente carregar um arquivo maior
 
 
 cpu 8086
@@ -123,8 +124,14 @@ Inicio:
     db 'Carregando',0
 
     mov si, [Config.PosArquivo]
-    add si, ObjItem.Zonas
     add si, Itens
+    cmp word [si+ObjItem.ZonaIndireta], 0
+    je .arquivoOk
+        call TermEscreva
+        db ' [ ARQUIVO GRANDE ]',0
+        jmp LoopInfinito
+    .arquivoOk:
+    add si, ObjItem.Zonas
     mov cx, ObjItem._QtdZonas
     mov ax, [Config.Destino]
     mov es, ax
@@ -158,6 +165,11 @@ Inicio:
     call TermEscreva
     db 'Iniciando',0
 
+    add di, 1024
+    xor si, si
+    es mov [si+6], di
+
+    xor di, di
     mov cx, [Config.Cilindros]
     mov dh, [Config.Cabecas]
     mov dl, [Config.Disco]
@@ -170,7 +182,7 @@ Inicio:
     mov ax, LoopInfinito
     push ax
     push ds
-    xor ax, ax
+    mov ax, [si+4]
     push ax
     mov ax, 1989
     call TermEscreva
