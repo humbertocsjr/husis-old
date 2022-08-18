@@ -19,6 +19,7 @@ Prog:
     dw 1
     .PtrInicial: dw inicial
     .Tamanho: dw 0
+    .Processo: dw 0
     .PtrNome: dw nome
     .PtrVersao: dw versao
     .PtrModulos: dw modulos

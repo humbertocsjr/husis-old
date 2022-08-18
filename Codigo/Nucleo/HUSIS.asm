@@ -23,5 +23,7 @@ cpu 8086
 %include 'Terminal.asm'
 %include 'Memoria.asm'
 %include 'Disco.asm'
+%include 'Unidade.asm'
+%include 'MinixFS.asm'
 
 

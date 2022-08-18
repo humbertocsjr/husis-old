@@ -26,8 +26,6 @@ ObjDisco:
 Disco: dw _disco, 0
     .Leia512: dw _discoLeia512, 0
     .Escreva512: dw _discoEscreva512, 0
-    .Leia: dw _discoLeia, 0
-    .Escreva: dw _discoEscreva, 0
     .Info: dw _discoInfo, 0
     .BuscaPorId: dw _discoBuscaPorId, 0
     dw 0
@@ -35,22 +33,27 @@ Disco: dw _disco, 0
     .Dados: times (._Capacidade * ObjDisco._Tam) db 0xff
 
 _disco:
+    push si
+    push bx
     mov si, Disco.Dados
     xor bx, bx
-    mov word [si+bx+ObjDisco.Id], 0
-    mov word [si+bx+ObjDisco.Cilindros], 80
-    mov word [si+bx+ObjDisco.Cabecas], 2
-    mov word [si+bx+ObjDisco.Setores], 18
-    mov word [si+bx+ObjDisco.CabecasSetores], 36
-    mov word [si+bx+ObjDisco.Removivel], 1
+    cs mov word [si+bx+ObjDisco.Id], 0
+    cs mov word [si+bx+ObjDisco.Cilindros], 80
+    cs mov word [si+bx+ObjDisco.Cabecas], 2
+    cs mov word [si+bx+ObjDisco.Setores], 18
+    cs mov word [si+bx+ObjDisco.CabecasSetores], 36
+    cs mov word [si+bx+ObjDisco.Removivel], 1
     add bx, ObjDisco._Tam
-    mov word [si+bx+ObjDisco.Id], 1
-    mov word [si+bx+ObjDisco.Cilindros], 80
-    mov word [si+bx+ObjDisco.Cabecas], 2
-    mov word [si+bx+ObjDisco.Setores], 18
-    mov word [si+bx+ObjDisco.CabecasSetores], 36
-    mov word [si+bx+ObjDisco.Removivel], 1
+    cs mov word [si+bx+ObjDisco.Id], 1
+    cs mov word [si+bx+ObjDisco.Cilindros], 80
+    cs mov word [si+bx+ObjDisco.Cabecas], 2
+    cs mov word [si+bx+ObjDisco.Setores], 18
+    cs mov word [si+bx+ObjDisco.CabecasSetores], 36
+    cs mov word [si+bx+ObjDisco.Removivel], 1
+    pop bx
+    pop si
     retf
+
 
 ; Le informacoes de um disco
 ; bx = Disco
@@ -110,7 +113,7 @@ _discoBuscaPorId:
         jmp .fim
     .ok:
         mov bx, dx
-        call far [Disco.Info]
+        cs call far [Disco.Info]
     .fim:
     pop si
     retf
@@ -158,7 +161,7 @@ _discoLeia512:
     push bx
     push cx
     mov bx, [bp+.varDisco]
-    call far [Disco.Info]
+    cs call far [Disco.Info]
     jc .discoExiste
         pop cx
         pop bx
@@ -234,11 +237,122 @@ _discoLeia512:
     pop ax
     retf
 
+
+; Escreve um bloco de um disco
+; dx:ax = Endereco em blocos de 512 bytes
+; bx = Disco
+; es:di = Origem
+; ret: cf = 1=Lido | 0=Erro
 _discoEscreva512:
-    retf
-
-_discoLeia:
-    retf
-
-_discoEscreva:
+    push ax
+    push bx
+    push cx
+    push dx
+    push di
+    push bp
+    mov bp, sp
+    push ax
+    push dx
+    .varEndereco: equ -4
+    push ax
+    .varCilindro: equ -6
+    push ax
+    .varCabeca: equ -8
+    push ax
+    .varSetor: equ -10
+    push bx
+    .varDisco: equ -12
+    push di
+    .varDestino: equ -14
+    push ax
+    .varFalhas: equ -16
+    push ax
+    .varQtdCilindros: equ -18
+    push ax
+    .varQtdCabecas: equ -20
+    push ax
+    .varQtdSetores: equ -22
+    push ax
+    .varQtdCabSet: equ -24
+    mov word [bp+.varFalhas], 3
+    ; Busca o ID do disco
+    push dx
+    push ax
+    push bx
+    push cx
+    mov bx, [bp+.varDisco]
+    cs call far [Disco.Info]
+    jc .discoExiste
+        pop cx
+        pop bx
+        pop ax
+        pop dx
+        jmp .falha
+    .discoExiste:
+    mov [bp+.varDisco], bx
+    mov [bp+.varQtdCilindros], cx
+    push dx
+    xor dh, dh
+    mov [bp+.varQtdSetores], dx
+    pop dx
+    xchg dl, dh
+    xor dh, dh
+    mov [bp+.varQtdCabecas], dx
+    mov [bp+.varQtdCabSet], ax
+    pop cx
+    pop bx
+    pop ax
+    pop dx
+    ; Calculo do endereço
+    div word [bp+.varQtdCabSet]
+    mov [bp+.varCilindro], ax
+    xchg ax, dx
+    xor dx, dx
+    div word [bp+.varQtdSetores]
+    mov [bp+.varCabeca], ax
+    inc dx
+    mov [bp+.varSetor], dx
+    ; Montando comando bios
+    .tentativa:
+        mov bx, [bp+.varDestino]
+        mov dh, [bp+.varCabeca]
+        mov dl, [bp+.varDisco]
+        mov ch, [bp+.varCilindro]
+        mov cl, [bp+.varSetor]
+        mov al, [bp+.varCilindro+1]
+        and al, 0x2
+        shl al, 1
+        shl al, 1
+        shl al, 1
+        shl al, 1
+        shl al, 1
+        shl al, 1
+        or cl, al
+        mov ax, 0x301
+        push bp
+        int 0x13
+        pop bp
+        jnc .ok
+            dec word [bp+.varFalhas]
+            cmp word [bp+.varFalhas], 0
+            je .falha
+            xor ax, ax
+            mov dl, [bp+.varDisco]
+            push bp
+            int 0x13
+            pop bp
+            jmp .tentativa
+    .falha:
+        clc
+        jmp .fim
+    .ok:
+        stc
+    .fim:
+    mov sp, bp
+    pop bp
+    pop di
+    pop dx
+    pop cx
+    pop bx
+    pop ax
     retf

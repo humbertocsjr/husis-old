@@ -1,7 +1,9 @@
 modulos:
     dw Memoria
     dw Terminal
+    dw Unidade
     dw Disco
+    dw MinixFS
     dw 0
 
 nome: db 'HUSIS',0
@@ -56,50 +58,92 @@ inicial:
     cs mov [.constDiscoBios], dl
 
     call processarModulos
-
-    call far [Memoria]
-    call far [Terminal]
     
-    call far [Terminal.Escreva]
+
+    cs call far [Memoria]
+    cs call far [Terminal]
+    
+    cs call far [Terminal.Escreva]
     db 'HUSIS\n\n',0
 
-    call far [Terminal.Escreva]
+    cs call far [Terminal.Escreva]
+    db ' Tamanho do Nucleo: ',0
+    cs mov ax, [Prog.Tamanho]
+    cs call far [Terminal.EscrevaNum]
+    cs call far [Terminal.Escreva]
+    db ' Bytes\n',0
+
+    cs call far [Terminal.Escreva]
     db ' Controlador de disco',0
-    call far [Disco]
-    call far [Terminal.Escreva]
+    cs call far [Unidade]
+    cs call far [Terminal.Escreva]
+    db ' .',0
+    cs call far [Disco]
+    cs call far [Terminal.Escreva]
     db ' . [ OK ]\n',0
     
-    call far [Terminal.Escreva]
+    cs call far [Terminal.Escreva]
     db ' Disco Inicial ',0
     cs mov bx, [.constDiscoBios]
-    call far [Disco.BuscaPorId]
+    cs call far [Disco.BuscaPorId]
     jc .discoInicialOk
-        call far [Terminal.Escreva]
+        cs call far [Terminal.Escreva]
         db ' [ NENHUM DISCO INICIAL ENCONTRADO ]',0
         jmp .fim
     .discoInicialOk:
     push bx
     mov ax, bx
     cs mov [.constDisco], ax
-    call far [Terminal.EscrevaNum]
+    cs call far [Terminal.EscrevaNum]
     pop bx
-    call far [Terminal.Escreva]
+    cs call far [Terminal.Escreva]
     db ': ', 0
     mov ax, cx
-    call far [Terminal.EscrevaNum]
-    call far [Terminal.Escreva]
+    cs call far [Terminal.EscrevaNum]
+    cs call far [Terminal.Escreva]
     db ' Cilindros, ', 0
     xor ax, ax
     mov al, dh
-    call far [Terminal.EscrevaNum]
-    call far [Terminal.Escreva]
+    cs call far [Terminal.EscrevaNum]
+    cs call far [Terminal.Escreva]
     db ' Cabecas, ', 0
     mov al, dl
-    call far [Terminal.EscrevaNum]
-    call far [Terminal.Escreva]
+    cs call far [Terminal.EscrevaNum]
+    cs call far [Terminal.Escreva]
     db ' Setores\n', 0
 
+    cs call far [Terminal.Escreva]
+    db ' Sistema de Arquivos',0
+    cs call far [MinixFS]
+    cs call far [Terminal.Escreva]
+    db ' . [ OK ]\n',0
     
+
+
+
+    cs call far [Terminal.Escreva]
+    db '\n Memoria Livre: ',0
+    cs call far [Memoria.CalculaLivre]
+    cs call far [Terminal.EscrevaNum]
+    cs call far [Terminal.Escreva]
+    db ' KiB\n',0
+
+    cs call far [Terminal.Escreva]
+    db ' Memoria Reservada: ',0
+    mov al, 0xff
+    cs call far [Memoria.Calcula]
+    cs call far [Terminal.EscrevaNum]
+    cs call far [Terminal.Escreva]
+    db ' KiB\n',0
+
+    cs call far [Terminal.Escreva]
+    db ' Memoria Nucleo: ',0
+    cs mov al, [Prog.Processo]
+    cs call far [Memoria.Calcula]
+    cs call far [Terminal.EscrevaNum]
+    cs call far [Terminal.Escreva]
+    db ' KiB\n\n',0
+
     .fim:
     retf
     .constDiscoBios: dw 0

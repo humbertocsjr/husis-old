@@ -19,6 +19,7 @@ Terminal: dw _terminal, 0
     .Escreva: dw _terminalEscreva, 0
     .EscrevaSI: dw _terminalEscrevaSI, 0
     .EscrevaNum: dw _terminalEscrevaNum, 0
+    .EscrevaEnter: dw _terminalEscrevaEnter, 0
     dw 0
 
 _terminal:
@@ -56,7 +57,7 @@ _terminalEscreva:
         cmp al, '\'
         je .escape
         .escreve:
-        call far [Terminal.EscrevaC]
+        cs call far [Terminal.EscrevaC]
         jmp .caractere
     .escape:
         lodsb
@@ -69,9 +70,9 @@ _terminalEscreva:
         jmp .escreve
     .escapeN:
         mov al, 13
-        call far [Terminal.EscrevaC]
+        cs call far [Terminal.EscrevaC]
         mov al, 10
-        call far [Terminal.EscrevaC]
+        cs call far [Terminal.EscrevaC]
         jmp .caractere
     .escapeT:
         mov al, ' '
@@ -96,7 +97,7 @@ _terminalEscrevaSI:
         cmp al, '\'
         je .escape
         .escreve:
-        call far [Terminal.EscrevaC]
+        cs call far [Terminal.EscrevaC]
         jmp .caractere
     .escape:
         lodsb
@@ -109,9 +110,9 @@ _terminalEscrevaSI:
         jmp .escreve
     .escapeN:
         mov al, 13
-        call far [Terminal.EscrevaC]
+        cs call far [Terminal.EscrevaC]
         mov al, 10
-        call far [Terminal.EscrevaC]
+        cs call far [Terminal.EscrevaC]
         jmp .caractere
     .escapeT:
         mov al, ' '
@@ -131,12 +132,17 @@ _terminalEscrevaNum:
         cs div word [.constDez]
         cmp ax, 0
         je .fim
-            call far [Terminal.EscrevaNum]
+            cs call far [Terminal.EscrevaNum]
     .fim:
     mov al, dl
     add al, '0'
-    call far [Terminal.EscrevaC]
+    cs call far [Terminal.EscrevaC]
     pop dx
     pop ax
     retf
     .constDez: dw 10
+
+_terminalEscrevaEnter:
+    cs call far [Terminal.Escreva]
+    db '\n',0
+    retf
