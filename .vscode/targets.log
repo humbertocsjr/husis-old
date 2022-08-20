@@ -6,9 +6,8 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 # PARTICULAR PURPOSE.
 
 # This program built for i386-apple-darwin11.3.0
- 
 
-# Make data base, printed on Wed Aug 17 10:32:40 2022
+# Make data base, printed on Fri Aug 19 12:41:22 2022
 
 # Variables
 
@@ -43,7 +42,7 @@ ELECTRON_RUN_AS_NODE = 1
 # default
 .FEATURES := target-specific order-only second-expansion else-if archives jobserver check-symlink
 # environment
-SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.ccY0QCPMxO/Listeners
+SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.KbQ8Apuo6O/Listeners
 # automatic
 %F = $(notdir $%)
 # environment
@@ -127,7 +126,7 @@ MAKELEVEL := 0
 # environment
 LANG = C
 # environment
-VSCODE_PID = 16744
+VSCODE_PID = 968
 # variable set hash-table stats:
 # Load=58/1024=6%, Rehash=0, Collisions=1/84=1%
 
@@ -137,9 +136,9 @@ VSCODE_PID = 16744
 
 # Directories
 
-# . (device 16777225, inode 1431528): 9 files, no impossibilities.
+# . (device 16777223, inode 1431528): 10 files, no impossibilities.
 
-# 9 files, no impossibilities in 1 directories.
+# 10 files, no impossibilities in 1 directories.
 
 # Implicit Rules
 
@@ -151,7 +150,7 @@ qemu:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  commands to execute (from `Makefile', line 13):
+#  commands to execute (from `Makefile', line 14):
 	@make all
 	@qemu-system-i386 -fda disco.img
 	
@@ -195,7 +194,7 @@ all:
 # Not a target:
 Makefile:
 #  Implicit rule search has been done.
-#  Last modified 2022-08-17 10:32:23
+#  Last modified 2022-08-18 21:46:01
 #  File has been updated.
 #  Successfully updated.
 # variable set hash-table stats:
@@ -213,7 +212,8 @@ imagem:
 #  File has not been updated.
 #  commands to execute (from `Makefile', line 6):
 	@echo " -= Gerar imagem inicializavel =-"
-	@Ferramentas/minixfs mkfs ./disco.img -s 1440 -i 128 -n 14 -1
+	@Ferramentas/minixfs mkfs ./disco.img -s 1440 -i 256 -n 30 -1
+	@Ferramentas/minixfs add ./disco.img Temp/HUSIS HUSIS
 	@dd if=Temp/Inicial of=disco.img conv=notrunc
 	@echo " -= Imagens geradas =-"
 	@ls -l disco.img
@@ -231,8 +231,7 @@ imagem:
 # # of strcache buffers: 1
 # strcache size: total = 4096 / max = 4096 / min = 4096 / avg = 4096
 # strcache free: total = 4087 / max = 4087 / min = 4087 / avg = 4087
- 
 
-# Finished Make data base on Wed Aug 17 10:32:40 2022
+# Finished Make data base on Fri Aug 19 12:41:22 2022
 
  

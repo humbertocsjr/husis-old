@@ -1,17 +1,35 @@
 modulos:
+    dw Caractere
     dw Memoria
     dw Terminal
     dw Unidade
     dw Disco
+    dw SisArq
     dw MinixFS
     dw 0
+
+importar:
+    dw 0
+
+exportar: ; Cada item deve ter o ponteiro seguido do nome do modulo
+    dw Memoria
+    db 'Memoria',0
+    dw Caractere
+    db 'Caractere',0
+    dw Unidade
+    db 'Unidade',0
+    dw SisArq
+    db 'SisArq',0
+    dw 0
+
+tipo: dw TipoProg.Nucleo
 
 nome: db 'HUSIS',0
 
 versao:
+    dw 0
     dw 1
-    dw 0
-    dw 0
+    dw 1
 
 ; Processa um modulo
 ; es:bx = Modulo
@@ -64,7 +82,19 @@ inicial:
     cs call far [Terminal]
     
     cs call far [Terminal.Escreva]
-    db 'HUSIS\n\n',0
+    db 'HUSIS v',0
+    cs mov ax, [versao]
+    cs call far [Terminal.EscrevaNum]
+    cs call far [Terminal.Escreva]
+    db '.',0
+    cs mov ax, [versao+2]
+    cs call far [Terminal.EscrevaNum]
+    cs call far [Terminal.Escreva]
+    db '.',0
+    cs mov ax, [versao+4]
+    cs call far [Terminal.EscrevaNum]
+    cs call far [Terminal.Escreva]
+    db '\nCopyright (c) 2022 Humberto Costa dos Santos Junior (humbertocsjr)\n\n',0
 
     cs call far [Terminal.Escreva]
     db ' Tamanho do Nucleo: ',0
@@ -114,10 +144,70 @@ inicial:
 
     cs call far [Terminal.Escreva]
     db ' Sistema de Arquivos',0
+    cs call far [SisArq]
+    cs call far [Terminal.Escreva]
+    db ' .',0
     cs call far [MinixFS]
     cs call far [Terminal.Escreva]
-    db ' . [ OK ]\n',0
+    db ' .',0
+
+    cs mov bx, [.constDisco]
+    cs call far [MinixFS.Monta]
+    jc .sisArqValido
+        cs call far [Terminal.Escreva]
+        db ' [ SISTEMA DE ARQUIVOS INVALIDO ]',0
+        jmp .fim
+    .sisArqValido:
+    cs call far [Terminal.Escreva]
+    db ' .',0
+
+    push cs
+    pop ds
+    cs mov bx, [.constDisco]
+    cs call far [SisArq.RegistraRaiz]
+    cs call far [SisArq.LeiaUnidade]
+    jc .unidadeValida
+        cs call far [Terminal.Escreva]
+        db ' [ UNIDADE INEXISTENTE ]',0
+        jmp .fim
+    .unidadeValida:
+    cs call far [Terminal.Escreva]
+    db ' .',0
+
+    mov si, .constEnderecoConfig
+    cs call far [SisArq.AbrirEndereco]
+    jc .subItemExiste
+        cs call far [Terminal.Escreva]
+        db ' [ UNIDADE VAZIA ]',0
+        jmp .fim
+    .subItemExiste:
+    es mov ax, [ObjSisArq.Id]
+    cs call far [Terminal.EscrevaNum]
+    cs call far [Terminal.Escreva]
+    db ' .',0
+
+
+
+    cs call far [Terminal.Escreva]
+    db ' [ OK ]\n',0
     
+mov cx, 2
+cs call far [SisArq.SubItem]
+
+    push ds
+    push es
+    pop ds
+
+    mov si, ObjSisArqItem.Nome
+    cs call far [Terminal.Escreva]
+    db '::::',0
+    cs call far [Terminal.EscrevaSI]
+
+    pop ds
+
+
+
+
 
 
 
@@ -148,3 +238,4 @@ inicial:
     retf
     .constDiscoBios: dw 0
     .constDisco: dw 0
+    .constEnderecoConfig: db '/Sistema/Config.cfg',0

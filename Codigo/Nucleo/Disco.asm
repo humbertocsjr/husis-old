@@ -31,6 +31,7 @@ Disco: dw _disco, 0
     dw 0
     ._Capacidade: equ 6
     .Dados: times (._Capacidade * ObjDisco._Tam) db 0xff
+    .Debug: dw 1
 
 _disco:
     push si
@@ -64,7 +65,6 @@ _disco:
 ;      dl = Setores
 ;      bx = Disco
 _discoInfo:
-    push ax
     push si
     push bx
     mov si, Disco.Dados
@@ -84,7 +84,6 @@ _discoInfo:
         stc
     .fim:
     pop si
-    pop ax
     retf
 
 ; Busca um Disco usando o Id
@@ -117,6 +116,44 @@ _discoBuscaPorId:
     .fim:
     pop si
     retf
+
+__discoDebug:
+    push ax
+    push cx
+    push dx
+    cs call far [Terminal.Escreva]
+    db '[C',0
+    mov ah, cl
+    push cx
+    mov cl, 6
+    shr ah, cl
+    mov al, ch
+    pop cx
+    cs call far [Terminal.EscrevaNum]
+    cs call far [Terminal.Escreva]
+    db ':H',0
+    xor ax, ax
+    mov al, dh
+    cs call far [Terminal.EscrevaNum]
+    cs call far [Terminal.Escreva]
+    db ':S',0
+    mov al, cl
+    and al, 0x3f
+    cs call far [Terminal.EscrevaNum]
+    cs call far [Terminal.Escreva]
+    db '->',0
+    mov ax, es
+    cs call far [Terminal.EscrevaNum]
+    cs call far [Terminal.Escreva]
+    db ':',0
+    mov ax, bx
+    cs call far [Terminal.EscrevaNum]
+    cs call far [Terminal.Escreva]
+    db ']',0
+    pop dx
+    pop cx
+    pop ax
+    ret
 
 ; Le um bloco de um disco
 ; dx:ax = Endereco em blocos de 512 bytes
@@ -183,6 +220,7 @@ _discoLeia512:
     pop bx
     pop ax
     pop dx
+;cs call far [Terminal.EscrevaDebugPilha]
     ; Calculo do endereço
     div word [bp+.varQtdCabSet]
     mov [bp+.varCilindro], ax
@@ -209,6 +247,10 @@ _discoLeia512:
         shl al, 1
         or cl, al
         mov ax, 0x201
+        cs cmp word [Disco.Debug], 0
+        je .ignoraDebug
+            call __discoDebug
+        .ignoraDebug:
         push bp
         int 0x13
         pop bp

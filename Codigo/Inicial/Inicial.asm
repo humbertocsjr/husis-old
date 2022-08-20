@@ -165,7 +165,6 @@ Inicio:
     call TermEscreva
     db 'Iniciando',0
 
-    add di, 1024
     xor si, si
     es mov [si+6], di
 

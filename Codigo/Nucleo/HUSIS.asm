@@ -15,15 +15,15 @@
 ; - 16/08/2022 - Humberto - Prototipo inicial
 
 
-cpu 8086
-
 %include '../Incluir/Prog.asm'
 
-%include 'Principal.asm'
+%include 'Caractere.asm'
 %include 'Terminal.asm'
 %include 'Memoria.asm'
 %include 'Disco.asm'
 %include 'Unidade.asm'
+%include 'SisArq.asm'
 %include 'MinixFS.asm'
+%include 'Principal.asm'
 
 

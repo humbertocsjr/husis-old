@@ -196,6 +196,7 @@ _memoriaCalcula:
 ;      es = Segmento alocado
 ;      di = 0
 _memoriaAlocaBloco:
+    push si
     push ds
     push ax
     push bx
@@ -235,9 +236,25 @@ _memoriaAlocaBloco:
             jae .encontrado
             jmp .continua
         .encontrado:
-            mov di, [bp+.varEnderecoSI]
+            ; Limpa conteudo do destino
+            mov ax, [bp+.varQtdNecessario]
+            cmp ax, 256
+            jne .calcula
+                mov cx, 0xffff
+                jmp .fimCalculo
+            .calcula:
+                mov cx, 256
+                mul cx
+                mov cx, ax
+            .fimCalculo:
+            mov ax, [bp+.varEndereco]
+            mov es, ax
+            xor di, di
+            rep stosb
+            ; Registra espaco ocupado
             push ds
             pop es
+            mov di, [bp+.varEnderecoSI]
             mov cx, [bp+.varQtdNecessario]
             mov ax, [bp+.varProcesso]
             .registrar:
@@ -265,6 +282,7 @@ _memoriaAlocaBloco:
     pop bx
     pop ax
     pop ds
+    pop si
     retf
 
 ; Libera um espaco na memoria anteriormente alocado
