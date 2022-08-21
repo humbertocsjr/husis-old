@@ -215,6 +215,7 @@ _discoLeia512:
     xchg dl, dh
     xor dh, dh
     mov [bp+.varQtdCabecas], dx
+cs call far [Terminal.EscrevaNumDX]
     mov [bp+.varQtdCabSet], ax
     pop cx
     pop bx

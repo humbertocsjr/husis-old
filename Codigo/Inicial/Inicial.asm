@@ -25,11 +25,17 @@ org 0
 Inicio:
 
     ; Garante que os segmentos apontam para o 0x7c0
+    cli
     mov ax, 0x7c0
     push ax
     pop ds
     push ax
     pop es
+    push ax
+    mov ax, 0x600
+    mov ss, ax
+    mov sp, 0x7bfe-0x6000
+    sti
 
     ; Pula para o segmento definido
     push es
@@ -207,7 +213,7 @@ Continuacao:
 Config:
     .CabecalhoConfig: db 'HU'
     .VersaoConfig: dw 1
-    .Destino: dw 0x1000
+    .Destino: dw 0x880
     .Disco: dw 0
     .Cilindros: dw 80
     .Cabecas: dw 2
@@ -448,3 +454,4 @@ Indice:
     ; 1.44: 1
 
 Itens: equ Indice + 1024
+; Destino = 0x7c0 + 0x40(Binario) + 0x40(Indice) + 0x40(Itens) = 0x880
