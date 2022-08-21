@@ -13,6 +13,7 @@
 ; Historico........:
 ;
 ; - 20/08/2022 - Humberto - Prototipo inicial
+; - 21/08/2022 - Humberto - Implementado traducao
 
 %include '../Incluir/Prog.asm'
 
@@ -26,6 +27,8 @@ modulos:
     dw Texto
     dw Unidade
     dw Disco
+    dw SisArq
+    dw MinixFS
     dw 0
 
 %include 'Memoria.asm'
@@ -34,6 +37,8 @@ modulos:
 %include 'Texto.asm'
 %include 'Unidade.asm'
 %include 'Disco.asm'
+%include 'SisArq.asm'
+%include 'MinixFS.asm'
 
 importar:
     dw 0
@@ -137,6 +142,7 @@ inicial:
         jmp .fim
     .unidadeOk:
 
+    cs call far [SisArq]
     cs call far [Disco]
     jc .discoOk
     cs mov ax, [Trad.FalhaDisco]
@@ -156,9 +162,56 @@ inicial:
         db ' [ %at ]\n', 0
         jmp .fim
     .discoRegOk:
+    cs mov word [Unidade.UnidadePrincipal], bx
+
+    cs call far [MinixFS.Monta]
+    jc .montagemOk
+    cs mov ax, [Trad.FalhaMontagem]
+        cs call far [Terminal.Escreva]
+        db ' [ %at ]\n', 0
+        jmp .fim
+    .montagemOk:
+
+    cs call far [Terminal.EscrevaPonto]
+
+    cs mov bx, [Unidade.UnidadePrincipal]
+    cs call far [Unidade.LeiaRaizRemoto]
+    jc .montagem2Ok
+    cs mov ax, [Trad.FalhaMontagem]
+        cs call far [Terminal.Escreva]
+        db ' [ %at ]\n', 0
+        jmp .fim
+    .montagem2Ok:
+
+    cs call far [Terminal.EscrevaPonto]
+
+    push cs
+    pop ds
+    cs mov si, [Trad.EnderecoConfig]
+    cs call far [SisArq.AbreEnderecoRemoto]
+    jc .naoEncontradoConfig
+    cs mov ax, [Trad.FalhaEncontrarConfig]
+        cs call far [Terminal.Escreva]
+        db ' [ %at ]\n', 0
+        jmp .fim
+    .naoEncontradoConfig:
+
+    mov ax, es
+    cs mov [.constArqConf], ax
 
     cs call far [Terminal.EscrevaOk]
 
+    push cs
+    pop ds
+    mov si, .constLinhaComando
+    mov cx, ._constLinhaComandoTam
+    cs call far [SisArq.LeiaLinhaLocal]
+
+    cs call far [Terminal.EscrevaLocal]
+
+
+
+    
     .fim:
     retf
     .constDiscoBios: dw 0
@@ -166,3 +219,6 @@ inicial:
     .constCabecas: dw 0
     .constSetores: dw 0
     .constNumero: db '7c0',0
+    .constArqConf: dw 0
+    ._constLinhaComandoTam: equ 256
+    .constLinhaComando: times ._constLinhaComandoTam db 0

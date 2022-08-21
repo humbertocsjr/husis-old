@@ -39,6 +39,7 @@ Terminal: dw _terminal, 0
     .EscrevaNumEmDSSIBX: dw _terminalEscrevaNumEmDSSIBX, 0
     .EscrevaNumEmESDIBX: dw _terminalEscrevaNumEmESDIBX, 0
     .EscrevaDebug: dw _terminalEscrevaDebug, 0
+    .EscrevaDebugCurto: dw _terminalEscrevaDebugCurto, 0
     .EscrevaDebugDSSI: dw _terminalEscrevaDebugDSSI, 0
     .EscrevaDebugESDI: dw _terminalEscrevaDebugESDI, 0
     .EscrevaDebugESSI: dw _terminalEscrevaDebugESSI, 0
@@ -64,6 +65,12 @@ _terminalC:
     push bp
     mov ah, 0xe
     int 0x10
+    cmp al, 10
+    jne .fim
+        mov ah, 0xe
+        mov al, 13
+        int 0x10
+    .fim:
     pop bp
     pop ax
     popf
@@ -94,6 +101,14 @@ _terminalEscreva:
     push bx
     .varBx: equ -8
     push ds
+    .varLSeg: equ -10
+    push si
+    .varL: equ -12
+    push es
+    .varRSeg: equ -14
+    push di
+    .varR: equ -16
+    push ds
     mov ax, [bp+4]
     mov ds, ax
     mov si, [bp+2]
@@ -120,6 +135,14 @@ _terminalEscreva:
         je .externoC
         cmp al, 'd'
         je .externoD
+        cmp al, 'L'
+        je .externoLSeg
+        cmp al, 'l'
+        je .externoL
+        cmp al, 'R'
+        je .externoRseg
+        cmp al, 'r'
+        je .externoR
         jmp .escreve
     .externoA:
         mov bx, [bp+.varAx]
@@ -132,6 +155,18 @@ _terminalEscreva:
         jmp .externoForma
     .externoD:
         mov bx, dx
+        jmp .externoForma
+    .externoLSeg:
+        mov bx, [bp+.varLSeg]
+        jmp .externoForma
+    .externoL:
+        mov bx, [bp+.varL]
+        jmp .externoForma
+    .externoRseg:
+        mov bx, [bp+.varRSeg]
+        jmp .externoForma
+    .externoR:
+        mov bx, [bp+.varR]
         jmp .externoForma
     .externoForma:
         lodsb
@@ -202,8 +237,6 @@ _terminalEscreva:
         je .escapeN
         jmp .escreve
     .escapeN:
-        mov al, 13
-        cs call far [Terminal.EscrevaC]
         mov al, 10
         cs call far [Terminal.EscrevaC]
         jmp .caractere
@@ -212,6 +245,10 @@ _terminalEscreva:
         jmp .escreve
     .fim:
     mov [bp+2], si
+    pop ds
+    pop di
+    pop es
+    pop si
     pop ds
     pop bx
     pop ax
@@ -245,8 +282,6 @@ _terminalEscrevaLocal:
         je .escapeN
         jmp .escreve
     .escapeN:
-        mov al, 13
-        cs call far [Terminal.EscrevaC]
         mov al, 10
         cs call far [Terminal.EscrevaC]
         jmp .caractere
@@ -423,8 +458,10 @@ _terminalEscrevaDebug:
     cs call far [Terminal.Escreva]
     db ' DX: 0x%ah[%an]',0
     pop ax
+    pop bx
     popf
     pushf
+    push bx
     push ax
     jc .cfSim
         cs call far [Terminal.Escreva]
@@ -506,6 +543,73 @@ _terminalEscrevaDebug:
         .fimCaractere:
         ret
 
+_terminalEscrevaDebugCurto:
+    pushf
+    push bx
+    push ax
+    cs call far [Terminal.Escreva]
+    db '\nDEBUG: AX: 0x%ah[%an]',0
+    call .subCaractere
+    mov ax, bx
+    cs call far [Terminal.Escreva]
+    db ' BX: 0x%ah[%an]',0
+    mov ax, cx
+    cs call far [Terminal.Escreva]
+    db ' CX: 0x%ah[%an]',0
+    mov ax, dx
+    cs call far [Terminal.Escreva]
+    db ' DX: 0x%ah[%an]',0
+    pop ax
+    pop bx
+    popf
+    pushf
+    push bx
+    push ax
+    jc .cfSim
+        cs call far [Terminal.Escreva]
+        db ' CF: 0',0
+        jmp .cfFim
+    .cfSim:
+        cs call far [Terminal.Escreva]
+        db ' CF: 1',0
+    .cfFim:
+    mov ax, cs
+    cs call far [Terminal.Escreva]
+    db '\n       CS: 0x',0
+    cs call far [Terminal.EscrevaHex]
+    mov ax, ds
+    cs call far [Terminal.Escreva]
+    db ' DS: 0x',0
+    cs call far [Terminal.EscrevaHex]
+    mov ax, si
+    cs call far [Terminal.Escreva]
+    db ' SI: ',0
+    cs call far [Terminal.EscrevaNum]
+    mov ax, es
+    cs call far [Terminal.Escreva]
+    db ' ES: 0x',0
+    cs call far [Terminal.EscrevaHex]
+    mov ax, di
+    cs call far [Terminal.Escreva]
+    db ' DI: ',0
+    cs call far [Terminal.EscrevaNum]
+    pop ax
+    pop bx
+    popf
+    retf
+    .subCaractere:
+        cmp ax, ' '
+        jb .fimCaractere
+        cmp ax, 'z'
+        ja .fimCaractere
+            cs call far [Terminal.Escreva]
+            db '"',0
+            cs call far [Terminal.EscrevaC]
+            cs call far [Terminal.Escreva]
+            db '"',0
+        .fimCaractere:
+        ret
+
 _terminalEscrevaDebugPara:
     cs call far [Terminal.EscrevaDebug]
     cs call far [Terminal.Escreva]
@@ -527,8 +631,14 @@ _terminalEscrevaDebugDSSI:
     .escreve:
         lodsb
         cs call far [Terminal.Escreva]
-        db ' ', 0
-        cs call far [Terminal.EscrevaNum]
+        db ' %ah', 0
+        cmp al, ' '
+        jb .ignora
+        cmp al, 'z'
+        ja .ignora
+            cs call far [Terminal.Escreva]
+            db '"%ac"', 0
+        .ignora:
         loop .escreve
     pop cx
     pop si
@@ -553,8 +663,14 @@ _terminalEscrevaDebugESDI:
     .escreve:
         lodsb
         cs call far [Terminal.Escreva]
-        db ' ', 0
-        cs call far [Terminal.EscrevaNum]
+        db ' %ah', 0
+        cmp al, ' '
+        jb .ignora
+        cmp al, 'z'
+        ja .ignora
+            cs call far [Terminal.Escreva]
+            db '"%ac"', 0
+        .ignora:
         loop .escreve
     pop cx
     pop ds
@@ -580,7 +696,7 @@ _terminalEscrevaDebugESSI:
         lodsb
         cs call far [Terminal.Escreva]
         db ' ', 0
-        cs call far [Terminal.EscrevaNum]
+        cs call far [Terminal.EscrevaHex]
         loop .escreve
     pop cx
     pop ds
@@ -606,7 +722,7 @@ _terminalEscrevaDebugPilha:
         mov ax, [si]
         cs call far [Terminal.Escreva]
         db ' ', 0
-        cs call far [Terminal.EscrevaNum]
+        cs call far [Terminal.EscrevaHex]
         add si, 2
         loop .escreve
     pop cx

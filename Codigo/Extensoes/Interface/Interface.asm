@@ -13,4 +13,4 @@ exportar:
 inicial:
     retf
 
-Trad:
+Trad: dw 0

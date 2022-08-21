@@ -314,7 +314,7 @@ _memoriaAlocaBlocoRemoto:
     push ax
     .varEnderecoSI: equ -8
 
-    push word [Memoria.Mapa]
+    cs push word [Memoria.Mapa]
     pop ds
     cs mov cx, [Memoria.TotalBlocos]
     xor bx, bx
@@ -372,6 +372,10 @@ _memoriaAlocaBlocoRemoto:
         .continua:
         add dx, 16
         loop .busca
+
+cs call far [Memoria.CalculaLivre]
+cs call far [Terminal.Escreva]
+db '{LIVRE%bn}',0
     clc
     .fim:
     mov sp, bp
@@ -392,11 +396,13 @@ _memoriaAlocaBlocoRemoto:
 ;      si = 0
 _memoriaAlocaBlocoLocal:
     push es
+    push di
     cs call far [Memoria.AlocaBlocoRemoto]
     push es
     pop ds
     mov si, di
-    push es
+    pop di
+    pop es
     retf
 
 ; Libera um espaco na memoria anteriormente alocado
@@ -456,7 +462,7 @@ _memoriaLiberaBlocoLocal:
     cs call far [Memoria.LiberaBlocoRemoto]
     push es
     pop ds
-    push es
+    pop es
     retf
 
 ; Aloca um espaco na memoria (Sera alocado conjuntos de 256 Bytes)
@@ -493,11 +499,15 @@ _memoriaAlocaRemoto:
 ;      si = 0
 _memoriaAlocaLocal:
     push es
+    push di
     cs call far [Memoria.AlocaRemoto]
+    jnc .fim
     push es
     pop ds
     mov si, di
-    push es
+    .fim:
+    pop di
+    pop es
     retf
 
 ; Libera um espaco na memoria anteriormente alocado
@@ -521,7 +531,7 @@ _memoriaLiberaLocal:
     cs call far [Memoria.LiberaBlocoRemoto]
     push es
     pop ds
-    push es
+    pop es
     retf
 
 ; Copia um conjunto do local para o remoto

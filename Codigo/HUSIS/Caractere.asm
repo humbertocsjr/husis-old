@@ -159,13 +159,17 @@ _caractereEhHexadecimal:
 ; ret: cf = 1=Ok | 0=Numero invalido
 _caractereDeNumero:
     push bx
+    push ax
     cmp al, 0xf
     jbe .ok
+        pop ax
         clc
         jmp .fim
     .ok:
     mov bx, .constMapa
+    and ax, 0xf
     add bx, ax
+    pop ax
     cs mov al, [bx]
     stc
     .fim:

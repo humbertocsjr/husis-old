@@ -50,10 +50,12 @@ Unidade: dw _unidade, 0
         ; Reserva uma unidade
         ; ret: es:di = ObjUnidade reservado
         ;      cf = 1=Ok | 0=Estouro de capacidade
+        ;      bx = Unidade
     .ReservaLocal: dw _unidadeReservaLocal, 0
         ; Reserva uma unidade
         ; ret: ds:si = ObjUnidade reservado
         ;      cf = 1=Ok | 0=Estouro de capacidade
+        ;      bx = Unidade
     .BuscaRemoto: dw _unidadeBuscaRemoto, 0
         ; Busca uma unidade
         ; bx = Unidade
@@ -64,6 +66,28 @@ Unidade: dw _unidade, 0
         ; bx = Unidade
         ; ret: ds:si = ObjUnidade
         ;      cf = 1=Encontrado | 0=Estouro de capacidade
+    .LeiaRemoto: dw _unidadeLeiaRemoto,0
+        ; Le um bloco remoto
+        ; dx:ax = Endereco
+        ; bx = Unidade
+        ; es:di = Bloco
+        ; ret: cf = 1=Ok | 0=Falha
+    .LeiaLocal: dw _unidadeLeiaLocal,0
+        ; Le um bloco local
+        ; dx:ax = Endereco
+        ; bx = Unidade
+        ; ds:si = Bloco
+        ; ret: cf = 1=Ok | 0=Falha
+    .LeiaRaizRemoto: dw _unidadeLeiaRaizRemoto,0
+        ; Le a raiz de uma unidade
+        ; bx = Unidade
+        ; ret: cf = 1=Ok | 0=Falha
+        ;      es:di = ObjSisArq
+    .LeiaRaizLocal: dw _unidadeLeiaRaizLocal,0
+        ; Le a raiz de uma unidade
+        ; bx = Unidade
+        ; ret: cf = 1=Ok | 0=Falha
+        ;      ds:si = ObjSisArq
     dw 0
     .UnidadePrincipal: dw 0
     .Lista: dw 0
@@ -99,6 +123,7 @@ _unidade:
 ; Reserva uma unidade
 ; ret: es:di = ObjUnidade reservado
 ;      cf = 1=Encontrado | 0=Estouro de capacidade
+;      bx = Unidade
 _unidadeReservaRemoto:
     push ax
     push cx
@@ -106,6 +131,7 @@ _unidadeReservaRemoto:
     mov es, ax
     xor di, di
     mov cx, Unidade._Capacidade
+    xor bx, bx
     .busca:
         es cmp word [di+ObjUnidade.Status], StatusUnidade.Vazio
         jne .proximo
@@ -113,6 +139,8 @@ _unidadeReservaRemoto:
             stc
             jmp .fim
         .proximo:
+        inc bx
+        add di, ObjUnidade._Tam
         loop .busca
     clc
     .fim:
@@ -123,6 +151,7 @@ _unidadeReservaRemoto:
 ; Reserva uma unidade
 ; ret: ds:si = ObjUnidade reservado
 ;      cf = 1=Encontrado | 0=Estouro de capacidade
+;      bx = Unidade
 _unidadeReservaLocal:
     push es
     push di
@@ -175,4 +204,98 @@ _unidadeBuscaLocal:
     .fim:
     pop di
     pop es
+    retf
+
+; Le um bloco remoto
+; dx:ax = Endereco
+; bx = Unidade
+; es:di = Bloco
+; ret: cf = 1=Ok | 0=Falha
+_unidadeLeiaRemoto:
+    push ax
+    push dx
+    push bx
+    push ds
+    push si
+    cs call far [Unidade.BuscaLocal]
+    jnc .fim
+    ds cmp word [ObjUnidade.PtrLeia], 0
+    jne .ok
+        clc
+        jmp .fim
+    .ok:
+    shl ax, 1
+    rcl dx, 1
+    ds call far [ObjUnidade.PtrLeia]
+    jnc .fim
+    add di, 512
+    add ax, 1
+    adc dx, 0
+    ds call far [ObjUnidade.PtrLeia]
+    .fim:
+    pop si
+    pop ds
+    pop bx
+    pop dx
+    pop ax
+    retf
+
+; Le um bloco local
+; dx:ax = Endereco
+; bx = Unidade
+; ds:si = Bloco
+; ret: cf = 1=Ok | 0=Falha
+_unidadeLeiaLocal:
+    push es
+    push di
+    push ds
+    pop es
+    mov di, si
+    cs call far [Unidade.LeiaRemoto]
+    pop di
+    pop es
+    retf
+
+; Le a raiz de uma unidade
+; bx = Unidade
+; ret: cf = 1=Ok | 0=Falha
+;      ds:si = ObjSisArq
+_unidadeLeiaRaizLocal:
+    push es
+    push di
+    cs call far [Unidade.BuscaRemoto]
+    xor si, si
+    es push word [ObjUnidade.Raiz]
+    pop ds
+    es cmp word [ObjUnidade.Raiz], 0
+    jne .ok
+        clc
+        jmp .fim
+    .ok:
+        stc
+    .fim:
+    pop di
+    pop es
+    retf
+
+; Le a raiz de uma unidade
+; bx = Unidade
+; ret: cf = 1=Ok | 0=Falha
+;      es:di = ObjSisArq
+_unidadeLeiaRaizRemoto:
+    push ds
+    push si
+    cs call far [Unidade.BuscaLocal]
+    xor di, di
+    ds push word [ObjUnidade.Raiz]
+    pop es
+    ds cmp word [ObjUnidade.Raiz], 0
+    jne .ok
+        clc
+        jmp .fim
+    .ok:
+        stc
+    .fim:
+    pop si
+    pop ds
     retf

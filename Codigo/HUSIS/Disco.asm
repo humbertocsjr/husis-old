@@ -24,13 +24,16 @@ _disco:
 
 _discoRegistaManualmente:
     push ax
-    push bx
     push cx
     push dx
     push es
     push di
+    push si
     cs call far [Terminal.EscrevaPonto]
+    push bx
     cs call far [Unidade.ReservaRemoto]
+    mov si, bx
+    pop bx
     jnc .fim
     es mov [di+ObjUnidade.IdBios], ax
     es mov [di+ObjUnidade.Cilindros], bx
@@ -55,13 +58,15 @@ _discoRegistaManualmente:
     es mov word [di+ObjUnidade.Status], StatusUnidade.Alocado
     cs call far [Terminal.EscrevaPonto]
 
+    mov bx, si
+
     stc
     .fim:
+    pop si
     pop di
     pop es
     pop dx
     pop cx
-    pop bx
     pop ax
     retf
 
@@ -70,7 +75,7 @@ __discoDebug:
     push cx
     push dx
     cs call far [Terminal.Escreva]
-    db '[C',0
+    db '[DISCO C',0
     mov ah, cl
     push cx
     mov cl, 6
@@ -91,7 +96,7 @@ __discoDebug:
     cs call far [Terminal.Escreva]
     db '->',0
     mov ax, es
-    cs call far [Terminal.EscrevaNum]
+    cs call far [Terminal.EscrevaHex]
     cs call far [Terminal.Escreva]
     db ':',0
     mov ax, bx
@@ -165,6 +170,12 @@ _discoLeia:
         int 0x13
         pop bp
         jnc .ok
+            cs cmp word [Disco.Debug], 0
+            je .ignoraDebugErro
+                call __discoDebug
+                cs call far [Terminal.Escreva]
+                db '[ERRO]',0
+            .ignoraDebugErro:
             dec word [bp+.varTentativas]
             cmp word [bp+.varTentativas], 0
             je .falha

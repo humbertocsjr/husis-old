@@ -62,6 +62,7 @@ _textoLocalParaNumero:
         add bx, ax
         jmp .processa
     .fim:
+    stc
     dec si
     mov ax, bx
     pop dx
@@ -108,6 +109,7 @@ _textoLocalParaHexadecimal:
         add bx, ax
         jmp .processa
     .fim:
+    stc
     dec si
     mov ax, bx
     pop dx
