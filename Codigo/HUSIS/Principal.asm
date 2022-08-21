@@ -29,6 +29,7 @@ modulos:
     dw Disco
     dw SisArq
     dw MinixFS
+    dw Multitarefa
     dw 0
 
 %include 'Memoria.asm'
@@ -39,6 +40,7 @@ modulos:
 %include 'Disco.asm'
 %include 'SisArq.asm'
 %include 'MinixFS.asm'
+%include 'Multitarefa.asm'
 
 importar:
     dw 0
@@ -121,6 +123,7 @@ inicial:
     cs call far [Terminal.Escreva]
     db ' - %at [%bt: %cn Bytes]',0
     cs call far [Memoria]
+    cs call far [Multitarefa]
     cs call far [Terminal.EscrevaOk]
 
     cs mov ax, [Trad.DiscoBIOS]
@@ -209,9 +212,14 @@ inicial:
 
     cs call far [Terminal.EscrevaLocal]
 
+    .loop:
+    cs mov ax, [Multitarefa.Contador]
+    cs call far [Terminal.Escreva]
+    db '\r %an',0
+    hlt
+    jmp .loop
 
 
-    
     .fim:
     retf
     .constDiscoBios: dw 0

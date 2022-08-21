@@ -233,11 +233,17 @@ _terminalEscreva:
         je .fim
         cmp al, 'n'
         je .escapeN
+        cmp al, 'r'
+        je .escapeR
         cmp al, 't'
         je .escapeN
         jmp .escreve
     .escapeN:
         mov al, 10
+        cs call far [Terminal.EscrevaC]
+        jmp .caractere
+    .escapeR:
+        mov al, 13
         cs call far [Terminal.EscrevaC]
         jmp .caractere
     .escapeT:
@@ -278,11 +284,17 @@ _terminalEscrevaLocal:
         je .fim
         cmp al, 'n'
         je .escapeN
+        cmp al, 'r'
+        je .escapeR
         cmp al, 't'
         je .escapeN
         jmp .escreve
     .escapeN:
         mov al, 10
+        cs call far [Terminal.EscrevaC]
+        jmp .caractere
+    .escapeR:
+        mov al, 13
         cs call far [Terminal.EscrevaC]
         jmp .caractere
     .escapeT:

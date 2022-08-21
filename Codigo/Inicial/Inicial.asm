@@ -131,7 +131,7 @@ Inicio:
 
     mov si, [Config.PosArquivo]
     add si, Itens
-    cmp word [si+ObjItem.ZonaIndireta], 0
+    cmp word [si+ObjItem.ZonaDuplaIndireta], 0
     je .arquivoOk
         call TermEscreva
         db ' [ ARQUIVO GRANDE ]',0
@@ -145,14 +145,6 @@ Inicio:
     xor di, di
     .carrega:
         mov ax, [si]
-        cmp word [Config.Debug], 0
-        je .ignoraDebug
-            call TermEscreva
-            db ' [',0
-            call TermEscrevaNum
-            call TermEscreva
-            db ']',0
-        .ignoraDebug:
         cmp ax, 0
         je .fimCarrega
         xor dx, dx
@@ -164,6 +156,33 @@ Inicio:
         add si, 2
         add di, 1024
         loop .carrega
+    cs cmp word [.trava], 0
+    jne .fimCarrega
+        call TermEscreva
+        db ' || ',0
+        mov ax, [si]
+        cmp ax, 0
+        je .fimCarrega
+        push es
+        push di
+
+        push ds
+        pop es
+        mov di, Itens
+        xor dx, dx
+        mov ax, [si]
+        mov bx, [Config.Disco]
+        call DiscoLer
+        jc .okCarregaExt
+            jmp ErroLeitura
+        .okCarregaExt:
+        pop di
+        pop es
+        mov cx, 512
+        mov si, Itens
+        cs mov word [.trava], 1
+        jmp .carrega
+    .trava: dw 0
     .fimCarrega:
 
     call TermEscrevaOk
@@ -219,7 +238,7 @@ Config:
     .Cabecas: dw 2
     .Setores: dw 18
     .SetoresCabecas: dw 36
-    .Debug: dw 0
+    .Debug: dw 1
     .ArquivoCodigo: dw 2
     .PosItens: dw 0
     .QtdBlocosItens: dw 0
@@ -335,6 +354,14 @@ DiscoLer:
 ; es:di = Destino
 ; bx = Disco
 DiscoLer512:
+    cmp word [Config.Debug], 0
+    je .ignoraDebugPre
+        call TermEscreva
+        db ' [',0
+        call TermEscrevaNum
+        call TermEscreva
+        db ']',0
+    .ignoraDebugPre:
     push ax
     push bx
     push cx

@@ -12,7 +12,7 @@
 ;
 ; Historico........:
 ;
-; - 18/08/2022 - Humberto - Prototipo inicial
+; - 21/08/2022 - Humberto - Prototipo inicial
 
 ObjMinixFSIndice:
     .QtdItens: equ 0
@@ -593,7 +593,7 @@ _minixfsLeia:
     je .naoLeu
         stc
         jmp .fimValida
-    .naoLeu
+    .naoLeu:
         clc
     .fimValida:
     mov dx, cx
@@ -651,7 +651,7 @@ _minixfsLeiaLinha:
     je .naoLeu
         stc
         jmp .fimValida
-    .naoLeu
+    .naoLeu:
         clc
     .fimValida:
     mov dx, cx
