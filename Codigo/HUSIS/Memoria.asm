@@ -47,7 +47,7 @@ Memoria: dw _memoria, 0
         ; cx = Espaco em Blocos de 256 Bytes
         ; ret: cf = 1=Ok | 0=Sem espaco livre OU Processo invalido
         ;      ds = Segmento alocado
-        ;      di = 0
+        ;      si = 0
     .LiberaBlocoLocal: dw _memoriaLiberaBlocoLocal, 0
         ; Libera um espaco na memoria anteriormente alocado
         ; al = Processo
@@ -59,7 +59,7 @@ Memoria: dw _memoria, 0
         ; cx = Espaco em bytes
         ; ret: cf = 1=Ok | 0=Sem espaco livre OU Processo invalido
         ;      ds = Segmento alocado
-        ;      di = 0
+        ;      si = 0
     .LiberaLocal: dw _memoriaLiberaLocal, 0
         ; Libera um espaco na memoria anteriormente alocado
         ; al = Processo
@@ -389,12 +389,13 @@ _memoriaAlocaBlocoRemoto:
 ; cx = Espaco em Blocos de 256 Bytes
 ; ret: cf = 1=Ok | 0=Sem espaco livre OU Processo invalido
 ;      ds = Segmento alocado
-;      di = 0
+;      si = 0
 _memoriaAlocaBlocoLocal:
     push es
     cs call far [Memoria.AlocaBlocoRemoto]
     push es
     pop ds
+    mov si, di
     push es
     retf
 
@@ -489,12 +490,13 @@ _memoriaAlocaRemoto:
 ; cx = Espaco em bytes
 ; ret: cf = 1=Ok | 0=Sem espaco livre OU Processo invalido
 ;      ds = Segmento alocado
-;      di = 0
+;      si = 0
 _memoriaAlocaLocal:
     push es
     cs call far [Memoria.AlocaRemoto]
     push es
     pop ds
+    mov si, di
     push es
     retf
 
