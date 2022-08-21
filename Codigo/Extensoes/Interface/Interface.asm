@@ -12,3 +12,5 @@ exportar:
 
 inicial:
     retf
+
+Trad:

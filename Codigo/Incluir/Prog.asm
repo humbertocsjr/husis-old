@@ -21,6 +21,7 @@ Prog:
     .PtrInicial: dw inicial
     .Tamanho: dw 0
     .Processo: dw 0
+    .Traducao: dw Trad
     .PtrTipo: dw tipo
     .PtrNome: dw nome
     .PtrVersao: dw versao

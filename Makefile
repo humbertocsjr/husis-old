@@ -4,17 +4,27 @@ all:
 
 imagem:
 	@echo " -= Gerar imagem inicializavel =-"
-	@Ferramentas/minixfs mkfs ./disco.img -s 1440 -i 256 -n 30 -1
-	@Ferramentas/minixfs add ./disco.img Temp/HUSIS HUSIS
-	@Ferramentas/minixfs mkdir ./disco.img Sistema
-	@Ferramentas/minixfs add ./disco.img Config.cfg Sistema/Config.cfg
-	@Ferramentas/minixfs mkdir ./disco.img Sistema/Extensoes
-	@Ferramentas/minixfs add ./disco.img Temp/Interface Sistema/Extensoes/Interface
-	@dd if=Temp/Inicial of=disco.img conv=notrunc
+	@Ferramentas/minixfs mkfs ./ptbr.img -s 1440 -i 256 -n 30 -1
+	@cp ptbr.img enus.img
+	@Ferramentas/minixfs add ./ptbr.img Temp/HUSISPtBr HUSIS
+	@Ferramentas/minixfs add ./enus.img Temp/HUSISEnUs HUSIS
+	@Ferramentas/minixfs mkdir ./ptbr.img Sistema
+	@Ferramentas/minixfs mkdir ./enus.img System
+	@Ferramentas/minixfs add ./ptbr.img Config.cfg Sistema/Config.cfg
+	@Ferramentas/minixfs add ./enus.img Config.cfg System/Config.cfg
+	@Ferramentas/minixfs mkdir ./ptbr.img Sistema/Extensoes
+	@Ferramentas/minixfs mkdir ./enus.img System/Extensions
+	@Ferramentas/minixfs add ./ptbr.img Temp/Interface Sistema/Extensoes/Interface
+	@Ferramentas/minixfs add ./enus.img Temp/Interface System/Extensions/Interface
+	@dd if=Temp/Inicial of=ptbr.img conv=notrunc
+	@dd if=Temp/Inicial of=enus.img conv=notrunc
 	@echo " -= Imagens geradas =-"
-	@ls -l disco.img
-	@ls -l Temp/HUSIS
+	@ls -l ptbr.img
+	@ls -l Temp/HUSISPtBr
 
-qemu:
+ptbr:
 	@make all
-	@qemu-system-i386 -fda disco.img
+	@qemu-system-i386 -fda ptbr.img
+enus:
+	@make all
+	@qemu-system-i386 -fda enus.img

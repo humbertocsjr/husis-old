@@ -94,8 +94,9 @@ inicial:
 
     cmp ax, 1989
     je .inicialOk
+        cs mov ax, [Trad.SetorInicialIncompativel]
         cs call far [Terminal.Escreva]
-        db ' -= SISTEMA PARALIZADO - SETOR INICIAL INCOMPATIVEL =-',0
+        db ' -= %ae =-',0
         .infinito:
             hlt
             jmp .infinito
@@ -109,30 +110,38 @@ inicial:
     cs call far [Terminal.Escreva]
     db 'HUSIS v%an.%bn.%cn %de\n\n',0
 
-    cs mov ax, [Prog.Tamanho]
+    cs mov ax, [Trad.MemoriaRAM]
+    cs mov bx, [Trad.TamNucleo]
+    cs mov cx, [Prog.Tamanho]
     cs call far [Terminal.Escreva]
-    db ' - Memoria RAM [Tam. Nucleo: %an Bytes]',0
+    db ' - %at [%bt: %cn Bytes]',0
     cs call far [Memoria]
     cs call far [Terminal.EscrevaOk]
 
-    cs mov ax, [.constDiscoBios]
+    cs mov ax, [Trad.DiscoBIOS]
+    cs mov bx, [.constDiscoBios]
+    cs call far [Terminal.Escreva]
+    db ' - %at %bn',0
+    cs mov ax, [Trad.Geometria]
     cs mov bx, [.constCilindros]
     cs mov cx, [.constCabecas]
     cs mov dx, [.constSetores]
     cs call far [Terminal.Escreva]
-    db ' - Disco BIOS %an [Geometria: %bn:%cn:%dn]',0
+    db ' [%at: %bn:%cn:%dn]',0
 
     cs call far [Unidade]
     jc .unidadeOk
+        cs mov ax, [Trad.FalhaUnidades]
         cs call far [Terminal.Escreva]
-        db ' [ Falha ao iniciar o controlador de unidades ]\n', 0
+        db ' [ %at ]\n', 0
         jmp .fim
     .unidadeOk:
 
     cs call far [Disco]
     jc .discoOk
+    cs mov ax, [Trad.FalhaDisco]
         cs call far [Terminal.Escreva]
-        db ' [ Falha ao iniciar o controlador de disco base ]\n', 0
+        db ' [ %at ]\n', 0
         jmp .fim
     .discoOk:
 
@@ -142,8 +151,9 @@ inicial:
     cs mov dx, [.constSetores]
     cs call far [Disco.RegistraManualmente]
     jc .discoRegOk
+    cs mov ax, [Trad.FalhaDiscoReg]
         cs call far [Terminal.Escreva]
-        db ' [ Falha ao registrar o disco ]\n', 0
+        db ' [ %at ]\n', 0
         jmp .fim
     .discoRegOk:
 
@@ -156,4 +166,3 @@ inicial:
     .constCabecas: dw 0
     .constSetores: dw 0
     .constNumero: db '7c0',0
-

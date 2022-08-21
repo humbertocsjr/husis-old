@@ -21,6 +21,7 @@ Terminal: dw _terminal, 0
     .EscrevaOk: dw _terminalEscrevaOk, 0
     .EscrevaPonto: dw _terminalEscrevaPonto, 0
     .EscrevaLocal: dw _terminalEscrevaLocal, 0
+    .EscrevaEstatico: dw _terminalEscrevaEstatico, 0
     .EscrevaRemoto: dw _terminalEscrevaRemoto, 0
     .EscrevaHex: dw _terminalEscrevaHex, 0
     .EscrevaNum: dw _terminalEscrevaNum, 0
@@ -148,6 +149,8 @@ _terminalEscreva:
         je .externoRemoto
         cmp al, 'e'
         je .externoEstatico
+        cmp al, 't'
+        je .externoTrad
         jmp .escreve
     .externoNum:
         cs call far [Terminal.EscrevaNumBX]
@@ -175,10 +178,17 @@ _terminalEscreva:
     .externoEstatico:
         push si
         push ds
-        push cs
-        pop ds
         mov si, bx
-        cs call far [Terminal.EscrevaLocal]
+        cs call far [Terminal.EscrevaEstatico]
+        pop ds
+        pop si
+        jmp .caractere
+    .externoTrad:
+        push si
+        push ds
+        mov si, bx
+        add si, Trad
+        cs call far [Terminal.EscrevaEstatico]
         pop ds
         pop si
         jmp .caractere
@@ -615,6 +625,16 @@ _terminalEscrevaRemoto:
     mov si, di
     cs call far [Terminal.EscrevaLocal]
     pop si
+    pop ds
+    popf
+    retf
+
+_terminalEscrevaEstatico:
+    pushf
+    push ds
+    push cs
+    pop ds
+    cs call far [Terminal.EscrevaLocal]
     pop ds
     popf
     retf
