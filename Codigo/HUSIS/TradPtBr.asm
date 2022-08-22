@@ -12,6 +12,7 @@ Trad:
     .FalhaDiscoReg: dw _tradFalhaDiscoReg - Trad
     .FalhaMontagem: dw _tradFalhaMontagem - Trad
     .FalhaEncontrarConfig: dw _tradFalhaEncontrarConfig - Trad
+    .FalhaEncontrar: dw _tradFalhaEncontrar - Trad
     dw 0
 
 _tradEnderecoConfig: db '/Sistema/Config.cfg',0
@@ -25,3 +26,4 @@ _tradFalhaDisco: db 'Falha ao iniciar o controlador de disco base',0
 _tradFalhaDiscoReg: db 'Falha ao registrar o disco',0
 _tradFalhaMontagem: db 'Falha ao montar a unidade principal',0
 _tradFalhaEncontrarConfig: db 'Arquivo de configuracao nao encontrado',0
+_tradFalhaEncontrar: db 'Executavel nao encontrado',0

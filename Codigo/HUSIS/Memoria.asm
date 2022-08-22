@@ -118,6 +118,8 @@ Memoria: dw _memoria, 0
         ; Zera um conjunto remoto
         ; cs:si = Remoto
         ; cx = Tamanho
+    .ExcluiProcesso: dw _memoriaExcluiProcesso,0
+        ; al = Processo
     dw 0
     .Mapa: dw 0
     .InicioLivre: dw 0
@@ -738,4 +740,10 @@ _memoriaZeraEstatico:
     cs call far [Memoria.ZeraRemoto]
     pop di
     pop es
+    retf
+
+; al = Processo
+_memoriaExcluiProcesso:
+    ; Apenas exclui dos indices (Evitando apagar a propria pilha na exclusao
+    ; de um processo)
     retf

@@ -12,6 +12,7 @@ Trad:
     .FalhaDiscoReg: dw _tradFalhaDiscoReg - Trad
     .FalhaMontagem: dw _tradFalhaMontagem - Trad
     .FalhaEncontrarConfig: dw _tradFalhaEncontrarConfig - Trad
+    .FalhaEncontrar: dw _tradFalhaEncontrar - Trad
     dw 0
 
 _tradEnderecoConfig: db '/System/Config.cfg',0
@@ -25,3 +26,4 @@ _tradFalhaDisco: db 'Failed to start the base disk controller',0
 _tradFalhaDiscoReg: db 'Failed to register disk',0
 _tradFalhaMontagem: db 'Failed to mount main unit',0
 _tradFalhaEncontrarConfig: db 'Config file not found',0
+_tradFalhaEncontrar: db 'Binary file not found',0

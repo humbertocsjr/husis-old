@@ -17,6 +17,8 @@ Disco: dw _disco,0
     .RegistraManualmente: dw _discoRegistaManualmente, 0
     dw 0
     .Debug: dw 0
+    .PtrBufferErro: dw .BufferErro
+    .BufferErro: times 513 db 0
 
 _disco:
     stc
@@ -75,7 +77,7 @@ __discoDebug:
     push cx
     push dx
     cs call far [Terminal.Escreva]
-    db '[DISCO C',0
+    db ' [DISCO C',0
     mov ah, cl
     push cx
     mov cl, 6
@@ -109,6 +111,74 @@ __discoDebug:
     ret
 
 _discoLeia:
+    ; Protege a rotina de leitura contra o erro 9 (Estouro de limite de 64KiB)
+    ; Usado 600 como margem para protecao
+    push ax
+    push bx
+    cmp si, 0xffff - 600
+    ja .protege
+        mov bx, si
+        add bx, 600
+        shr bx, 1
+        shr bx, 1
+        shr bx, 1
+        shr bx, 1
+        mov ax, es
+        and ax, 0xfff
+        add ax, bx
+        cmp ax, 0xfff
+        ja .protege
+    pop bx
+    pop ax
+    jmp _discoLeiaSemProtecao
+
+    .protege:
+        pop bx
+        pop ax
+        cs cmp word [Disco.Debug], 0
+        je .ignoraDebugErro
+            cs call far [Terminal.Escreva]
+            db ' [CONTORNO AO ERRO 9 ES:%Rh DI:%rn VIA ',0
+        .ignoraDebugErro:
+        push es
+        push di
+        ; Copia o ponteiro do buffer de erro
+        push cs
+        pop es
+        cs push word [Disco.PtrBufferErro]
+        pop di
+        cs cmp word [Disco.Debug], 0
+        je .ignoraDebugErroCont
+            cs call far [Terminal.Escreva]
+            db ' ES:%Rh DI:%rn]',0
+        .ignoraDebugErroCont:
+        ; Faz a leitura no buffer backup
+        push cs
+        call _discoLeiaSemProtecao
+        pop di
+        pop es
+        jnc .fim
+        ; Salva ponteiros
+        push ds
+        push si
+        push di
+        push cx
+        ; Efetua a copia
+        mov cx, 512
+        push cs
+        pop ds
+        mov si, Disco.BufferErro
+        rep movsb
+        ; Restaura ponteiros
+        pop cx
+        pop di
+        pop si
+        pop ds
+        stc
+        .fim:
+        retf
+
+_discoLeiaSemProtecao:
     push ax
     push bx
     push cx
@@ -166,15 +236,17 @@ _discoLeia:
         je .ignoraDebug
             call __discoDebug
         .ignoraDebug:
-        push bp
         int 0x13
-        pop bp
         jnc .ok
             cs cmp word [Disco.Debug], 0
             je .ignoraDebugErro
+                push ax
                 call __discoDebug
+                xchg ah, al
+                xor ah, ah
                 cs call far [Terminal.Escreva]
-                db '[ERRO]',0
+                db ' [ERRO %an ES:%Rh DI:%rn] ',0
+                pop ax
             .ignoraDebugErro:
             dec word [bp+.varTentativas]
             cmp word [bp+.varTentativas], 0

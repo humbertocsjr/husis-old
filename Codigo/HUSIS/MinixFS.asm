@@ -80,9 +80,33 @@ MinixFS: dw _minixfs,0
         ; ret: cf = 1=Ok | 0=Falha
     dw 0
     .Debug: dw 0
+    .Trava: dw 0
 
 _minixfs:
+    cs mov word [MinixFS.Trava], 0
     retf
+
+__minixfsTravaMultitarefa:
+    pushf
+    cli
+    cs inc word [MinixFS.Trava]
+    .aguarda:
+        cs cmp word [MinixFS.Trava], 1
+        je .fim
+            hlt
+            jmp .aguarda
+    .fim:
+    popf
+    ret
+
+__minixfsLiberaMultitarefa:
+    pushf
+    cs cmp word [MinixFS.Trava], 0
+    je .fim
+        cs dec word [MinixFS.Trava]
+    .fim:
+    popf
+    ret
 
 ; ax = Bloco
 ; ds:si = ObjSisArqMinixFSRaiz
@@ -401,6 +425,7 @@ _minixfsSubItem:
     push dx
     push es
     push di
+    call __minixfsTravaMultitarefa
     mov ax, cx
     mov cx, 32
     xor dx, dx
@@ -440,6 +465,7 @@ _minixfsSubItem:
     xor si, si
     stc
     .fim:
+    call __minixfsLiberaMultitarefa
     pop di
     pop es
     pop dx
@@ -480,12 +506,18 @@ _minixfsAbrir:
     push ax
     push cx
     push dx
+    call __minixfsTravaMultitarefa
     mov cx, ObjSisArqMinixFS._Tam
     cs mov al, [Prog.Processo]
     cs call far [Memoria.AlocaRemoto]
     jnc .fim
         ds mov ax, [si+ObjSisArqItem.Id]
         es mov [di+ObjSisArq.Id], ax
+        cs cmp word [MinixFS.Debug], 0
+        je .ignoraDebug
+            cs call far [Terminal.Escreva]
+            db '[ ABRE: %Rh:%an ]',0
+        .ignoraDebug:
         
         es mov word [di+ObjSisArqMinixFS.PosNoBuffer], 0
         es mov word [di+ObjSisArqMinixFS.PosNoItem], 0
@@ -514,18 +546,24 @@ _minixfsAbrir:
         add si, ax
         add si, ObjSisArqMinixFSRaiz.Itens
         ds mov ax, [si+ObjMinixFSItem.Modo]
-        test ax, 0x4000
-        jne .naoDir
-            es mov word [ObjSisArq.Tipo], TipoSisArq.Diretorio
+        and ax, 0x8000
+        cmp ax, 0
+        je .naoDir
+            es mov word [di+ObjSisArq.Tipo], TipoSisArq.Diretorio
 
             mov ax, cs
 
             es mov [di+ObjSisArq.SubItem+2], ax
             mov cx, _minixfsSubItem
             es mov [di+ObjSisArq.SubItem], cx
+
+            es mov [di+ObjSisArq.CalculaTamanho+2], ax
+            mov cx, _minixfsCalculaTamanho
+            es mov [di+ObjSisArq.CalculaTamanho], cx
+
             jmp .naoArq
         .naoDir:
-            es mov word [ObjSisArq.Tipo], TipoSisArq.Arquivo
+            es mov word [di+ObjSisArq.Tipo], TipoSisArq.Arquivo
 
             mov ax, cs
 
@@ -536,6 +574,10 @@ _minixfsAbrir:
             es mov [di+ObjSisArq.LeiaLinha+2], ax
             mov cx, _minixfsLeiaLinha
             es mov [di+ObjSisArq.LeiaLinha], cx
+
+            es mov [di+ObjSisArq.CalculaTamanho+2], ax
+            mov cx, _minixfsCalculaTamanho
+            es mov [di+ObjSisArq.CalculaTamanho], cx
         .naoArq:
 
         pop si
@@ -548,6 +590,7 @@ _minixfsAbrir:
     cs call far [Memoria.LiberaRemoto]
     clc
     .fim:
+    call __minixfsLiberaMultitarefa
     pop dx
     pop cx
     pop ax
@@ -563,6 +606,7 @@ _minixfsLeia:
     push dx
     push bx
     push ax
+    call __minixfsTravaMultitarefa
     xor dx, dx
     .le:
         cmp cx, dx
@@ -596,7 +640,8 @@ _minixfsLeia:
     .naoLeu:
         clc
     .fimValida:
-    mov dx, cx
+    mov cx, dx
+    call __minixfsLiberaMultitarefa
     pop ax
     pop bx
     pop dx
@@ -613,6 +658,7 @@ _minixfsLeiaLinha:
     push dx
     push bx
     push ax
+    call __minixfsTravaMultitarefa
     xor dx, dx
     .le:
         cmp cx, dx
@@ -655,8 +701,54 @@ _minixfsLeiaLinha:
         clc
     .fimValida:
     mov dx, cx
+    call __minixfsLiberaMultitarefa
     pop ax
     pop bx
     pop dx
     pop si
+    retf
+
+; es:di = ObjSisArq
+; ret: cf = 1=Ok | 0=Falha
+;      dx:ax = Tamanho
+_minixfsCalculaTamanho:
+    push cx
+    push ds
+    push si
+    call __minixfsTravaMultitarefa
+    ; Carrega a raiz
+    es mov ax, [di+ObjSisArq.Raiz]
+    mov ds, ax
+    xor si, si
+    ; Calcula bloco itens
+    es mov ax, [di+ObjSisArq.Id]
+    mov cx, 32
+    xor dx,dx
+    div cx
+    ; Carrega bloco itens
+    push dx
+    call __minixfsCarregaItensLocal
+    pop dx
+    jc .ok
+        xor ax, ax
+        xor dx, dx
+        clc
+        jmp .fim
+    .ok:
+    mov si, ObjSisArqMinixFSRaiz.Itens
+    ; Le o item
+    mov ax, dx
+    dec ax
+    xor dx, dx
+    mov cx, ObjMinixFSItem._Tam
+    mul cx
+    add si, ax
+    mov ax, [si+ObjMinixFSItem.Tamanho]
+    mov dx, [si+ObjMinixFSItem.Tamanho+2]
+    stc
+    .fim:
+    call __minixfsLiberaMultitarefa
+    pop si
+    pop ds
+    pop cx
     retf

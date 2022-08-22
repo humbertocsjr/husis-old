@@ -85,7 +85,8 @@ ObjSisArq:
         ; cx = Qtd de Bytes
         ; ret: cf = 1=Lido | 0=Nao lido
         ;      cx = Qtd de Bytes lidos
-    ._Tam: equ 54
+    .CalculaTamanho: equ 54
+    ._Tam: equ 58
 
 ObjSisArqItem:
     .Id: equ 0
@@ -105,14 +106,14 @@ ObjSisArqItem:
 
 TipoSisArq:
     .Desconhecido: equ 0
-    .Arquivo: equ 10
-    .Diretorio: equ 20
+    .Arquivo: equ 0x10
+    .Diretorio: equ 0x20
 
 StatusSisArq:
     .Desconhecido: equ 0
-    .NaoExiste: equ 10
-    .SemEspaco: equ 20
-    .ApenasLeitura: equ 30
+    .NaoExiste: equ 0x10
+    .SemEspaco: equ 0x20
+    .ApenasLeitura: equ 0x30
 
 SisArq: dw _sisarq,0
     .SubItem: dw _sisarqSubItem, 0
@@ -138,6 +139,14 @@ SisArq: dw _sisarq,0
         ; cx = Qtd de Bytes
         ; ret: cf = 1=Lido | 0=Nao lido
         ;      cx = Qtd de Bytes lidos
+    .CalculaTamanhoRemoto: dw _sisarqCalculaTamanhoRemoto, 0
+        ; es:di = ObjSisArq
+        ; ret: cf = 1=Lido | 0=Nao lido
+        ;      dx:ax = Tamanho
+    .FechaRemoto: dw _sisarqFechaRemoto, 0
+        ; es:di = ObjSisArq
+        ; ret: cf = 1=Lido | 0=Nao lido
+        ;      dx:ax = Tamanho
     dw 0
 
 _sisarq:
@@ -346,4 +355,29 @@ _sisarqLeiaLinhaLocal:
     pop dx
     pop bx
     pop ax
+    retf
+
+; es:di = ObjSisArq
+; ret: cf = 1=Lido | 0=Nao lido
+;      dx:ax = Tamanho
+_sisarqCalculaTamanhoRemoto:
+    push bx
+    push es
+    push di
+    es mov word [ObjSisArq.Status], StatusSisArq.Desconhecido
+    es cmp word [ObjSisArq.CalculaTamanho], 0
+    jne .ok
+        clc
+        jmp .fim
+    .ok:
+    es call far [ObjSisArq.CalculaTamanho]
+    .fim:
+    pop di
+    pop es
+    pop bx
+    retf
+
+; es:di = ObjSisArq
+_sisarqFechaRemoto:
+    cs call far [Memoria.LiberaRemoto]
     retf

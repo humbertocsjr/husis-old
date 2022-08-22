@@ -18,7 +18,7 @@
 %include '../Incluir/Prog.asm'
 
 nome: db 'HUSIS',0
-versao: dw 0,1,1,'Alpha',0
+versao: dw 0,1,2,'Alpha',0
 tipo: dw TipoProg.Nucleo
 modulos:
     dw Memoria
@@ -210,7 +210,27 @@ inicial:
     mov cx, ._constLinhaComandoTam
     cs call far [SisArq.LeiaLinhaLocal]
 
-    cs call far [Terminal.EscrevaLocal]
+    cs call far [Terminal.Escreva]
+    db ' - Executando %le',0
+    cs call far [Multitarefa.ExecutaArquivo]
+    ;cs call far [SisArq.AbreEnderecoRemoto]
+    jc .naoEncontrado
+    cs mov ax, [Trad.FalhaEncontrar]
+        cs call far [Terminal.Escreva]
+        db ' . [ %at ]\n', 0
+        jmp .fim
+    .naoEncontrado:
+    ;cs call far [Terminal.EscrevaPonto]
+    ;cs call far [SisArq.CalculaTamanhoRemoto]
+    ;cs call far [Terminal.Escreva]
+    ;db ' [ %an Bytes ]',0
+
+    
+
+
+
+    cs call far [Terminal.EscrevaEnter]
+    cs call far [Terminal.EscrevaEnter]
 
     .loop:
     cs mov ax, [Multitarefa.Contador]

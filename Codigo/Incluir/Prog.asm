@@ -16,8 +16,9 @@
 
 cpu 8086
 Prog:
-    dw 1989
-    dw 1
+    .Assinatura: dw 1989
+    ._CompatibilidadeNivel: equ 1
+    .Compatibilidade: dw ._CompatibilidadeNivel
     .PtrInicial: dw inicial
     .Tamanho: dw 0
     .Processo: dw 0
