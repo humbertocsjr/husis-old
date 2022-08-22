@@ -76,6 +76,36 @@ Texto: dw _texto, 0
         ; Calcula o tamanho de um texto
         ; cs:si = Texto
         ; ret: cx = Tamanho
+    .IgualLocalEstatico: dw _textoIgualLocalEstatico, 0
+        ; Compara se dois textos sao iguais
+        ; ds:si = Texto 1
+        ; cs:di = Texto 2
+        ; ret: cf = 1=Igual | 0=Diferente
+    .IgualLocalLocal: dw _textoIgualLocalLocal, 0
+        ; Compara se dois textos sao iguais
+        ; ds:si = Texto 1
+        ; ds:di = Texto 2
+        ; ret: cf = 1=Igual | 0=Diferente
+    .IgualLocalRemoto: dw _textoIgualLocalRemoto, 0
+        ; Compara se dois textos sao iguais
+        ; ds:si = Texto 1
+        ; es:di = Texto 2
+        ; ret: cf = 1=Igual | 0=Diferente
+    .IgualRemotoEstatico: dw _textoIgualRemotoEstatico, 0
+        ; Compara se dois textos sao iguais
+        ; cs:si = Texto 1
+        ; es:di = Texto 2
+        ; ret: cf = 1=Igual | 0=Diferente
+    .IgualRemotoRemoto: dw _textoIgualRemotoRemoto, 0
+        ; Compara se dois textos sao iguais
+        ; es:si = Texto 1
+        ; es:di = Texto 2
+        ; ret: cf = 1=Igual | 0=Diferente
+    .IgualEstaticoEstatico: dw _textoIgualEstaticoEstatico, 0
+        ; Compara se dois textos sao iguais
+        ; cs:si = Texto 1
+        ; cs:di = Texto 2
+        ; ret: cf = 1=Igual | 0=Diferente
     dw 0
 
 _texto:
@@ -301,7 +331,7 @@ _textoCalculaTamanhoRemoto:
         jmp .calcula
     .fim:
     pop si
-    pop es
+    pop ds
     pop ax
     retf
 
@@ -320,6 +350,149 @@ _textoCalculaTamanhoEstatico:
         jmp .calcula
     .fim:
     pop si
+    pop ds
+    pop ax
+    retf
+
+_textoIgualLocalRemoto:
+    push ax
+    push si
+    push di
+    .compara:
+        cmpsb
+        jne .diferente
+        cmp byte [si-1], 0
+        jne .compara
+            stc
+            jmp .fim
+        .diferente:
+            clc
+            jmp .fim
+    .fim:
+    pop di
+    pop si
+    pop ax
+    retf
+
+_textoIgualLocalEstatico:
+    push ax
+    push es
+    push si
+    push di
+    mov ax, cs
+    mov es, ax
+    .compara:
+        cmpsb
+        jne .diferente
+        cmp byte [si-1], 0
+        jne .compara
+            stc
+            jmp .fim
+        .diferente:
+            clc
+            jmp .fim
+    .fim:
+    pop di
+    pop si
+    pop es
+    pop ax
+    retf
+
+_textoIgualRemotoEstatico:
+    push ax
+    push ds
+    push si
+    push di
+    mov ax, cs
+    mov ds, ax
+    .compara:
+        cmpsb
+        jne .diferente
+        cmp byte [si-1], 0
+        jne .compara
+            stc
+            jmp .fim
+        .diferente:
+            clc
+            jmp .fim
+    .fim:
+    pop di
+    pop si
+    pop ds
+    pop ax
+    retf
+
+_textoIgualRemotoRemoto:
+    push ax
+    push ds
+    push si
+    push di
+    mov ax, es
+    mov ds, ax
+    .compara:
+        cmpsb
+        jne .diferente
+        cmp byte [si-1], 0
+        jne .compara
+            stc
+            jmp .fim
+        .diferente:
+            clc
+            jmp .fim
+    .fim:
+    pop di
+    pop si
+    pop ds
+    pop ax
+    retf
+
+_textoIgualLocalLocal:
+    push ax
+    push es
+    push si
+    push di
+    mov ax, ds
+    mov es, ax
+    .compara:
+        cmpsb
+        jne .diferente
+        cmp byte [si-1], 0
+        jne .compara
+            stc
+            jmp .fim
+        .diferente:
+            clc
+            jmp .fim
+    .fim:
+    pop di
+    pop si
+    pop es
+    pop ax
+    retf
+
+_textoIgualEstaticoEstatico:
+    push ax
+    push es
+    push ds
+    push si
+    push di
+    mov ax, cs
+    mov ds, ax
+    mov es, ax
+    .compara:
+        cmpsb
+        jne .diferente
+        cmp byte [si-1], 0
+        jne .compara
+            stc
+            jmp .fim
+        .diferente:
+            clc
+            jmp .fim
+    .fim:
+    pop di
+    pop si
+    pop ds
     pop es
     pop ax
     retf

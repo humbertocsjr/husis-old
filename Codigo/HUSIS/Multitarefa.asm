@@ -76,6 +76,11 @@ _multitarefa:
     mov ax, cs
     ds mov [8 * 4], bx
     ds mov [8 * 4 + 2], ax
+
+    mov bx, _multitarefaInt8.proxTarefa
+    ds mov [0x81 * 4], bx
+    ds mov [0x81 * 4 + 2], ax
+
     sti
     pop ds
     retf
@@ -94,6 +99,7 @@ _multitarefaReativa:
     popf
     retf
 
+
 _multitarefaInt8:
     pushf
     push cs
@@ -107,6 +113,7 @@ _multitarefaInt8:
         cs inc word [Multitarefa.Contador]
         cs cmp word [Multitarefa.Simultaneos], 2
         jb .fim
+            .proxTarefa:
             push ax
             push bx
             push cx
@@ -278,6 +285,10 @@ _multitarefaExecutaArquivo:
     jne .falhaArquivo
     cmp word [Prog.Compatibilidade], Prog._CompatibilidadeNivel
     ja .falhaArquivo
+    mov ax, ds
+    mov es, ax
+    call processaModulos
+    jnc .falhaArquivo
     ; Para multitarefas e impede interrupcoes
     sti
     pushf

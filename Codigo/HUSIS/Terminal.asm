@@ -143,6 +143,8 @@ _terminalEscreva:
         je .externoRseg
         cmp al, 'r'
         je .externoR
+        cmp al, 'E'
+        je .externoEseg
         jmp .escreve
     .externoA:
         mov bx, [bp+.varAx]
@@ -167,6 +169,9 @@ _terminalEscreva:
         jmp .externoForma
     .externoR:
         mov bx, [bp+.varR]
+        jmp .externoForma
+    .externoEseg:
+        mov bx, [bp+4]
         jmp .externoForma
     .externoForma:
         lodsb

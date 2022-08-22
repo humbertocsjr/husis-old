@@ -1,5 +1,5 @@
 
-Memoria:
+Memoria: dw ._Fim
     db 'HUSIS',0
     db 'Memoria',0
     .AlocaBlocoRemoto: dw 1, 0
@@ -105,4 +105,4 @@ Memoria:
         ; cx = Tamanho
     .ExcluiProcesso: dw 1,0
         ; al = Processo
-    dw 0
+    ._Fim:

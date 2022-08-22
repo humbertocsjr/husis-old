@@ -1,7 +1,9 @@
 %include 'Principal.asm'
 
 Trad:
-    .EnderecoConfig: dw _tradEnderecoConfig
+    .EnderecoConfig: dw _tradEnderecoConfig - Trad
+    .EnderecoDirSis: dw _tradEnderecoDirSis - Trad
+    .EnderecoDirExt: dw _tradEnderecoDirExt - Trad
     .SetorInicialIncompativel: dw _tradSetorInicialIncompativel - Trad
     .MemoriaRAM: dw _tradMemoriaRAM - Trad
     .TamNucleo: dw _tradTamNucleo - Trad

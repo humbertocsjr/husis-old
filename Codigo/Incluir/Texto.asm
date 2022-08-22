@@ -1,5 +1,5 @@
 
-Texto: 
+Texto: dw ._Fim
     db 'HUSIS',0
     db 'Texto',0
     .LocalParaNumero: dw 1, 0
@@ -64,4 +64,34 @@ Texto:
         ; Calcula o tamanho de um texto
         ; cs:si = Texto
         ; ret: cx = Tamanho
-    dw 0
+    .IgualLocalEstatico: dw 1, 0
+        ; Compara se dois textos sao iguais
+        ; ds:si = Texto 1
+        ; cs:di = Texto 2
+        ; ret: cf = 1=Igual | 0=Diferente
+    .IgualLocalLocal: dw 1, 0
+        ; Compara se dois textos sao iguais
+        ; ds:si = Texto 1
+        ; ds:di = Texto 2
+        ; ret: cf = 1=Igual | 0=Diferente
+    .IgualLocalRemoto: dw 1, 0
+        ; Compara se dois textos sao iguais
+        ; ds:si = Texto 1
+        ; es:di = Texto 2
+        ; ret: cf = 1=Igual | 0=Diferente
+    .IgualRemotoEstatico: dw 1, 0
+        ; Compara se dois textos sao iguais
+        ; cs:si = Texto 1
+        ; es:di = Texto 2
+        ; ret: cf = 1=Igual | 0=Diferente
+    .IgualRemotoRemoto: dw 1, 0
+        ; Compara se dois textos sao iguais
+        ; es:si = Texto 1
+        ; es:di = Texto 2
+        ; ret: cf = 1=Igual | 0=Diferente
+    .IgualEstaticoEstatico: dw 1, 0
+        ; Compara se dois textos sao iguais
+        ; cs:si = Texto 1
+        ; cs:di = Texto 2
+        ; ret: cf = 1=Igual | 0=Diferente
+    ._Fim:

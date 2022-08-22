@@ -14,6 +14,7 @@
 ;
 ; - 20/08/2022 - Humberto - Prototipo inicial
 ; - 21/08/2022 - Humberto - Implementado traducao
+; - 22/08/2022 - Humberto - Separada as rotinas de tratamento de executaveis
 
 %include '../Incluir/Prog.asm'
 
@@ -21,6 +22,7 @@ nome: db 'HUSIS',0
 versao: dw 0,1,2,'Alpha',0
 tipo: dw TipoProg.Nucleo
 modulos:
+    dw HUSIS
     dw Memoria
     dw Terminal
     dw Caractere
@@ -45,48 +47,30 @@ modulos:
 importar:
     dw 0
 exportar:
+    dw HUSIS
+    db 'HUSIS',0
     dw Memoria
     db 'Memoria',0
     dw Texto
     db 'Texto',0
     dw 0
 
-; Processa um modulo
-; es:bx = Modulo
-processaModulo:
-    push si
-    push bx
-    push ax
-    mov ax, es
-    .processaFuncoes:
-        es cmp word [bx], 0
-        je .fim
-        es mov [bx+2], ax
-        add bx, 4
-        jmp .processaFuncoes
-    .fim:
-    pop ax
-    pop bx
-    pop si
-    ret
 
-; Processa os modulos de um programa
-; es = Programa
-processaModulos:
-    push bx
-    push si
-    es mov si, [Prog.PtrModulos]
-    .processa:
-        es cmp word [si], 0
-        je .fim
-        es mov bx, [si]
-        call processaModulo
-        add si, 2
-        jmp .processa
-    .fim:
-    pop si
-    pop bx
-    ret
+HUSIS: dw _husis,0
+    .ProcessoAtual: dw _husisProcessoAtual, 0
+    .ProximaTarefa: dw _husisProximaTarefa, 0
+    dw 0
+
+_husis:
+    retf
+
+_husisProcessoAtual:
+    cs mov ax, [Multitarefa.Processo]
+    retf
+
+_husisProximaTarefa:
+    int 0x81
+    retf
 
 
 inicial:
@@ -195,6 +179,7 @@ inicial:
     push cs
     pop ds
     cs mov si, [Trad.EnderecoConfig]
+    add si, Trad
     cs call far [SisArq.AbreEnderecoRemoto]
     jc .naoEncontradoConfig
     cs mov ax, [Trad.FalhaEncontrarConfig]
@@ -238,7 +223,7 @@ inicial:
         cs mov ax, [Multitarefa.Contador]
         cs call far [Terminal.Escreva]
         db '\r %an',0
-        hlt
+        cs call far [HUSIS.ProximaTarefa]
         jmp .loop
 
 
