@@ -34,6 +34,7 @@ modulos:
     dw Multitarefa
     dw 0
 
+%include 'TratamentoExecutavel.asm'
 %include 'Memoria.asm'
 %include 'Terminal.asm'
 %include 'Caractere.asm'
