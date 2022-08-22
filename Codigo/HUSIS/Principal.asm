@@ -19,7 +19,7 @@
 %include '../Incluir/Prog.asm'
 
 nome: db 'HUSIS',0
-versao: dw 0,1,2,'Alpha',0
+versao: dw 0,1,3,'Alpha',0
 tipo: dw TipoProg.Nucleo
 modulos:
     dw HUSIS
@@ -91,7 +91,7 @@ inicial:
     je .inicialOk
         cs mov ax, [Trad.SetorInicialIncompativel]
         cs call far [Terminal.Escreva]
-        db ' -= %ae =-',0
+        db ' -= %at =-',0
         .infinito:
             hlt
             jmp .infinito
