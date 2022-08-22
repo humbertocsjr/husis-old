@@ -537,6 +537,7 @@ _minixfsAbrir:
         xor si, si
         ; Carrega item atual
         es mov ax, [di+ObjSisArq.Id]
+        dec ax
         mov cx, 32
         xor dx, dx
         div cx
@@ -547,7 +548,7 @@ _minixfsAbrir:
         add si, ObjSisArqMinixFSRaiz.Itens
         ds mov ax, [si+ObjMinixFSItem.Modo]
         and ax, 0x8000
-        cmp ax, 0
+        cmp ax, 0x8000
         je .naoDir
             es mov word [di+ObjSisArq.Tipo], TipoSisArq.Diretorio
 

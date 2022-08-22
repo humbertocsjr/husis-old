@@ -59,7 +59,13 @@ exportar:
 
 HUSIS: dw _husis,0
     .ProcessoAtual: dw _husisProcessoAtual, 0
+        ; ret: al = Processo atual
     .ProximaTarefa: dw _husisProximaTarefa, 0
+        ; Executa proximo processo pendente, encerrando o tempo de execucao
+        ; ate a proxima passagem do gestor de multitarefa (Yield)
+    .EntraEmModoBiblioteca: dw _husisEntraEmModoBiblioteca, 0
+        ; Encerra a execucao da rotina principal deste executavel, limitando
+        ; seu uso atraves das rotinas dos modulos que exporta
     dw 0
 
 _husis:
@@ -72,6 +78,15 @@ _husisProcessoAtual:
 _husisProximaTarefa:
     int 0x81
     retf
+
+_husisEntraEmModoBiblioteca:
+    cs call far [HUSIS.ProcessoAtual]
+    call __multitarefaPonteiro
+    cs mov word [si+ObjProcesso.Status], StatusProcesso.Biblioteca
+    .loop:
+        int 0x81
+        jmp .loop
+
 
 
 inicial:
@@ -182,12 +197,12 @@ inicial:
     cs mov si, [Trad.EnderecoConfig]
     add si, Trad
     cs call far [SisArq.AbreEnderecoRemoto]
-    jc .naoEncontradoConfig
+    jc .encontradoConfig
     cs mov ax, [Trad.FalhaEncontrarConfig]
         cs call far [Terminal.Escreva]
         db ' [ %at ]\n', 0
         jmp .fim
-    .naoEncontradoConfig:
+    .encontradoConfig:
 
     mov ax, es
     cs mov [.constArqConf], ax
@@ -223,8 +238,8 @@ inicial:
     .loop:
         cs mov ax, [Multitarefa.Contador]
         cs call far [Terminal.Escreva]
-        db '\r %an',0
-        cs call far [HUSIS.ProximaTarefa]
+        db '\r %an ',0
+        hlt
         jmp .loop
 
 

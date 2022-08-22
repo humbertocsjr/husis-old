@@ -30,6 +30,8 @@ StatusProcesso:
         ; Reservado porem nao executando
     .Encerrado: equ 30
         ; Vazio entre itens ativos
+    .Biblioteca: equ 40
+        ; Ativo porem nao tem uma rotina principal rodando
 
 Multitarefa: dw _multitarefa,0
     .Suspende: dw _multitarefaSuspende, 0
@@ -39,7 +41,7 @@ Multitarefa: dw _multitarefa,0
     .Simultaneos: dw 1
     .ProcessoPonteiro: dw 0
         ; Ponteiro SI
-    .Processo: dw 0
+    .Processo: dw 1
         ; Numero do Processo
     .StatusGeral: dw 0
     .Int8: dw 0, 0
@@ -133,7 +135,6 @@ _multitarefaInt8:
             cs mov [si+ObjProcesso.Pilha+2], ax
 
             add si, ObjProcesso._Tam
-            mov ax, 1
             .buscaProximo:
                 cmp si, Multitarefa.FimLista
                 jae .fimLista
@@ -142,7 +143,6 @@ _multitarefaInt8:
                 cs cmp word [si+ObjProcesso.Status], StatusProcesso.Ativo
                 je .encontrado
                 add si, ObjProcesso._Tam
-                inc ax
                 jmp .buscaProximo
                 .fimLista:
                     mov si, Multitarefa.Lista
@@ -150,6 +150,7 @@ _multitarefaInt8:
             .encontrado:
 
             cs mov [Multitarefa.ProcessoPonteiro], si
+            cs mov ax, [si+ObjProcesso.Id]
             cs mov [Multitarefa.Processo], ax
             cs mov bx, [si+ObjProcesso.Pilha]
             cs mov ax, [si+ObjProcesso.Pilha+2]
@@ -187,7 +188,7 @@ __multitarefaReserva:
         je .proximo
         cs cmp word [si+ObjProcesso.Status], StatusProcesso.Suspenso
         je .proximo
-            cs mov word [si+ObjProcesso.Id], ax
+            cs mov [si+ObjProcesso.Id], ax
             cs mov word [si+ObjProcesso.Status], StatusProcesso.Suspenso
             jmp .encontrado
         .proximo:
@@ -212,6 +213,7 @@ __multitarefaPonteiro:
     push ax
     push dx
     push bx
+    dec ax
     mov bx, ObjProcesso._Tam
     mul bx
     mov si, Multitarefa.Lista
@@ -285,6 +287,7 @@ _multitarefaExecutaArquivo:
     jne .falhaArquivo
     cmp word [Prog.Compatibilidade], Prog._CompatibilidadeNivel
     ja .falhaArquivo
+    mov [Prog.Processo], bx
     mov ax, ds
     mov es, ax
     call processaModulos

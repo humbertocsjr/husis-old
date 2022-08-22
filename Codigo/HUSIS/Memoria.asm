@@ -134,7 +134,7 @@ _memoria:
     push cx
     push dx
     ; Grava o numero do processo do nucleo
-    cs mov word [Prog.Processo], 0xfe
+    cs mov word [Prog.Processo], 1
     ; Grava o inicio do nucleo
     mov ax, cs
     cs mov [Memoria.InicioNucleo], ax
@@ -196,7 +196,7 @@ _memoria:
         cmp dx, ax
         ja .vazio
         ; Processo 0xfe (Nucleo), Posicao 0xff (Final)
-        mov ax, 0xfffe
+        mov ax, 0xff01
         stosw
         jmp .proxPreenche
         .reservado:
