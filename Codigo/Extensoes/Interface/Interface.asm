@@ -13,7 +13,6 @@ modulos:
     %include '../../HUSIS/Terminal.asm'
 
 importar:
-    %include '../../Incluir/Memoria.asm'
     %include '../../Incluir/Texto.asm'
     dw 0
 exportar:

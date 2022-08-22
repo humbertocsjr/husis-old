@@ -45,7 +45,7 @@ importaExecutavelLocal:
     ; Define com nucleo para comparar
     push cs
     pop ds
-    xor si, si
+    mov si, nome
     cs call far [Texto.IgualRemotoEstatico]
     jnc .naoNucleo
         stc
