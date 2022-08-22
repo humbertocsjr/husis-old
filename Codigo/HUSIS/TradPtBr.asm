@@ -2,6 +2,8 @@
 
 Trad:
     .EnderecoConfig: dw _tradEnderecoConfig
+    .EnderecoDirSis: dw _tradEnderecoDirSis
+    .EnderecoDirExt: dw _tradEnderecoDirExt
     .SetorInicialIncompativel: dw _tradSetorInicialIncompativel - Trad
     .MemoriaRAM: dw _tradMemoriaRAM - Trad
     .TamNucleo: dw _tradTamNucleo - Trad
@@ -16,6 +18,8 @@ Trad:
     dw 0
 
 _tradEnderecoConfig: db '/Sistema/Config.cfg',0
+_tradEnderecoDirSis: db '/Sistema/',0
+_tradEnderecoDirExt: db '/Sistema/Extensoes/',0
 _tradSetorInicialIncompativel: db 'SISTEMA PARALIZADO - SETOR INICIAL INCOMPATIVEL',0
 _tradMemoriaRAM: db 'Memoria RAM',0
 _tradTamNucleo: db 'Tam. Nucleo',0

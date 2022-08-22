@@ -6,15 +6,16 @@ tipo: dw TipoProg.Executavel
 modulos:
     dw 0
 importar:
+    %include '../../Incluir/Memoria.asm'
+    %include '../../Incluir/Texto.asm'
     dw 0
 exportar:
     dw 0
 
 inicial:
     .loop:
-        mov ax, 0xe0a
-        int 0x10
-        mov ax, 0xe0d
+        mov ah, 0xe
+        mov al, 'A'
         int 0x10
         hlt
         jmp .loop

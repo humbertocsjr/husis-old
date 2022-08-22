@@ -16,6 +16,8 @@ Trad:
     dw 0
 
 _tradEnderecoConfig: db '/System/Config.cfg',0
+_tradEnderecoDirSis: db '/System/',0
+_tradEnderecoDirExt: db '/System/Extensions/',0
 _tradSetorInicialIncompativel: db 'SYSTEM STOPPED - INCOMPATIBLE BOOT SECTOR',0
 _tradMemoriaRAM: db 'Memory RAM',0
 _tradTamNucleo: db 'Kernel Size',0

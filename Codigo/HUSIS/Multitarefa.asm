@@ -147,7 +147,6 @@ _multitarefaInt8:
             cs mov bx, [si+ObjProcesso.Pilha]
             cs mov ax, [si+ObjProcesso.Pilha+2]
 
-
             mov sp, bx
             mov ss, ax
             sti
@@ -241,6 +240,7 @@ _multitarefaExecutaArquivo:
         .falhaProcesso:
             call __multitarefaPonteiro
             cs mov word [si+ObjProcesso.Status], StatusProcesso.Encerrado
+            clc
             jmp .fim
     .okProcesso:
     ; Guarda o numero do processo para uso futuro
@@ -279,7 +279,10 @@ _multitarefaExecutaArquivo:
     cmp word [Prog.Compatibilidade], Prog._CompatibilidadeNivel
     ja .falhaArquivo
     ; Para multitarefas e impede interrupcoes
+    sti
     pushf
+    pop dx
+    push dx
     cli
     ; Guarda pilha atual
     mov ax, bx
@@ -295,7 +298,7 @@ _multitarefaExecutaArquivo:
     push cs
     cs push word [.constPonteiroVolta]
     ; Empilha o IRET da multitarefa
-    pushf
+    push dx
     push ds
     mov ax, [Prog.PtrInicial]
     push ax
@@ -310,7 +313,13 @@ _multitarefaExecutaArquivo:
     push ds
     push ax
     push ax
-    cs inc word [Multitarefa.Contador]
+    cs inc word [Multitarefa.Simultaneos]
+
+    mov ax, bx
+    call __multitarefaPonteiro
+    
+    cs mov word [si+ObjProcesso.Status], StatusProcesso.Ativo
+    cs mov word [si+ObjProcesso.Pilha], sp
 
     ; Restaura pilha atual
     cs mov ax, [.constSSNucleo]
@@ -341,7 +350,7 @@ __multitarefaVolta:
     cs mov ax, [Multitarefa.Processo]
     call __multitarefaPonteiro
     cs mov word [si+ObjProcesso.Status], StatusProcesso.Encerrado
-    cs dec word [Multitarefa.Contador]
+    cs dec word [Multitarefa.Simultaneos]
     pop ax
     pop si
     jmp _multitarefaInt8.trocaDeTarefas

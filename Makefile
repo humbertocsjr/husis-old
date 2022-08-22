@@ -10,8 +10,8 @@ imagem:
 	@Ferramentas/minixfs add ./enus.img Temp/HUSISEnUs HUSIS
 	@Ferramentas/minixfs mkdir ./ptbr.img Sistema
 	@Ferramentas/minixfs mkdir ./enus.img System
-	@Ferramentas/minixfs add ./ptbr.img Config.cfg Sistema/Config.cfg
-	@Ferramentas/minixfs add ./enus.img Config.cfg System/Config.cfg
+	@Ferramentas/minixfs add ./ptbr.img ConfigPtBr.cfg Sistema/Config.cfg
+	@Ferramentas/minixfs add ./enus.img ConfigEnUs.cfg System/Config.cfg
 	@Ferramentas/minixfs mkdir ./ptbr.img Sistema/Extensoes
 	@Ferramentas/minixfs mkdir ./enus.img System/Extensions
 	@Ferramentas/minixfs add ./ptbr.img Temp/Interface Sistema/Extensoes/Interface

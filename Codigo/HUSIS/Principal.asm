@@ -45,6 +45,10 @@ modulos:
 importar:
     dw 0
 exportar:
+    dw Memoria
+    db 'Memoria',0
+    dw Texto
+    db 'Texto',0
     dw 0
 
 ; Processa um modulo
@@ -204,40 +208,38 @@ inicial:
 
     cs call far [Terminal.EscrevaOk]
 
-    push cs
-    pop ds
-    mov si, .constLinhaComando
-    mov cx, ._constLinhaComandoTam
-    cs call far [SisArq.LeiaLinhaLocal]
+    cs call far [Multitarefa.Suspende]
 
-    cs call far [Terminal.Escreva]
-    db ' - Executando %le',0
-    cs call far [Multitarefa.ExecutaArquivo]
-    ;cs call far [SisArq.AbreEnderecoRemoto]
-    jc .naoEncontrado
-    cs mov ax, [Trad.FalhaEncontrar]
+    .carregaArquivos:
+        push cs
+        pop ds
+        mov si, .constLinhaComando
+        mov cx, ._constLinhaComandoTam
+        cs call far [SisArq.LeiaLinhaLocal]
+        jnc .fimCarregaArquivos
         cs call far [Terminal.Escreva]
-        db ' . [ %at ]\n', 0
-        jmp .fim
-    .naoEncontrado:
-    ;cs call far [Terminal.EscrevaPonto]
-    ;cs call far [SisArq.CalculaTamanhoRemoto]
-    ;cs call far [Terminal.Escreva]
-    ;db ' [ %an Bytes ]',0
+        db ' - %le',0
+        cs call far [Terminal.EscrevaPonto]
+        cs call far [Multitarefa.ExecutaArquivo]
+        jc .arqEncontrado
+            cs mov ax, [Trad.FalhaEncontrar]
+            cs call far [Terminal.Escreva]
+            db ' [ %at ]\n', 0
+            jmp .fim
+        .arqEncontrado:
+        cs call far [Terminal.EscrevaPonto]
+        cs call far [Terminal.EscrevaOk]
+        jmp .carregaArquivos
 
-    
+    .fimCarregaArquivos:
 
-
-
-    cs call far [Terminal.EscrevaEnter]
-    cs call far [Terminal.EscrevaEnter]
-
+    cs call far [Multitarefa.Reativa]
     .loop:
-    cs mov ax, [Multitarefa.Contador]
-    cs call far [Terminal.Escreva]
-    db '\r %an',0
-    hlt
-    jmp .loop
+        cs mov ax, [Multitarefa.Contador]
+        cs call far [Terminal.Escreva]
+        db '\r %an',0
+        hlt
+        jmp .loop
 
 
     .fim:
