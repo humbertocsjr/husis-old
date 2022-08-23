@@ -51,6 +51,11 @@ Interface: dw ._Fim
         ; cx = X2
         ; dx = Y2
         ; ret: cf = 1=Ok | 0=Falha
+    .AlteraTamanhoRemoto: dw 1, 0
+        ; es:di = ObjControle
+        ; cx = Largura
+        ; dx = Altura
+        ; ret: cf = 1=Ok | 0=Falha
     .AlteraConteudoRemoto: dw 1, 0
         ; es:di = ObjControle
         ; ds:si = Novo conteudo

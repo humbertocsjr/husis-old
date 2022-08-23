@@ -26,30 +26,30 @@ _interfaceJanelaRemoto:
     es mov dx, [di+ObjControle.CalcY1]
     inc cx
     mov al, TipoBorda.HorizDir
-    es mov ah, [di+ObjControle.CorFrente]
+    cs mov ah, [Interface.TemaCorBorda]
     cs call far [Interface.DesenhaCaractere]
     inc cx
     mov al, ' '
-    es mov ah, [di+ObjControle.CorFrente]
     cs call far [Interface.DesenhaCaractere]
+    inc cx
     call __interfacePtrConteudoLocal
     jnc .fim
     .renderiza:
         lodsb
         cmp al, 0
         je .ok
-        es cmp cx, [di+ObjControle.CalcX2]
+        es cmp dx, [di+ObjControle.CalcY2]
         ja .ok
-        es mov bx, [di+ObjControle.CalcY2]
-        sub bx, 7
-        cmp dx, bx
+        es mov bx, [di+ObjControle.CalcX2]
+        sub bx, 3
+        cmp cx, bx
         ja .ok
-        es mov ah, [di+ObjControle.CorFrente]
+        cs mov ah, [Interface.TemaCorTitulo]
         cs call far [Interface.DesenhaCaractere]
         inc cx
         jmp .renderiza
     .ok:
-    inc cx
+    cs mov ah, [Interface.TemaCorBorda]
     mov al, ' '
     cs call far [Interface.DesenhaCaractere]
     inc cx

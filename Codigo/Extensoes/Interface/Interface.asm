@@ -45,8 +45,8 @@ exportar:
 TipoBorda:
     .SupEsq: equ 218
     .InfDir: equ 217
-    .SupDir: equ 192
-    .InfEsq: equ 191
+    .SupDir: equ 191
+    .InfEsq: equ 192
     .Horiz: equ 196
     .Vert: equ 179
     .HorizEsq: equ 195
@@ -54,6 +54,7 @@ TipoBorda:
     .Central: equ 197
     .VertSup: equ 194
     .VertInf: equ 193
+
 Interface: dw _interface, 0
     .RegistraTela: dw _interfaceRegistraTela,0
         ; Registra a tela (Inicialmente apenas suporta uma)
@@ -103,6 +104,11 @@ Interface: dw _interface, 0
         ; es:di = ObjControle
         ; cx = X2
         ; dx = Y2
+        ; ret: cf = 1=Ok | 0=Falha
+    .AlteraTamanhoRemoto: dw _interfaceAlteraTamanhoRemoto, 0
+        ; es:di = ObjControle
+        ; cx = Largura
+        ; dx = Altura
         ; ret: cf = 1=Ok | 0=Falha
     .AlteraConteudoRemoto: dw _interfaceAlteraConteudoRemoto, 0
         ; es:di = ObjControle
@@ -170,6 +176,8 @@ Interface: dw _interface, 0
     ._CapacidadeJanelas: equ 32
     .Janelas: times ._CapacidadeJanelas dw 0,0
     .JanelaAtual: dw 0
+    .TemaCorBorda: dw TipoCor.Ciano
+    .TemaCorTitulo: dw TipoCor.CianoClaro
 
 _interface:
     ; 23/08/2022 - Comentado na remocao do codigo da interface grafica
@@ -341,14 +349,22 @@ _interfaceTempAtualizaBuffer:
     je .fim
         mov ax, 3
         int 0x10
+        mov ch, 0xb0000001
+        mov cl, 0
+        mov ah, 1
+        int 0x10 
     .fim:
     retf
 
 
 
 _interfaceDesenhaCaixaRemoto:
+    push ax
+    push bx
+    push cx
+    push dx
     cs call far [Interface.DesenhaFundoRemoto]
-    mov ah, [di+ObjControle.CorFrente]
+    cs mov ah, [Interface.TemaCorBorda]
     es mov cx, [di+ObjControle.X1]
     es mov dx, [di+ObjControle.Y1]
     mov al, TipoBorda.SupEsq
@@ -367,10 +383,13 @@ _interfaceDesenhaCaixaRemoto:
     cs call far [Interface.DesenhaCaractere]
 
     es mov cx, [di+ObjControle.X1]
+    inc cx
     mov al, TipoBorda.Horiz
     .horizontal:
-        es mov cx, [di+ObjControle.X2]
-        je .fimHorizontal
+        es cmp cx, [di+ObjControle.X2]
+        jb .contHorizontal
+        jmp .fimHorizontal
+        .contHorizontal:
         es mov dx, [di+ObjControle.Y1]
         cs call far [Interface.DesenhaCaractere]
         es mov dx, [di+ObjControle.Y2]
@@ -380,10 +399,13 @@ _interfaceDesenhaCaixaRemoto:
     .fimHorizontal:
 
     es mov dx, [di+ObjControle.Y1]
+    inc dx
     mov al, TipoBorda.Vert
     .vertical:
-        es mov dx, [di+ObjControle.Y2]
-        je .fimVertical
+        es cmp dx, [di+ObjControle.Y2]
+        jb .contVertical
+        jmp .fimVertical
+        .contVertical:    
         es mov cx, [di+ObjControle.X1]
         cs call far [Interface.DesenhaCaractere]
         es mov cx, [di+ObjControle.X2]
@@ -391,6 +413,10 @@ _interfaceDesenhaCaixaRemoto:
         inc dx
         jmp .vertical
     .fimVertical:
+    pop dx
+    pop cx
+    pop bx
+    pop ax
     retf
 
 _interfaceDesenhaFundoRemoto:
@@ -506,6 +532,18 @@ _interfaceAlteraPosFinalRemoto:
 _interfaceAlteraPosInicialRemoto:
     es mov [di+ObjControle.X1], cx
     es mov [di+ObjControle.Y1], dx
+    cs call far [Interface.RenderizaRemoto]
+    retf
+
+_interfaceAlteraTamanhoRemoto:
+    push cx
+    push dx
+    es add cx, [di+ObjControle.X1]
+    es add dx, [di+ObjControle.Y1]
+    es mov [di+ObjControle.X2], cx
+    es mov [di+ObjControle.Y2], dx
+    pop dx
+    pop cx
     cs call far [Interface.RenderizaRemoto]
     retf
 
@@ -676,19 +714,20 @@ inicial:
     push cs
     pop ds
     mov si, .teste
-    cs call far [Interface.IniciaRotuloRemoto]
+    cs call far [Interface.IniciaJanelaRemoto]
     mov cx, 10
     mov dx, 10
     cs call far [Interface.AlteraPosInicialRemoto]
     mov cx, 20
     mov dx, 12
-    cs call far [Interface.AlteraPosFinalRemoto]
+    cs call far [Interface.AlteraTamanhoRemoto]
     cs call far [Interface.ExibeRemoto]
+    cs call far [Interface.AdicionarJanelaRemota]
     cs call far [Interface.RenderizaRemoto]
     .processa:
         cs call far [HUSIS.ProximaTarefa]
         jmp .processa
     retf
-    .teste: db 'Oieeee 123 asdsdkkknncdisncdijscnsjcndsk',0
+    .teste: db 'Oieeee',0
 
 Trad: dw 0

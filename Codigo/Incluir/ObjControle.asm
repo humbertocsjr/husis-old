@@ -30,6 +30,20 @@ ObjControle:
 
 TipoCor:
     .Preto: equ 0
+    .Azul: equ 1
+    .Verde: equ 2
+    .Ciano: equ 3
+    .Vermelho: equ 4
+    .Magenta: equ 5
+    .Marrom: equ 6
+    .CinzaClaro: equ 7
+    .CinzaEscuro: equ 8
+    .AzulClaro: equ 9
+    .VerdeClaro: equ 10
+    .CianoClaro: equ 11
+    .VermelhoClaro: equ 12
+    .MagentaClaro: equ 13
+    .Amarelo: equ 14
     .Branco: equ 15
 
 TipoControle:
