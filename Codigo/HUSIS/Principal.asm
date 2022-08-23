@@ -66,9 +66,14 @@ HUSIS: dw _husis,0
     .EntraEmModoBiblioteca: dw _husisEntraEmModoBiblioteca, 0
         ; Encerra a execucao da rotina principal deste executavel, limitando
         ; seu uso atraves das rotinas dos modulos que exporta
+    .Debug: dw _husisDebug,0
     dw 0
 
 _husis:
+    retf
+
+_husisDebug:
+    cs call far [Terminal.EscrevaDebugDSSI]
     retf
 
 _husisProcessoAtual:
@@ -237,8 +242,8 @@ inicial:
     cs call far [Multitarefa.Reativa]
     .loop:
         cs mov ax, [Multitarefa.Contador]
-        cs call far [Terminal.Escreva]
-        db '\r %an ',0
+        ;cs call far [Terminal.Escreva]
+        ;db '\r %an ',0
         hlt
         jmp .loop
 

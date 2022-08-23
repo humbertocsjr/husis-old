@@ -10,4 +10,5 @@ HUSIS: dw ._Fim
     .EntraEmModoBiblioteca: dw 1, 0
         ; Encerra a execucao da rotina principal deste executavel, limitando
         ; seu uso atraves das rotinas dos modulos que exporta
+    .Debug: dw 1,0
     ._Fim:
