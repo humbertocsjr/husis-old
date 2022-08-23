@@ -14,8 +14,12 @@ imagem:
 	@Ferramentas/minixfs add ./enus.img ConfigEnUs.cfg System/Config.cfg
 	@Ferramentas/minixfs mkdir ./ptbr.img Sistema/Extensoes
 	@Ferramentas/minixfs mkdir ./enus.img System/Extensions
-	@Ferramentas/minixfs add ./ptbr.img Temp/Interface Sistema/Extensoes/Interface
-	@Ferramentas/minixfs add ./enus.img Temp/Interface System/Extensions/Interface
+	@Ferramentas/minixfs add ./ptbr.img Temp/InterfaceVGA Sistema/Extensoes/InterfaceVGA
+	@Ferramentas/minixfs add ./enus.img Temp/InterfaceVGA System/Extensions/InterfaceVGA
+	@Ferramentas/minixfs add ./ptbr.img Temp/InterfaceCGA Sistema/Extensoes/InterfaceCGA
+	@Ferramentas/minixfs add ./enus.img Temp/InterfaceCGA System/Extensions/InterfaceCGA
+	@Ferramentas/minixfs add ./ptbr.img Temp/InterfaceMDA Sistema/Extensoes/InterfaceMDA
+	@Ferramentas/minixfs add ./enus.img Temp/InterfaceMDA System/Extensions/InterfaceMDA
 	@Ferramentas/minixfs add ./ptbr.img Temp/Serial Sistema/Extensoes/Serial
 	@Ferramentas/minixfs add ./enus.img Temp/Serial System/Extensions/Serial
 	@dd if=Temp/Inicial of=ptbr.img conv=notrunc

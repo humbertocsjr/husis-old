@@ -179,23 +179,6 @@ Interface: dw _interface, 0
     .TemaCorBorda: dw TipoCor.Ciano
     .TemaCorTitulo: dw TipoCor.CianoClaro
 
-_interface:
-    ; 23/08/2022 - Comentado na remocao do codigo da interface grafica
-    ;mov ax, FontePipoca
-    ;cs mov [Interface.Fontes], ax
-    ;mov ax, cs
-    ;cs mov [Interface.Fontes+2], ax
-    
-
-    mov si, 80
-    mov di, 25
-    mov ax, cs
-    mov bx, _interfaceTempDesenhaCaractere
-    mov cx, 16
-    mov dx, _interfaceTempAtualizaBuffer
-    cs call far [Interface.RegistraTela]
-
-    retf
 
 _interfaceAdicionarRemota:
     push ax
@@ -315,47 +298,6 @@ _interfaceAdicionarJanRemota:
     pop bx
     pop si
     retf
-
-_interfaceTempDesenhaCaractere:
-    push ds
-    push ax
-    push bx
-    push cx
-    push dx
-
-    push ax
-    mov ax, 0xb800
-    mov ds, ax
-    mov ax, dx
-    mov bx, 160
-    mul bx
-    add ax, cx
-    add ax, cx
-    mov bx, ax
-    pop ax
-    mov [bx], ax
-
-    stc
-
-    pop dx
-    pop cx
-    pop bx
-    pop ax
-    pop ds
-    retf
-
-_interfaceTempAtualizaBuffer:
-    cmp ax, 0
-    je .fim
-        mov ax, 3
-        int 0x10
-        mov ch, 0xb0000001
-        mov cl, 0
-        mov ah, 1
-        int 0x10 
-    .fim:
-    retf
-
 
 
 _interfaceDesenhaCaixaRemoto:
@@ -718,8 +660,8 @@ inicial:
     mov cx, 10
     mov dx, 10
     cs call far [Interface.AlteraPosInicialRemoto]
-    mov cx, 20
-    mov dx, 12
+    mov cx, 40
+    mov dx, 10
     cs call far [Interface.AlteraTamanhoRemoto]
     cs call far [Interface.ExibeRemoto]
     cs call far [Interface.AdicionarJanelaRemota]
