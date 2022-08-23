@@ -1,3 +1,20 @@
+; =========================
+;  Interface com o usuario
+; =========================
+;
+; Prototipo........: 22/08/2022
+; Versao Inicial...: 23/08/2022
+; Autor............: Humberto Costa dos Santos Junior
+;
+; Funcao...........: Interface com o usuario
+;
+; Limitacoes.......: 
+;
+; Historico........:
+;
+; - 22/08/2022 - Humberto - Prototipo inicial
+; - 23/08/2022 - Humberto - Volta para interface de texto por limitacoes
+;                           do hardware disponivel para teste
 %include '../../Incluir/Prog.asm'
 
 nome: db 'Interface',0
@@ -8,10 +25,11 @@ modulos:
     dw 0
 
 
-
-    %include 'FontePipoca.asm'
+; 23/08/2022 - Comentado na remocao do codigo da interface grafica
+;    %include 'FontePipoca.asm'
     %include '../../Incluir/ObjFonte.asm'
     %include '../../Incluir/ObjControle.asm'
+    %include 'CtlJanela.asm'
     %include 'CtlRotulo.asm'
 
 importar:
@@ -24,6 +42,18 @@ exportar:
     db 'Interface',0
     dw 0
 
+TipoBorda:
+    .SupEsq: equ 218
+    .InfDir: equ 217
+    .SupDir: equ 192
+    .InfEsq: equ 191
+    .Horiz: equ 196
+    .Vert: equ 179
+    .HorizEsq: equ 195
+    .HorizDir: equ 180
+    .Central: equ 197
+    .VertSup: equ 194
+    .VertInf: equ 193
 Interface: dw _interface, 0
     .RegistraTela: dw _interfaceRegistraTela,0
         ; Registra a tela (Inicialmente apenas suporta uma)
@@ -53,6 +83,9 @@ Interface: dw _interface, 0
         ; al = Caractere
         ; ret: cf = 1=Ok | 0=Falha
     .DesenhaFundoRemoto: dw _interfaceDesenhaFundoRemoto, 0
+        ; es:di = ObjControle
+        ; ret: cf = 1=Ok | 0=Falha
+    .DesenhaCaixaRemoto: dw _interfaceDesenhaCaixaRemoto, 0
         ; es:di = ObjControle
         ; ret: cf = 1=Ok | 0=Falha
     .AlocaControleRemoto: dw _interfaceAlocaControleRemoto,0
@@ -100,11 +133,27 @@ Interface: dw _interface, 0
     .OcultaRemoto: dw _interfaceOcultaRemoto, 0
         ; es:di = ObjControle
         ; ret: cf = 1=Ok | 0=Falha
+    .AdicionarJanelaRemota: dw _interfaceAdicionarJanRemota,0
+        ; Adiciona uma janela a raiz
+        ; es:di = ObjControle
+        ; ret: cf = 1=Ok | 0=Falha
+    .AdicionarRemota: dw _interfaceAdicionarRemota,0
+        ; Adiciona um controle a um outro controle/janela
+        ; es:di = ObjControle Acima
+        ; ds:si = ObjControle Abaixo
+        ; ret: cf = 1=Ok | 0=Falha
+    .CopiaPonteiroRemotoParaLocal: dw _interfaceCopiaPtr,0
+        ; Copia es:di para ds:si de forma facil, ficando os dois identicos
+        ; ret: cf = 1=Ok | 0=Falha
     .IniciaRemoto: dw _interfaceIniciaRemoto, 0
         ; Inicia um objeto em branco
         ; es:di = ObjControle
         ; ret: cf = 1=Ok | 0=Falha
     .IniciaRotuloRemoto: dw _interfaceIniciaRotuloRemoto,0
+        ; es:di = ObjControle
+        ; ds:si = Texto
+        ; ret: cf = 1=Ok | 0=Falha
+    .IniciaJanelaRemoto: dw _interfaceIniciaJanelaRemoto,0
         ; es:di = ObjControle
         ; ds:si = Texto
         ; ret: cf = 1=Ok | 0=Falha
@@ -115,17 +164,19 @@ Interface: dw _interface, 0
     .Altura: dw 0
     .Cores: dw 0
     .PtrBuffer: dw 0
-    ._CapacidadeFontes: equ 32
-    .Fontes: times ._CapacidadeFontes dw 0,0
+    ; 23/08/2022 - Comentado na remocao do codigo da interface grafica
+    ;._CapacidadeFontes: equ 32
+    ;.Fontes: times ._CapacidadeFontes dw 0,0
     ._CapacidadeJanelas: equ 32
     .Janelas: times ._CapacidadeJanelas dw 0,0
     .JanelaAtual: dw 0
 
 _interface:
-    mov ax, FontePipoca
-    cs mov [Interface.Fontes], ax
-    mov ax, cs
-    cs mov [Interface.Fontes+2], ax
+    ; 23/08/2022 - Comentado na remocao do codigo da interface grafica
+    ;mov ax, FontePipoca
+    ;cs mov [Interface.Fontes], ax
+    ;mov ax, cs
+    ;cs mov [Interface.Fontes+2], ax
     
 
     mov si, 80
@@ -136,6 +187,125 @@ _interface:
     mov dx, _interfaceTempAtualizaBuffer
     cs call far [Interface.RegistraTela]
 
+    retf
+
+_interfaceAdicionarRemota:
+    push ax
+    push bx
+    es cmp word [di+ObjControle.PtrAbaixo],0
+    je .abaixoOk
+        mov ax, [di+ObjControle.PtrAbaixo+2]
+        mov bx, [di+ObjControle.PtrAbaixo]
+        mov es, ax
+        mov di, bx
+        es cmp word [di+ObjControle.PtrProximo],0
+        je .proximoOk
+            .buscaProximo:
+                mov ax, [di+ObjControle.PtrProximo+2]
+                mov bx, [di+ObjControle.PtrProximo]
+                mov es, ax
+                mov di, bx
+                es cmp word [di+ObjControle.PtrProximo],0
+                je .proximoOk
+                jmp .buscaProximo
+        .proximoOk:
+            mov ax, ds
+            es mov [di+ObjControle.PtrProximo+2], ax
+            es mov [di+ObjControle.PtrProximo], si
+            stc
+            jmp .fim
+    .abaixoOk:
+        mov ax, ds
+        es mov [di+ObjControle.PtrAbaixo+2], ax
+        es mov [di+ObjControle.PtrAbaixo], si
+        stc
+    .fim:
+    pop bx
+    pop ax
+    retf
+
+_interfaceCopiaPtr:
+    push es
+    pop ds
+    mov si, di
+    stc
+    retf
+
+; es:di = ObjControle
+; bx = Janela
+__interfaceAplicarJanela:
+    push ax
+    push bx
+    es mov [di+ObjControle.Janela], bx
+    es cmp word [di+ObjControle.PtrAcima],0
+    je .ignoraAcima
+        push es
+        push di
+        mov ax, [di+ObjControle.PtrAcima+2]
+        mov bx, [di+ObjControle.PtrAcima]
+        mov es, ax
+        mov di, bx
+        call __interfaceAplicarJanela
+        pop di
+        pop es
+    .ignoraAcima:
+    es cmp word [di+ObjControle.PtrAbaixo],0
+    je .ignoraAbaixo
+        push es
+        push di
+        mov ax, [di+ObjControle.PtrAbaixo+2]
+        mov bx, [di+ObjControle.PtrAbaixo]
+        mov es, ax
+        mov di, bx
+        call __interfaceAplicarJanela
+        pop di
+        pop es
+    .ignoraAbaixo:
+    es cmp word [di+ObjControle.PtrProximo],0
+    je .ignoraProximo
+        push es
+        push di
+        mov ax, [di+ObjControle.PtrProximo+2]
+        mov bx, [di+ObjControle.PtrProximo]
+        mov es, ax
+        mov di, bx
+        call __interfaceAplicarJanela
+        pop di
+        pop es
+    .ignoraProximo:
+    pop bx
+    pop ax
+    ret
+
+_interfaceAdicionarJanRemota:
+    push si
+    push bx
+    push ax
+    mov si, Interface.Janelas
+    mov cx, Interface._CapacidadeJanelas
+    xor bx, bx
+    .busca:
+        cs cmp word [si], 0
+        jne .continua
+            mov ax, es
+            cs mov [si+2], ax
+            cs mov [si], di
+            es cmp word [di+ObjControle.Visivel], 0
+            je .ignoraAtiva
+                cs mov [Interface.JanelaAtual], bx
+            .ignoraAtiva:
+            call __interfaceAplicarJanela
+            stc
+            jmp .fim
+        .continua:
+        add si, 4
+        inc bx
+        loop .busca
+    clc
+    .fim:
+    pop ax
+    pop bx
+    pop si
     retf
 
 _interfaceTempDesenhaCaractere:
@@ -167,8 +337,60 @@ _interfaceTempDesenhaCaractere:
     retf
 
 _interfaceTempAtualizaBuffer:
-    mov ax, 3
-    int 0x10
+    cmp ax, 0
+    je .fim
+        mov ax, 3
+        int 0x10
+    .fim:
+    retf
+
+
+
+_interfaceDesenhaCaixaRemoto:
+    cs call far [Interface.DesenhaFundoRemoto]
+    mov ah, [di+ObjControle.CorFrente]
+    es mov cx, [di+ObjControle.X1]
+    es mov dx, [di+ObjControle.Y1]
+    mov al, TipoBorda.SupEsq
+    cs call far [Interface.DesenhaCaractere]
+    es mov cx, [di+ObjControle.X2]
+    es mov dx, [di+ObjControle.Y2]
+    mov al, TipoBorda.InfDir
+    cs call far [Interface.DesenhaCaractere]
+    es mov cx, [di+ObjControle.X2]
+    es mov dx, [di+ObjControle.Y1]
+    mov al, TipoBorda.SupDir
+    cs call far [Interface.DesenhaCaractere]
+    es mov cx, [di+ObjControle.X1]
+    es mov dx, [di+ObjControle.Y2]
+    mov al, TipoBorda.InfEsq
+    cs call far [Interface.DesenhaCaractere]
+
+    es mov cx, [di+ObjControle.X1]
+    mov al, TipoBorda.Horiz
+    .horizontal:
+        es mov cx, [di+ObjControle.X2]
+        je .fimHorizontal
+        es mov dx, [di+ObjControle.Y1]
+        cs call far [Interface.DesenhaCaractere]
+        es mov dx, [di+ObjControle.Y2]
+        cs call far [Interface.DesenhaCaractere]
+        inc cx
+        jmp .horizontal
+    .fimHorizontal:
+
+    es mov dx, [di+ObjControle.Y1]
+    mov al, TipoBorda.Vert
+    .vertical:
+        es mov dx, [di+ObjControle.Y2]
+        je .fimVertical
+        es mov cx, [di+ObjControle.X1]
+        cs call far [Interface.DesenhaCaractere]
+        es mov cx, [di+ObjControle.X2]
+        cs call far [Interface.DesenhaCaractere]
+        inc dx
+        jmp .vertical
+    .fimVertical:
     retf
 
 _interfaceDesenhaFundoRemoto:
@@ -222,9 +444,17 @@ _interfaceIniciaRemoto:
     es mov word [di+ObjControle.PtrConteudo+2], 0
     es mov word [di+ObjControle.PtrRenderiza], 0
     es mov word [di+ObjControle.PtrRenderiza+2], 0
-    es mov word [di+ObjControle.PtrFonte], FontePipoca
+    es mov word [di+ObjControle.PtrFonte], 0
     mov ax, cs
     es mov [di+ObjControle.PtrFonte+2], ax
+    es mov word [di+ObjControle.X1], 0
+    es mov word [di+ObjControle.Y1], 0
+    es mov word [di+ObjControle.X2], 0
+    es mov word [di+ObjControle.Y2], 0
+    es mov word [di+ObjControle.MargemX1], 0
+    es mov word [di+ObjControle.MargemY1], 0
+    es mov word [di+ObjControle.MargemX2], 0
+    es mov word [di+ObjControle.MargemY2], 0
     es mov word [di+ObjControle.ValorA], 0
     es mov word [di+ObjControle.ValorB], 0
     es mov word [di+ObjControle.ValorC], 0
@@ -294,6 +524,7 @@ _interfaceRenderizaRemoto:
     es mov ax, [di+ObjControle.Y2]
     es cmp ax, [di+ObjControle.Y1]
     jb .falha
+    call __interfaceCalcularCoordenadas
     es call far [di+ObjControle.PtrRenderiza]
     .ok:
     stc
@@ -381,6 +612,51 @@ __interfacePtrFonteLocal:
     pop ax
     ret
 
+; es:di = ObjControle
+__interfaceCalcularCoordenadas:
+    push ds
+    push si
+    push ax
+    cs call far [Interface.CopiaPonteiroRemotoParaLocal]
+    ds mov ax, [si+ObjControle.X1]
+    ds mov [si+ObjControle.CalcX1], ax
+    ds mov ax, [si+ObjControle.Y1]
+    ds mov [si+ObjControle.CalcY1], ax
+    ds mov ax, [si+ObjControle.X2]
+    ds mov [si+ObjControle.CalcX2], ax
+    ds mov ax, [si+ObjControle.Y2]
+    ds mov [si+ObjControle.CalcY2], ax
+    ds cmp word [si+ObjControle.PtrAcima], 0
+    je .fim
+        ds mov ax, [si+ObjControle.PtrAcima+2]
+        mov es, ax
+        ds mov di, [si+ObjControle.PtrAcima]
+        es mov ax, [di+ObjControle.CalcX1]
+        es add ax, [di+ObjControle.MargemX1]
+        ds add [si+ObjControle.CalcX1], ax
+        ds add [si+ObjControle.CalcX2], ax
+        es mov ax, [di+ObjControle.CalcY1]
+        es add ax, [di+ObjControle.MargemY1]
+        ds add [si+ObjControle.CalcY1], ax
+        ds add [si+ObjControle.CalcY2], ax
+        es mov ax, [di+ObjControle.CalcX2]
+        es sub ax, [di+ObjControle.MargemX2]
+        ds cmp ax, [si+ObjControle.CalcX2]
+        jae .ignoraX2
+            ds mov [si+ObjControle.CalcX2], ax
+        .ignoraX2:
+        es mov ax, [di+ObjControle.CalcY2]
+        es sub ax, [di+ObjControle.MargemY2]
+        ds cmp ax, [si+ObjControle.CalcY2]
+        jae .ignoraY2
+            ds mov [si+ObjControle.CalcY2], ax
+        .ignoraY2:
+
+    .fim:
+    pop ax
+    pop si
+    pop ds
+    ret
 
 inicial:
     cs call far [Interface]

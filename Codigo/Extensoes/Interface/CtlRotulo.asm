@@ -15,22 +15,22 @@ _interfaceRotuloRemoto:
     push si
     push ax
     cs call far [Interface.DesenhaFundoRemoto]
-    es mov cx, [di+ObjControle.X1]
-    es mov dx, [di+ObjControle.Y1]
+    es mov cx, [di+ObjControle.CalcX1]
+    es mov dx, [di+ObjControle.CalcY1]
     call __interfacePtrConteudoLocal
     jnc .fim
     .renderiza:
         lodsb
         cmp al, 0
         je .ok
-        es cmp cx, [di+ObjControle.X2]
+        es cmp cx, [di+ObjControle.CalcX2]
         ja .proxLinha
-        es cmp dx, [di+ObjControle.Y2]
+        es cmp dx, [di+ObjControle.CalcY2]
         ja .ok
         cmp al, 10
         jne .continua
             .proxLinha:
-            es mov cx, [di+ObjControle.X1]
+            es mov cx, [di+ObjControle.CalcX1]
             inc dx
             jmp .renderiza
         .continua:
