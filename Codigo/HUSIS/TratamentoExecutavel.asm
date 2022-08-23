@@ -51,6 +51,39 @@ importaExecutavelLocal:
         stc
         jmp .fim
     .naoNucleo:
+    mov ax, 1
+    mov cx, Multitarefa._Capacidade
+    .buscaAtivos:
+        call __multitarefaPonteiro
+        cs cmp word [si+ObjProcesso.Status], StatusProcesso.Ativo
+        je .testaAtivo
+        cs cmp word [si+ObjProcesso.Status], StatusProcesso.Biblioteca
+        je .testaAtivo
+        cs cmp word [si+ObjProcesso.Status], StatusProcesso.Vazio
+        je .naoAtivos
+        .continuaAtivos:
+        inc ax
+        loop .buscaAtivos
+        .testaAtivo:
+            push ax
+            push ds
+            push si
+            mov ax, [si+ObjProcesso.Segmento]
+            mov ds, ax
+            ds mov si, [Prog.PtrNome]
+            cs call far [Texto.IgualLocalRemoto]
+            pop si
+            pop ds
+            pop ax
+            jnc .continuaAtivos
+                mov ax, [si+ObjProcesso.Segmento]
+                mov ds, ax
+                xor si, si
+                stc
+                jmp .fim
+    jmp .naoAtivos
+    ; TODO: Falta buscar no diretorio Extensoes
+    .naoAtivos:
     clc
     .fim:
     pop ax

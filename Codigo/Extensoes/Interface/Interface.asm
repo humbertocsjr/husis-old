@@ -18,6 +18,8 @@ importar:
     %include '../../Incluir/HUSIS.asm'
     dw 0
 exportar:
+    dw Interface
+    db 'Interface',0
     dw 0
 
 Interface: dw _interface, 0

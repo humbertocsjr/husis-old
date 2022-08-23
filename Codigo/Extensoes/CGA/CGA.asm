@@ -9,6 +9,7 @@ modulos:
 importar:
     %include '../../Incluir/Memoria.asm'
     %include '../../Incluir/HUSIS.asm'
+    %include '../../Incluir/Interface.asm'
     dw 0
 exportar:
     dw 0

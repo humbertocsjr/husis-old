@@ -301,6 +301,8 @@ _multitarefaExecutaArquivo:
     ; Guarda pilha atual
     mov ax, bx
     call __multitarefaPonteiro
+    mov ax, ds
+    cs mov [si+ObjProcesso.Segmento], ax
     mov ax, ss
     cs mov [.constSSNucleo], ax
     cs mov [.constSPNucleo], sp
