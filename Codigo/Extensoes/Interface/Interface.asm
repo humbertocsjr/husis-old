@@ -92,6 +92,10 @@ Interface: dw _interface, 0
     .AlocaControleRemoto: dw _interfaceAlocaControleRemoto,0
         ; ret: cf = 1=Ok | 0=Falha
         ;      es:di = ObjControle
+    .AlocaSubControleRemoto: dw _interfaceAlocaSubControleRemoto,0
+        ; es:di = ObjControle Acima
+        ; ret: cf = 1=Ok | 0=Falha
+        ;      es:di = ObjControle
     .LiberaControleRemoto: dw _interfaceLiberaControleRemoto,0
         ; es:di = ObjControle
         ; ret: cf = 1=Ok | 0=Falha
@@ -113,6 +117,10 @@ Interface: dw _interface, 0
     .AlteraConteudoRemoto: dw _interfaceAlteraConteudoRemoto, 0
         ; es:di = ObjControle
         ; ds:si = Novo conteudo
+        ; ret: cf = 1=Ok | 0=Falha
+    .AlteraConteudoTradRemoto: dw _interfaceAlteraConteudoTradRemoto, 0
+        ; es:di = ObjControle
+        ; ds:si = Traducao (ds=cs)
         ; ret: cf = 1=Ok | 0=Falha
     .AlteraValorARemoto: dw _interfaceAlteraValorARemoto, 0
         ; es:di = ObjControle
@@ -139,14 +147,19 @@ Interface: dw _interface, 0
     .OcultaRemoto: dw _interfaceOcultaRemoto, 0
         ; es:di = ObjControle
         ; ret: cf = 1=Ok | 0=Falha
-    .AdicionarJanelaRemota: dw _interfaceAdicionarJanRemota,0
+    .AdicionaJanelaRemota: dw _interfaceAdicionaJanRemota,0
         ; Adiciona uma janela a raiz
         ; es:di = ObjControle
         ; ret: cf = 1=Ok | 0=Falha
-    .AdicionarRemota: dw _interfaceAdicionarRemota,0
+    .AdicionaRemota: dw _interfaceAdicionaRemota,0
         ; Adiciona um controle a um outro controle/janela
         ; es:di = ObjControle Acima
         ; ds:si = ObjControle Abaixo
+        ; ret: cf = 1=Ok | 0=Falha
+    .AdicionaLocal: dw _interfaceAdicionaLocal,0
+        ; Adiciona um controle a um outro controle/janela
+        ; es:di = ObjControle Abaixo
+        ; ds:si = ObjControle Acima
         ; ret: cf = 1=Ok | 0=Falha
     .CopiaPonteiroRemotoParaLocal: dw _interfaceCopiaPtr,0
         ; Copia es:di para ds:si de forma facil, ficando os dois identicos
@@ -159,9 +172,17 @@ Interface: dw _interface, 0
         ; es:di = ObjControle
         ; ds:si = Texto
         ; ret: cf = 1=Ok | 0=Falha
+    .IniciaRotuloTradRemoto: dw _interfaceIniciaRotuloTradRemoto,0
+        ; es:di = ObjControle
+        ; ds:si = Traducao (ds=cs)
+        ; ret: cf = 1=Ok | 0=Falha
     .IniciaJanelaRemoto: dw _interfaceIniciaJanelaRemoto,0
         ; es:di = ObjControle
         ; ds:si = Texto
+        ; ret: cf = 1=Ok | 0=Falha
+    .IniciaJanelaTradRemoto: dw _interfaceIniciaJanelaTradRemoto,0
+        ; es:di = ObjControle
+        ; ds:si = Traducao (ds=cs)
         ; ret: cf = 1=Ok | 0=Falha
     dw 0
     .PtrDesenhaCaractere: dw 0, 0
@@ -180,23 +201,29 @@ Interface: dw _interface, 0
     .TemaCorTitulo: dw TipoCor.CianoClaro
 
 
-_interfaceAdicionarRemota:
+
+_interfaceAdicionaRemota:
     push ax
     push bx
-    es cmp word [di+ObjControle.PtrAbaixo],0
+    push es
+    push di
+    mov es, ax
+    mov [si+ObjControle.PtrAcima+2], ax
+    mov [si+ObjControle.PtrAcima], di
+    es cmp word [di+ObjControle.PtrAbaixo+2],0
     je .abaixoOk
-        mov ax, [di+ObjControle.PtrAbaixo+2]
-        mov bx, [di+ObjControle.PtrAbaixo]
+        es mov ax, [di+ObjControle.PtrAbaixo+2]
+        es mov bx, [di+ObjControle.PtrAbaixo]
         mov es, ax
         mov di, bx
-        es cmp word [di+ObjControle.PtrProximo],0
+        es cmp word [di+ObjControle.PtrProximo+2],0
         je .proximoOk
             .buscaProximo:
-                mov ax, [di+ObjControle.PtrProximo+2]
-                mov bx, [di+ObjControle.PtrProximo]
+                es mov ax, [di+ObjControle.PtrProximo+2]
+                es mov bx, [di+ObjControle.PtrProximo]
                 mov es, ax
                 mov di, bx
-                es cmp word [di+ObjControle.PtrProximo],0
+                es cmp word [di+ObjControle.PtrProximo+2],0
                 je .proximoOk
                 jmp .buscaProximo
         .proximoOk:
@@ -213,6 +240,50 @@ _interfaceAdicionarRemota:
     .fim:
     pop bx
     pop ax
+    pop di
+    pop es
+    retf
+
+_interfaceAdicionaLocal:
+    push ds
+    push si
+    push ax
+    push bx
+    mov ds, ax
+    es mov [di+ObjControle.PtrAcima+2], ax
+    es mov [di+ObjControle.PtrAcima], si
+    cmp word [si+ObjControle.PtrAbaixo+2],0
+    je .abaixoOk
+        mov ax, [si+ObjControle.PtrAbaixo+2]
+        mov bx, [si+ObjControle.PtrAbaixo]
+        mov ds, ax
+        mov si, bx
+        cmp word [si+ObjControle.PtrProximo+2],0
+        je .proximoOk
+            .buscaProximo:
+                mov ax, [si+ObjControle.PtrProximo+2]
+                mov bx, [si+ObjControle.PtrProximo]
+                mov ds, ax
+                mov si, bx
+                cmp word [si+ObjControle.PtrProximo+2],0
+                je .proximoOk
+                jmp .buscaProximo
+        .proximoOk:
+            mov ax, es
+            mov [si+ObjControle.PtrProximo+2], ax
+            mov [si+ObjControle.PtrProximo], di
+            stc
+            jmp .fim
+    .abaixoOk:
+        mov ax, es
+        mov [si+ObjControle.PtrAbaixo+2], ax
+        mov [si+ObjControle.PtrAbaixo], di
+        stc
+    .fim:
+    pop bx
+    pop ax
+    pop si
+    pop ds
     retf
 
 _interfaceCopiaPtr:
@@ -228,7 +299,7 @@ __interfaceAplicarJanela:
     push ax
     push bx
     es mov [di+ObjControle.Janela], bx
-    es cmp word [di+ObjControle.PtrAcima],0
+    es cmp word [di+ObjControle.PtrAcima+2],0
     je .ignoraAcima
         push es
         push di
@@ -240,7 +311,7 @@ __interfaceAplicarJanela:
         pop di
         pop es
     .ignoraAcima:
-    es cmp word [di+ObjControle.PtrAbaixo],0
+    es cmp word [di+ObjControle.PtrAbaixo+2],0
     je .ignoraAbaixo
         push es
         push di
@@ -252,7 +323,7 @@ __interfaceAplicarJanela:
         pop di
         pop es
     .ignoraAbaixo:
-    es cmp word [di+ObjControle.PtrProximo],0
+    es cmp word [di+ObjControle.PtrProximo+2],0
     je .ignoraProximo
         push es
         push di
@@ -268,7 +339,7 @@ __interfaceAplicarJanela:
     pop ax
     ret
 
-_interfaceAdicionarJanRemota:
+_interfaceAdicionaJanRemota:
     push si
     push bx
     push ax
@@ -281,9 +352,11 @@ _interfaceAdicionarJanRemota:
             mov ax, es
             cs mov [si+2], ax
             cs mov [si], di
+            es mov [di+ObjControle.Janela], bx
             es cmp word [di+ObjControle.Visivel], 0
             je .ignoraAtiva
                 cs mov [Interface.JanelaAtual], bx
+                cs call far [Interface.RenderizaRemoto]
             .ignoraAtiva:
             call __interfaceAplicarJanela
             stc
@@ -401,9 +474,6 @@ _interfaceOcultaRemoto:
 
 _interfaceIniciaRemoto:
     push ax
-    es mov word [di+ObjControle.Janela], 0
-    es mov word [di+ObjControle.PtrAcima], 0
-    es mov word [di+ObjControle.PtrAcima+2], 0
     es mov word [di+ObjControle.PtrAbaixo], 0
     es mov word [di+ObjControle.PtrAbaixo+2], 0
     es mov word [di+ObjControle.PtrProximo], 0
@@ -465,6 +535,23 @@ _interfaceAlteraConteudoRemoto:
     stc
     retf
 
+_interfaceAlteraConteudoTradRemoto
+    push bp
+    mov bp, sp
+    push si
+    push ax
+    mov ax, ds
+    mov si, [si]
+    add si, [Prog.Traducao]
+    es mov [di+ObjControle.PtrConteudo+2], ax
+    es mov [di+ObjControle.PtrConteudo], si
+    cs call far [Interface.RenderizaRemoto]
+    pop ax
+    pop si
+    pop bp
+    stc
+    retf
+
 _interfaceAlteraPosFinalRemoto:
     es mov [di+ObjControle.X2], cx
     es mov [di+ObjControle.Y2], dx
@@ -482,6 +569,14 @@ _interfaceAlteraTamanhoRemoto:
     push dx
     es add cx, [di+ObjControle.X1]
     es add dx, [di+ObjControle.Y1]
+    cmp cx, 0
+    je .ignoraCx
+        dec cx
+    .ignoraCx:
+    cmp dx, 0
+    je .ignoraDx
+        dec dx
+    .ignoraDx:
     es mov [di+ObjControle.X2], cx
     es mov [di+ObjControle.Y2], dx
     pop dx
@@ -491,10 +586,24 @@ _interfaceAlteraTamanhoRemoto:
 
 _interfaceRenderizaRemoto:
     push ax
-    es cmp word [di+ObjControle.PtrRenderiza], 0
+    push bx
+    es cmp word [di+ObjControle.PtrRenderiza+2], 0
     je .falha
     es cmp word [di+ObjControle.Visivel], 0
     je .ok
+    es cmp word [di+ObjControle.PtrAcima+2],0
+    je .semAcima
+        push ds
+        push si
+        es push word [di+ObjControle.PtrAcima+2]
+        pop ds
+        es push word [di+ObjControle.PtrAcima]
+        pop si
+        mov ax, [si+ObjControle.Janela]
+        es mov [di+ObjControle.Janela], ax
+        pop si
+        pop ds
+    .semAcima:
     cs mov ax, [Interface.JanelaAtual]
     es cmp ax, [di+ObjControle.Janela]
     jne .ok
@@ -512,6 +621,7 @@ _interfaceRenderizaRemoto:
     .falha:
     clc
     .fim:
+    pop bx
     pop ax
     retf
 
@@ -546,6 +656,8 @@ _interfaceRegistraTela:
     mov di, _interfaceDesenhaCaractere
     mov cx, _interfaceDesenhaCaractere.fim - _interfaceDesenhaCaractere.inicio
     rep movsb
+    mov ax, 1
+    cs call far [Interface.PtrAtualizaTela]
     stc
     pop cx
     pop di
@@ -560,8 +672,30 @@ _interfaceAlocaControleRemoto:
     cs call far [HUSIS.ProcessoAtual]
     mov cx, ObjControle._Tam
     cs call far [Memoria.AlocaRemoto]
+    jnc .fim
+        es mov word [di+ObjControle.Janela], 0xffff
+        es mov word [di+ObjControle.PtrAcima], 0
+        es mov word [di+ObjControle.PtrAcima+2], 0
+    .fim:
     pop cx
     pop ax
+    retf
+
+_interfaceAlocaSubControleRemoto:
+    push ds
+    push si
+    push ax
+    cs call far [Interface.CopiaPonteiroRemotoParaLocal]
+    cs call far [Interface.AlocaControleRemoto]
+    jnc .fim
+        cs call far [Interface.AdicionaLocal]
+        mov ax, ds
+        es mov word [di+ObjControle.PtrAcima], si
+        es mov word [di+ObjControle.PtrAcima+2], ax
+    .fim:
+    pop ax
+    pop si
+    pop ds
     retf
 
 _interfaceLiberaControleRemoto:
@@ -596,6 +730,8 @@ __interfacePtrFonteLocal:
 __interfaceCalcularCoordenadas:
     push ds
     push si
+    push es
+    push di
     push ax
     cs call far [Interface.CopiaPonteiroRemotoParaLocal]
     ds mov ax, [si+ObjControle.X1]
@@ -606,7 +742,7 @@ __interfaceCalcularCoordenadas:
     ds mov [si+ObjControle.CalcX2], ax
     ds mov ax, [si+ObjControle.Y2]
     ds mov [si+ObjControle.CalcY2], ax
-    ds cmp word [si+ObjControle.PtrAcima], 0
+    ds cmp word [si+ObjControle.PtrAcima+2], 0
     je .fim
         ds mov ax, [si+ObjControle.PtrAcima+2]
         mov es, ax
@@ -634,6 +770,8 @@ __interfaceCalcularCoordenadas:
 
     .fim:
     pop ax
+    pop di
+    pop es
     pop si
     pop ds
     ret
@@ -645,27 +783,11 @@ inicial:
         je .continuaAguardando
         cs cmp word [Interface.PtrAtualizaTela], 0
         je .continuaAguardando
-            mov ax, 1
-            cs call far [Interface.PtrAtualizaTela]
             jmp .fimAguarda
         .continuaAguardando:
         cs call far [HUSIS.ProximaTarefa]
         jmp .aguardaTela
     .fimAguarda:
-    cs call far [Interface.AlocaControleRemoto]
-    push cs
-    pop ds
-    mov si, .teste
-    cs call far [Interface.IniciaJanelaRemoto]
-    mov cx, 10
-    mov dx, 10
-    cs call far [Interface.AlteraPosInicialRemoto]
-    mov cx, 40
-    mov dx, 10
-    cs call far [Interface.AlteraTamanhoRemoto]
-    cs call far [Interface.ExibeRemoto]
-    cs call far [Interface.AdicionarJanelaRemota]
-    cs call far [Interface.RenderizaRemoto]
     .processa:
         cs call far [HUSIS.ProximaTarefa]
         jmp .processa

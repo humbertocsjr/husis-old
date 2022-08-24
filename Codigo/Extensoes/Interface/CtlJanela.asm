@@ -1,11 +1,15 @@
-
-
-
 _interfaceIniciaJanelaRemoto:
     cs call far [Interface.IniciaRemoto]
-    mov ax, ds
-    es mov [di+ObjControle.PtrConteudo+2], ax
-    es mov word [di+ObjControle.PtrConteudo], si
+    cs call far [Interface.AlteraConteudoRemoto]
+    jmp _interfaceIniciaJanelaRemotoInterno
+
+_interfaceIniciaJanelaTradRemoto:
+    cs call far [Interface.IniciaRemoto]
+    cs call far [Interface.AlteraConteudoTradRemoto]
+    jmp _interfaceIniciaJanelaRemotoInterno
+
+
+_interfaceIniciaJanelaRemotoInterno:
     mov ax, cs
     es mov [di+ObjControle.PtrRenderiza+2], ax
     es mov word [di+ObjControle.PtrRenderiza], _interfaceJanelaRemoto
@@ -61,5 +65,4 @@ _interfaceJanelaRemoto:
     pop ax
     pop si
     pop ds
-
     retf

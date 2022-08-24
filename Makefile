@@ -22,6 +22,10 @@ imagem:
 	@Ferramentas/minixfs add ./enus.img Temp/InterfaceMDA System/Extensions/InterfaceMDA
 	@Ferramentas/minixfs add ./ptbr.img Temp/Serial Sistema/Extensoes/Serial
 	@Ferramentas/minixfs add ./enus.img Temp/Serial System/Extensions/Serial
+	@Ferramentas/minixfs mkdir ./ptbr.img Programas
+	@Ferramentas/minixfs mkdir ./enus.img Programs
+	@Ferramentas/minixfs add ./ptbr.img Temp/ArquivosPtBr Programas/Arquivos
+	@Ferramentas/minixfs add ./enus.img Temp/ArquivosEnUs Programs/Files
 	@dd if=Temp/Inicial of=ptbr.img conv=notrunc
 	@dd if=Temp/Inicial of=enus.img conv=notrunc
 	@echo " -= Imagens geradas =-"
