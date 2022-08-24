@@ -19,7 +19,7 @@
 %include '../Incluir/Prog.asm'
 
 nome: db 'HUSIS',0
-versao: dw 0,1,3,'Alpha',0
+versao: dw 0,1,4,'Alpha',0
 tipo: dw TipoProg.Nucleo
 modulos:
     dw HUSIS

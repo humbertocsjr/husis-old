@@ -358,15 +358,17 @@ _multitarefaExecutaArquivo:
     .constPonteiroVolta: dw __multitarefaVolta
 
 __multitarefaVolta:
-    cli
     push si
     push ax
+    pushf
+    cli
     cs mov ax, [Multitarefa.Processo]
     cs call far [Memoria.ExcluiProcesso]
     cs mov ax, [Multitarefa.Processo]
     call __multitarefaPonteiro
     cs mov word [si+ObjProcesso.Status], StatusProcesso.Encerrado
     cs dec word [Multitarefa.Simultaneos]
+    popf
     pop ax
     pop si
-    jmp _multitarefaInt8.trocaDeTarefas
+    int 0x81

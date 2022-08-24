@@ -746,4 +746,18 @@ _memoriaZeraEstatico:
 _memoriaExcluiProcesso:
     ; Apenas exclui dos indices (Evitando apagar a propria pilha na exclusao
     ; de um processo)
+
+    cs push word [Memoria.Mapa]
+    pop es
+    cs mov cx, [Memoria.TotalBlocos]
+    .libera:
+        es cmp [di], al
+        jne .ignora
+            es mov word [di], 0
+        .ignora:
+        inc di
+        inc di
+        loop .libera
+    .fim:
+    stc
     retf
