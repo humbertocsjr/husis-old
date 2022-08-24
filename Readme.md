@@ -2,7 +2,7 @@
 
 Sistema Operacional para PC/XT e compatíveis.
 
-
+![](Telas/v0.1.3-alpha.png)
 
 ## Licenciamento
 
