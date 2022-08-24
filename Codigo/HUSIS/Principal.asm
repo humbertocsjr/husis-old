@@ -32,6 +32,10 @@ modulos:
     dw SisArq
     dw MinixFS
     dw Multitarefa
+    dw Interrupcoes
+    dw DMA
+    dw Semaforo
+    dw Disquete
     dw 0
 
 %include 'TratamentoExecutavel.asm'
@@ -44,6 +48,10 @@ modulos:
 %include 'SisArq.asm'
 %include 'MinixFS.asm'
 %include 'Multitarefa.asm'
+%include 'Interrupcoes.asm'
+%include 'DMA.asm'
+%include 'Semaforo.asm'
+%include 'Disquete.asm'
 
 importar:
     dw 0
@@ -73,8 +81,7 @@ _husis:
     retf
 
 _husisDebug:
-    cs call far [Terminal.EscrevaDebugDSSI]
-    retf
+    jmp Terminal.EscrevaDebugDSSI
 
 _husisProcessoAtual:
     cs mov ax, [Multitarefa.Processo]
@@ -125,14 +132,26 @@ inicial:
     cs mov dx, versao+6
     cs call far [Terminal.Escreva]
     db 'HUSIS v%an.%bn.%cn %de\n\n',0
+    
+    cs call far [Terminal.Escreva]
+    db ' - Servicos Base',0
+    cs call far [Terminal.EscrevaPonto]
+    cs call far [Semaforo]
+    cs call far [Terminal.EscrevaPonto]
+    cs call far [Interrupcoes]
+    cs call far [Terminal.EscrevaPonto]
+    cs call far [DMA]
+    cs call far [Terminal.EscrevaPonto]
+    cs call far [Memoria]
+    cs call far [Terminal.EscrevaPonto]
+    cs call far [Multitarefa]
+    cs call far [Terminal.EscrevaOk]
 
     cs mov ax, [Trad.MemoriaRAM]
     cs mov bx, [Trad.TamNucleo]
     cs mov cx, [Prog.Tamanho]
     cs call far [Terminal.Escreva]
     db ' - %at [%bt: %cn Bytes]',0
-    cs call far [Memoria]
-    cs call far [Multitarefa]
     cs call far [Terminal.EscrevaOk]
 
     cs mov ax, [Trad.DiscoBIOS]
@@ -154,98 +173,98 @@ inicial:
         jmp .fim
     .unidadeOk:
 
-    cs call far [SisArq]
-    cs call far [Disco]
-    jc .discoOk
-    cs mov ax, [Trad.FalhaDisco]
-        cs call far [Terminal.Escreva]
-        db ' [ %at ]\n', 0
-        jmp .fim
-    .discoOk:
-
-    cs mov ax, [.constDiscoBios]
-    cs mov bx, [.constCilindros]
-    cs mov cx, [.constCabecas]
-    cs mov dx, [.constSetores]
-    cs call far [Disco.RegistraManualmente]
-    jc .discoRegOk
-    cs mov ax, [Trad.FalhaDiscoReg]
-        cs call far [Terminal.Escreva]
-        db ' [ %at ]\n', 0
-        jmp .fim
-    .discoRegOk:
-    cs mov word [Unidade.UnidadePrincipal], bx
-
-    cs call far [MinixFS.Monta]
-    jc .montagemOk
-    cs mov ax, [Trad.FalhaMontagem]
-        cs call far [Terminal.Escreva]
-        db ' [ %at ]\n', 0
-        jmp .fim
-    .montagemOk:
-
-    cs call far [Terminal.EscrevaPonto]
-
-    cs mov bx, [Unidade.UnidadePrincipal]
-    cs call far [Unidade.LeiaRaizRemoto]
-    jc .montagem2Ok
-    cs mov ax, [Trad.FalhaMontagem]
-        cs call far [Terminal.Escreva]
-        db ' [ %at ]\n', 0
-        jmp .fim
-    .montagem2Ok:
-
-    cs call far [Terminal.EscrevaPonto]
-
-    push cs
-    pop ds
-    cs mov si, [Trad.EnderecoConfig]
-    add si, Trad
-    cs call far [SisArq.AbreEnderecoRemoto]
-    jc .encontradoConfig
-    cs mov ax, [Trad.FalhaEncontrarConfig]
-        cs call far [Terminal.Escreva]
-        db ' [ %at ]\n', 0
-        jmp .fim
-    .encontradoConfig:
-
-    mov ax, es
-    cs mov [.constArqConf], ax
-
-    cs call far [Terminal.EscrevaOk]
-
-    cs call far [Multitarefa.Suspende]
-
-    .carregaArquivos:
-        push cs
-        pop ds
-        mov si, .constLinhaComando
-        mov cx, ._constLinhaComandoTam
-        cs call far [SisArq.LeiaLinhaLocal]
-        jnc .fimCarregaArquivos
-        cs call far [Terminal.Escreva]
-        db ' - %le',0
-        cs call far [Terminal.EscrevaPonto]
-        cs call far [Multitarefa.ExecutaArquivo]
-        jc .arqEncontrado
-            cs mov ax, [Trad.FalhaEncontrar]
-            cs call far [Terminal.Escreva]
-            db ' [ %at ]\n', 0
-            jmp .fim
-        .arqEncontrado:
-        cs call far [Terminal.EscrevaPonto]
-        cs call far [Terminal.EscrevaOk]
-        jmp .carregaArquivos
-
-    .fimCarregaArquivos:
-
-    cs call far [Multitarefa.Reativa]
-    .loop:
-        cs mov ax, [Multitarefa.Contador]
-        ;cs call far [Terminal.Escreva]
-        ;db '\r %an ',0
-        hlt
-        jmp .loop
+;    cs call far [SisArq]
+;    cs call far [Disco]
+;    jc .discoOk
+;    cs mov ax, [Trad.FalhaDisco]
+;        cs call far [Terminal.Escreva]
+;        db ' [ %at ]\n', 0
+;        jmp .fim
+;    .discoOk:
+;
+;    cs mov ax, [.constDiscoBios]
+;    cs mov bx, [.constCilindros]
+;    cs mov cx, [.constCabecas]
+;    cs mov dx, [.constSetores]
+;    cs call far [Disco.RegistraManualmente]
+;    jc .discoRegOk
+;    cs mov ax, [Trad.FalhaDiscoReg]
+;        cs call far [Terminal.Escreva]
+;        db ' [ %at ]\n', 0
+;        jmp .fim
+;    .discoRegOk:
+;    cs mov word [Unidade.UnidadePrincipal], bx
+;
+;    cs call far [MinixFS.Monta]
+;    jc .montagemOk
+;    cs mov ax, [Trad.FalhaMontagem]
+;        cs call far [Terminal.Escreva]
+;        db ' [ %at ]\n', 0
+;        jmp .fim
+;    .montagemOk:
+;
+;    cs call far [Terminal.EscrevaPonto]
+;
+;    cs mov bx, [Unidade.UnidadePrincipal]
+;    cs call far [Unidade.LeiaRaizRemoto]
+;    jc .montagem2Ok
+;    cs mov ax, [Trad.FalhaMontagem]
+;        cs call far [Terminal.Escreva]
+;        db ' [ %at ]\n', 0
+;        jmp .fim
+;    .montagem2Ok:
+;
+;    cs call far [Terminal.EscrevaPonto]
+;
+;    push cs
+;    pop ds
+;    cs mov si, [Trad.EnderecoConfig]
+;    add si, Trad
+;    cs call far [SisArq.AbreEnderecoRemoto]
+;    jc .encontradoConfig
+;    cs mov ax, [Trad.FalhaEncontrarConfig]
+;        cs call far [Terminal.Escreva]
+;        db ' [ %at ]\n', 0
+;        jmp .fim
+;    .encontradoConfig:
+;
+;    mov ax, es
+;    cs mov [.constArqConf], ax
+;
+;    cs call far [Terminal.EscrevaOk]
+;
+;    cs call far [Multitarefa.Suspende]
+;
+;    .carregaArquivos:
+;        push cs
+;        pop ds
+;        mov si, .constLinhaComando
+;        mov cx, ._constLinhaComandoTam
+;        cs call far [SisArq.LeiaLinhaLocal]
+;        jnc .fimCarregaArquivos
+;        cs call far [Terminal.Escreva]
+;        db ' - %le',0
+;        cs call far [Terminal.EscrevaPonto]
+;        cs call far [Multitarefa.ExecutaArquivo]
+;        jc .arqEncontrado
+;            cs mov ax, [Trad.FalhaEncontrar]
+;            cs call far [Terminal.Escreva]
+;            db ' [ %at ]\n', 0
+;            jmp .fim
+;        .arqEncontrado:
+;        cs call far [Terminal.EscrevaPonto]
+;        cs call far [Terminal.EscrevaOk]
+;        jmp .carregaArquivos
+;
+;    .fimCarregaArquivos:
+;
+;    cs call far [Multitarefa.Reativa]
+;    .loop:
+;        cs mov ax, [Multitarefa.Contador]
+;        ;cs call far [Terminal.Escreva]
+;        ;db '\r %an ',0
+;        hlt
+;        jmp .loop
 
 
     .fim:

@@ -22,6 +22,8 @@ imagem:
 	@Ferramentas/minixfs add ./enus.img Temp/InterfaceMDA System/Extensions/InterfaceMDA
 	@Ferramentas/minixfs add ./ptbr.img Temp/Serial Sistema/Extensoes/Serial
 	@Ferramentas/minixfs add ./enus.img Temp/Serial System/Extensions/Serial
+	@Ferramentas/minixfs add ./ptbr.img Temp/PS2 Sistema/Extensoes/PS2
+	@Ferramentas/minixfs add ./enus.img Temp/PS2 System/Extensions/PS2
 	@Ferramentas/minixfs mkdir ./ptbr.img Programas
 	@Ferramentas/minixfs mkdir ./enus.img Programs
 	@Ferramentas/minixfs add ./ptbr.img Temp/ArquivosPtBr Programas/Arquivos
@@ -30,7 +32,7 @@ imagem:
 	@dd if=Temp/Inicial of=enus.img conv=notrunc
 	@echo " -= Imagens geradas =-"
 	@ls -l ptbr.img
-	@ls -l Temp/HUSISPtBr
+	@ls -l Temp/*
 
 ptbr:
 	@make all

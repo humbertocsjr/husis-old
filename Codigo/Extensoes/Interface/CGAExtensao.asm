@@ -45,7 +45,7 @@ _interfaceTempAtualizaBuffer:
     je .fim
         mov ax, 3
         int 0x10
-        mov ch, 0xb0000001
+        mov ch, 0b00000001
         mov cl, 0
         mov ah, 1
         int 0x10 

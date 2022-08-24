@@ -459,6 +459,8 @@ _terminalEscrevaNumEmDSSIBX:
     retf
 
 _terminalEscrevaDebug:
+    push bp
+    mov bp, sp
     pushf
     push bx
     push ax
@@ -488,7 +490,7 @@ _terminalEscrevaDebug:
         cs call far [Terminal.Escreva]
         db ' CF: 1',0
     .cfFim:
-    mov ax, cs
+    mov ax, [bp+4]
     cs call far [Terminal.Escreva]
     db '\n       CS: 0x',0
     cs call far [Terminal.EscrevaHex]
@@ -546,6 +548,7 @@ _terminalEscrevaDebug:
     pop ax
     pop bx
     popf
+    pop bp
     retf
     .subCaractere:
         cmp ax, ' '
@@ -640,7 +643,6 @@ _terminalEscrevaDebugDSSI:
     push ax
     push si
     push cx
-    cs call far [Terminal.EscrevaDebug]
     mov cx, 16
     cs call far [Terminal.Escreva]
     db 'DS:SI:', 0
@@ -661,7 +663,7 @@ _terminalEscrevaDebugDSSI:
     pop si
     pop ax
     popf
-    retf
+    jmp Terminal.EscrevaDebug
 
 _terminalEscrevaDebugESDI:
     pushf
@@ -669,7 +671,6 @@ _terminalEscrevaDebugESDI:
     push si
     push ds
     push cx
-    cs call far [Terminal.EscrevaDebug]
     mov cx, 16
     cs call far [Terminal.Escreva]
     db 'ES:DI:', 0
@@ -694,7 +695,7 @@ _terminalEscrevaDebugESDI:
     pop si
     pop ax
     popf
-    retf
+    jmp Terminal.EscrevaDebug
 
 _terminalEscrevaDebugESSI:
     pushf
@@ -702,7 +703,6 @@ _terminalEscrevaDebugESSI:
     push si
     push ds
     push cx
-    cs call far [Terminal.EscrevaDebug]
     mov cx, 64
     cs call far [Terminal.Escreva]
     db 'ES:SI:', 0
@@ -720,7 +720,7 @@ _terminalEscrevaDebugESSI:
     pop si
     pop ax
     popf
-    retf
+    jmp Terminal.EscrevaDebug
 
 _terminalEscrevaDebugPilha:
     pushf
@@ -728,7 +728,6 @@ _terminalEscrevaDebugPilha:
     push si
     push ds
     push cx
-    ;cs call far [Terminal.EscrevaDebug]
     mov cx, 16
     cs call far [Terminal.Escreva]
     db '\nPILHA:', 0
@@ -747,7 +746,7 @@ _terminalEscrevaDebugPilha:
     pop si
     pop ax
     popf
-    retf
+    jmp Terminal.EscrevaDebug
 
 _terminalEscrevaRemoto:
     pushf

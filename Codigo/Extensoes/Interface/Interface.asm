@@ -535,7 +535,7 @@ _interfaceAlteraConteudoRemoto:
     stc
     retf
 
-_interfaceAlteraConteudoTradRemoto
+_interfaceAlteraConteudoTradRemoto:
     push bp
     mov bp, sp
     push si
