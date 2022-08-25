@@ -4,6 +4,38 @@ Sistema Operacional para PC/XT e compatíveis.
 
 ![](Telas/v0.1.3-alpha.png)
 
+
+
+## Versões
+
+- 0.1.3 - 24/08/2022 - Melhorias na Extensão Interface e criação do primeiro aplicativo
+  
+  - Prototipado versão modo texto de alta resolução e resolução normal
+  
+  - Criação do protótipo do Programa 'Arquivos'
+  
+  - Implementação de sub controles dentro de outros controles
+  
+  - Melhoria na importação permitindo importar módulos de programas já abertos
+
+- 0.1.2 - 22/08/2022 - Implementado a importação de módulos do núcleo para programas
+  
+  - Adição de rotinas de comparação de texto
+  
+  - Implementado a importação de módulos do nucleo por programas comuns
+
+- 0.1.1 - 21/08/2022 - Versão inicial
+  
+  - Criação da multitarefa
+  
+  - Implementado terminal de texto com saidas diversas para uso do núcleo
+  
+  - Criação do Gerenciamento de Memória que divide a RAM em blocos de 256 Bytes
+  
+  - Início da implementação do MinixFS
+
+
+
 ## Licenciamento
 
 Este software é licenciado via BSD-4 Clause, o que torna incompatível com código GPL.
