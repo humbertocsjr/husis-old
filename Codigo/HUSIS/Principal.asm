@@ -32,6 +32,8 @@ modulos:
     dw SisArq
     dw MinixFS
     dw Multitarefa
+    dw Semaforo
+    dw DMA
     dw 0
 
 %include 'TratamentoExecutavel.asm'
@@ -44,6 +46,8 @@ modulos:
 %include 'SisArq.asm'
 %include 'MinixFS.asm'
 %include 'Multitarefa.asm'
+%include 'Semaforo.asm'
+%include 'DMA.asm'
 
 importar:
     dw 0
@@ -54,6 +58,8 @@ exportar:
     db 'Memoria',0
     dw Texto
     db 'Texto',0
+    dw Semaforo
+    db 'Semaforo',0
     dw 0
 
 
@@ -133,6 +139,8 @@ inicial:
     db ' - %at [%bt: %cn Bytes]',0
     cs call far [Memoria]
     cs call far [Multitarefa]
+    cs call far [Semaforo]
+    cs call far [DMA]
     cs call far [Terminal.EscrevaOk]
 
     cs mov ax, [Trad.DiscoBIOS]
