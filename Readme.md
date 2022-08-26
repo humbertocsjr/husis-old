@@ -4,6 +4,7 @@ Sistema Operacional para PC/XT e compatíveis feito inteiramente em Assembly.
 
 Arquivos interessantes para ver:
 
+- **Rotina de Desenho de um Caractere de uma Fonte** da Interface Grafica: [VER LINHA 188 do /Codigo/Extensoes/Interface/Interface.asm](https://github.com/humbertocsjr/husis/blob/master/Codigo/Extensoes/Interface/Interface.asm)
 - **Rótulo** da Interface Grafica: [/Codigo/Extensoes/Interface/CtlRotulo.asm](https://github.com/humbertocsjr/husis/blob/master/Codigo/Extensoes/Interface/CtlRotulo.asm)
 - **Janela** da Interface Grafica: [/Codigo/Extensoes/Interface/CtlJanela.asm](https://github.com/humbertocsjr/husis/blob/master/Codigo/Extensoes/Interface/CtlJanela.asm)
 - **Núcleo do Sistema**: [/Codigo/HUSIS/Principal.asm](https://github.com/humbertocsjr/husis/blob/master/Codigo/HUSIS/Principal.asm)
