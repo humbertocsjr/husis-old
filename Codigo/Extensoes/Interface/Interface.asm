@@ -196,23 +196,31 @@ __interfaceDesenhaCaractere:
     push di
     push bp
     mov bp, sp
+    ; Cria as variaveis locais
     xor ah, ah
     push ax
     .varCaractere: equ -2
+
     es push word [di+ObjControle.InternoX1]
     .varX: equ -4
+
     es push word [di+ObjControle.InternoY1]
     .varY: equ -6
+
     xor ax, ax
     push ax
     .varLargura: equ -8
+
     push ax
     .varAltura: equ -10
+
     push ax
     .varX2: equ -12
+
     push ax
     .varY2: equ -14
-    ; Carrega a fonte
+
+    ; Carrega a fonte da lista de fontes
     es mov bx, [di+ObjControle.Fonte]
     shl bx, 1
     shl bx, 1
@@ -221,36 +229,61 @@ __interfaceDesenhaCaractere:
     cs mov ax, [bx+2]
     mov ds, ax
     ; Le parametros da fonte
+
+    ; Ignora os caracteres invisiveis, desenhando apenas se for visivel
     mov ax, [si+ObjFonte.PrimeiroCaractere]
     cmp [bp+.varCaractere], ax
     jb .fim
+        ; Usa o caractere como indice para apontar na fonte
+        ; Para isso subtrai do indice os caracteres invisiveis
         sub [bp+.varCaractere], ax
+        ; Le a altura da fonte
         mov ax, [si+ObjFonte.Altura]
         mov [bp+.varAltura], ax
+        ; Le o caractere/indice para ler na fonte
         mov ax, [bp+.varCaractere]
+        ; Multiplica o indice pelo tamanho em bytes de cada desenho de um
+        ; caractere
         mov cx, [si+ObjFonte.BytesPorCaractere]
         mul cx
+        ; Agora tendo um ponteiro para a lista de caracteres, soma ao ponteiro
+        ; que direciona para o inicio da lista
         mov si, [si+ObjFonte.PtrLocalInicio]
         add si, ax
+        ; Carrega o primeiro byte do ponteiro do caractere 
+        ; (Largura do caractere)
         xor ax, ax
         lodsb
         mov [bp+.varLargura], ax
+        
         ; Valida altura e largura com espaco disponivel
+
+        ; Largura > X2-X1 ?
         es mov ax, [di+ObjControle.InternoX2]
         es sub ax, [di+ObjControle.InternoX1]
         cmp [bp+.varLargura], ax
         jb .larguraOk
+            ; Se largura atual for maior que o espaco disponivel usa o espaco
             mov [bp+.varLargura], ax
         .larguraOk:
+
+        ; Altura > Y2-Y1 ?
         es mov ax, [di+ObjControle.InternoY2]
         es sub ax, [di+ObjControle.InternoY1]
         cmp [bp+.varAltura], ax
         jb .alturaOk
+            ; Se altura atual for maior que o espaco disponivel usa o espaco
             mov [bp+.varAltura], ax
         .alturaOk:
+
+        ; Calcula o X2
+        ; X2 = X1+Largura
         es mov ax, [di+ObjControle.InternoX1]
         add ax, [bp+.varLargura]
         mov [bp+.varX2], ax
+
+        ; Calcula o Y2
+        ; Y2 = Y1+Altura
         es mov ax, [di+ObjControle.InternoY1]
         add ax, [bp+.varAltura]
         mov [bp+.varY2], ax
@@ -258,7 +291,7 @@ __interfaceDesenhaCaractere:
         ; Desenha o caractere
         mov bx, [bp+.varY]
         .vert:
-            ; Verifica se chegou ao fim
+            ; Verifica se chegou ao fim vertical
             cmp bx, [bp+.varY2]
             jae .fimVert
             ; Le byte da fonte
@@ -267,21 +300,29 @@ __interfaceDesenhaCaractere:
             mov dx, ax
             pop ax
             ; Desenha uma linha da fonte
+            ; Redefine X para o inicio da proxima linha do desenho
             mov ax, [bp+.varX]
             .horiz:
-                ; Verifica se chegou ao fim da linha
+                ; Verifica se chegou ao fim da linha (horizontal)
                 cmp ax, [bp+.varX2]
                 ja .fimHoriz
+                ; O pixel é armazenado em um bit
+                ; Faz uma operação de descarte do bit mais a esquerda
                 shl dl, 1
                 push si
+                ; Se o bit descartado for 0, nao desenha
                 jnc .pula
+                    ; Se for 1, desenha
                     es mov si, [di+ObjControle.InternoCor]
+                    ; Desenha o pixel
                     cs call far [Video.Pixel]
                 .pula:
                 pop si
+                ; Incrementa X
                 inc ax
                 jmp .horiz
             .fimHoriz:
+            ; Incrementa Y
             inc bx
             jmp .vert
         .fimVert:
