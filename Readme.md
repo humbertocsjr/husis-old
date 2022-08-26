@@ -2,7 +2,11 @@
 
 Sistema Operacional para PC/XT e compatíveis.
 
+## Captura de telas
+#### Português do Brasil
 ![](Telas/v0.2.0-alpha.png)
+#### Inglês Americano
+![](Telas/v0.2.0-alpha-enus.png)
 
 
 
