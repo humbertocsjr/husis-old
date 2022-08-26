@@ -2,13 +2,13 @@
 
 Sistema Operacional para PC/XT e compatíveis feito inteiramente em Assembly.
 
-Principais arquivos para ver:
+Arquivos interessantes para ver:
 
+- **Janela** da Interface Grafica: /Codigo/Extensoes/Interface/CtlJanela.asm
+- **Rótulo** da Interface Grafica: /Codigo/Extensoes/Interface/CtlRótulo.asm
 - **Núcleo do Sistema**: /Codigo/HUSIS/Principal.asm
 - Programa **Gerenciador de Arquivos** (Protótipo de uso da Interface Gráfica): /Codigo/Programas/Arquivos/Arquivos.asm
 - Fonte **Pipoca**: /Codigo/Extensoes/Interface/FontePipoca.asm
-- **Janela** da Interface Grafica: /Codigo/Extensoes/Interface/CtlJanela.asm
-- **Rótulo** da Interface Grafica: /Codigo/Extensoes/Interface/CtlRótulo.asm
 
 ## Captura de telas
 #### Português do Brasil
