@@ -4,16 +4,20 @@ Sistema Operacional para PC/XT e compatíveis feito inteiramente em Assembly.
 
 Arquivos interessantes para ver:
 
-- **Rótulo** da Interface Grafica: /Codigo/Extensoes/Interface/CtlRótulo.asm
-- **Janela** da Interface Grafica: /Codigo/Extensoes/Interface/CtlJanela.asm
-- **Núcleo do Sistema**: /Codigo/HUSIS/Principal.asm
-- Programa **Gerenciador de Arquivos** (Protótipo de uso da Interface Gráfica): /Codigo/Programas/Arquivos/Arquivos.asm
-- Fonte **Pipoca**: /Codigo/Extensoes/Interface/FontePipoca.asm
+- **Rótulo** da Interface Grafica: [/Codigo/Extensoes/Interface/CtlRotulo.asm](https://github.com/humbertocsjr/husis/blob/master/Codigo/Extensoes/Interface/CtlRotulo.asm)
+- **Janela** da Interface Grafica: [/Codigo/Extensoes/Interface/CtlJanela.asm](https://github.com/humbertocsjr/husis/blob/master/Codigo/Extensoes/Interface/CtlJanela.asm)
+- **Núcleo do Sistema**: [/Codigo/HUSIS/Principal.asm](https://github.com/humbertocsjr/husis/blob/master/Codigo/HUSIS/Principal.asm)
+- Programa **Gerenciador de Arquivos** (Protótipo de uso da Interface Gráfica): [/Codigo/Programas/Arquivos/Arquivos.asm](https://github.com/humbertocsjr/husis/blob/master/Codigo/Programas/Arquivos/Arquivos.asm)
+- Fonte **Pipoca**: [/Codigo/Extensoes/Interface/FontePipoca.asm](https://github.com/humbertocsjr/husis/blob/master/Codigo/Extensoes/Interface/FontePipoca.asm)
 
 ## Captura de telas
+
 #### Português do Brasil
+
 ![](Telas/v0.2.0-alpha.png)
+
 #### Inglês Americano
+
 ![](Telas/v0.2.0-alpha-enus.png)
 
 ## Como compilar
@@ -33,14 +37,15 @@ make
 ```
 
 E para teste deve executar
+
 ```sh
 make ptbr
 ```
 
-
 ## Versões
 
 - 0.2.0 - 25/08/2022 - Interface Gráfica
+  
   - Implementação da Biblioteca de Video entre o Controlador de Vídeo e a Interface Gráfica, a Biblioteca implementa rotinas não otimizadas que podem ser substituidas por rotinas otimizadas do Controlador de Vídeo, facilitando a implementação de novos controladores, bastando implementar o desenho de pixel para conseguir funcionar
   - Criado o primeiro Controlador de Video CGA, por enquanto apenas foi implementado a rotina de desenhar um pixel, e esta de forma não otimizada, usando a BIOS, sendo assim o desempenho é bem lento.
   - Implementado a renderização de fontes simples, aproveitando a importação da Fonte Paçoca vinda do antigo projeto HCSO.
@@ -71,23 +76,17 @@ make ptbr
   
   - Início da implementação do MinixFS
 
-
-
 ## Licenciamento
 
 Este software é licenciado via BSD-4 Clause, o que torna incompatível com código GPL.
 
 Exigindo que qualquer derivado informe explicitamente a origem do código.
 
-
-
 ## Motivação
 
 Sempre tive interesse em Sistemas Operacionais e Assembly, como tenho uma pequena coleção de computadores antigos, resolvi desenvolver mirando no minimo em comum entre parte da minha coleção, a plataforma PC/XT, tenho como objetivo desenvolver um sistema leve e simples que possa ser rodado em vários hardwares com processador 8088/8086 e derivados.
 
 Quero ao menos tentar faze-lo compacto o suficiente para rodar no meu HP 95LX (Processador 8088 com 256 KiB de RAM e 256 KiB de armazenamento), mas não é o objetivo obrigatório deste projeto, pois estou mirando em computadores como IBM XT com 512 KiB de RAM e 5 MiB de Armazenamento.
-
-
 
 ## Objetivos
 
@@ -127,8 +126,6 @@ Quero ao menos tentar faze-lo compacto o suficiente para rodar no meu HP 95LX (P
 
 - Implementar um gerador de discos automático e personalizável podendo escolher os programas e extensões
 
-
-
 ## Inspiração
 
 Tenho como inspiração alguns sistemas operacionais, tais como:
@@ -145,8 +142,6 @@ Tenho como inspiração alguns sistemas operacionais, tais como:
 
 Com essa mistura quero fazer um sistema com o mínimo de APIs possível para ser funcional, ao mesmo tempo que não ignoro o necessário para ser fácil de criar aplicações.
 
-
-
 ## Escopo
 
 - Criar um Sistema Operacional para 8086/8088.
@@ -158,8 +153,6 @@ Com essa mistura quero fazer um sistema com o mínimo de APIs possível para ser
 - (Semi)Orientado a Objetos, limitada devido a escolha da linguagem de programação, porém o código usa e abusa de objetos dinamicamente alocados e classes estáticas para a parte principal do código.
 
 - Manter o núcleo o mais enxuto possível, sempre tentando manter o máximo de funcionalidades em extensões externas.
-
-
 
 ## Armazenamento de Arquivos/Diretórios
 
@@ -179,8 +172,6 @@ Exemplo:
 
 Caso não seja fornecida a unidade, será utilizada automaticamente a unidade principal, onde fica o sistema operacional.
 
-
-
 ## Hierarquia
 
 Por padrão os arquivos são armazenados nos diretórios abaixo, e seus nomes são traduzídos juntamente do sistema operacional.
@@ -194,10 +185,6 @@ Por padrão os arquivos são armazenados nos diretórios abaixo, e seus nomes s�
 | /Perfis/[USUARIO]/Config | /Profiles/[USUARIO]/Config | Arquivos de configuração do usuário                             |
 | /Programas               | /Programs                  | Programas Gerais instalados                                     |
 | /Desenvolvimento         | /Development               | Programas e ferramentas voltadas ao desenvolvimento de software |
-
-
-
-
 
 # Parte Técnica
 
@@ -221,13 +208,9 @@ Ao escolher uma versão específica desse sistema de arquivos, facilita o seu de
 
 Foi escolhida como linguagem principal o Assembly (Padrão NASM), por esta linguagem ser muito livre em forma, não exigindo um padrão especifico de desenvolvimento ou mesmo método, foi criado um padrão de codificação para este projeto, visando unificar todo o código fonte e simplificar sua manutenção, e por ser um padrão simples, facilitar a inclusão de novo código.
 
-
-
 ### (Quase)Orientação a Objetos
 
 Para diminuir o tamanho dos executáveis e facilitar o reaproveitamento de código entre projetos, os programas são divididos em Modulos (Simulacro de Classes Estáticas) e Objetos (Similar a uma Classe), foi feito de uma forma, que deixa a responsabilidade para o sistema operacional lidar com a alocação e gerenciamento dos segmentos do 8086.
-
-
 
 ### Segmentação de memória
 
@@ -253,10 +236,6 @@ Esta separação é para acomodar os Ponteiros disponíveis pelo Processador, e 
 
 A memória é organizada em blocos de 256 Bytes, mas isto é transparente para o programador do aplicativo, que pode opcionalmente usar metodor de alocação que usem blocos ao invés de bytes, para otimizar o código caso seja um projeto muito grande. 
 
-
-
 ## Chamadas
 
 Todo código deve usar chamadas do tipo CALL FAR entre rotinas, assim podendo chamar códigos de outros executáveis.
-
-
