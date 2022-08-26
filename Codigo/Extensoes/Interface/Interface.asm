@@ -180,7 +180,7 @@ _interface:
     pop ax
     retf
 
-
+; Rotina que desenha um caractere na tela usando uma fonte
 ; es:di = ObjControle
 ;         Usa coordenadas Internas
 ; al    = Caractere
