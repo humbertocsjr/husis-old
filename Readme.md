@@ -1,6 +1,7 @@
 # HUSIS
 
-Sistema Operacional para PC/XT e compatíveis.
+Sistema Operacional para PC/XT e compatíveis feito inteiramente em Assembly.
+
 
 ## Captura de telas
 #### Português do Brasil
@@ -8,6 +9,26 @@ Sistema Operacional para PC/XT e compatíveis.
 #### Inglês Americano
 ![](Telas/v0.2.0-alpha-enus.png)
 
+## Como compilar
+
+Tem como requisito apenas três softwares: NASM, Make e [MinixFS](https://github.com/humbertocsjr/minixfs)
+
+Futuramente será fornecido no pacote versões para diversos sistemas operacionais do MinixFS, por enquanto apenas faz parte do pacote a versão para MacOS.
+
+O binário do MinixFS fica na pasta /Ferramentas/ devendo ser substituido pelo executável equivalente do sistema operacional onde será compilado.
+
+Na falta desta ferramenta apenas a etapa final de geração do arquivo de Imagem de Disco não será possivel executar.
+
+Para compilar deve executar os comandos:
+
+```sh
+make
+```
+
+E para teste deve executar
+```sh
+make ptbr
+```
 
 
 ## Versões
