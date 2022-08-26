@@ -15,6 +15,8 @@
 ; - 25/08/2022 - Humberto - Prototipo inicial
 %include '../../Incluir/Prog.asm'
 
+; Cabecalho do executavel
+
 nome: db 'Video',0
 versao: dw 0,1,1
 tipo: dw TipoProg.Executavel
@@ -31,6 +33,8 @@ exportar:
     dw Video
     db 'Video',0
     dw 0
+
+; Modulos exportados
 
 Video: dw _video,0
     .Pixel: dw _videoPixel, 0
@@ -95,6 +99,8 @@ Video: dw _video,0
     .Largura: dw 0
     .Altura: dw 0
     .Cores: dw 0
+
+; Rotinas do modulo Video
 
 _video:
     retf
@@ -292,7 +298,7 @@ _videoRegistraVideo:
     pop bp
     retf
 
-
+; Rotina principal
 inicial:
     cs call far [HUSIS.EntraEmModoBiblioteca]
     retf

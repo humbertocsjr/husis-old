@@ -15,6 +15,8 @@
 ; - 24/08/2022 - Humberto - Prototipo inicial
 %include '../../Incluir/Prog.asm'
 
+; Cabecalho do executavel
+
 nome: db 'PS2',0
 versao: dw 0,1,1
 tipo: dw TipoProg.Executavel
@@ -34,6 +36,8 @@ exportar:
     db 'PS2',0
     dw 0
 
+; Modulos exportados
+
 PS2: dw _ps2, 0
     .Envia: dw _ps2Envia,0
         ; dx = Porta
@@ -50,6 +54,8 @@ PS2: dw _ps2, 0
     .Simultaneos: dw 1
     .TipoPorta1: dw TipoPS2.Desconhecido
     .TipoPorta2: dw TipoPS2.Desconhecido
+
+; Enumeradores usados
 
 TipoPS2:
     .Desconhecido: equ 0
@@ -159,6 +165,8 @@ MascaraConfig:
     .TraducaoPorta1:   equ 0b01000000
     .LimpaSempreZero:  equ 0b01110111
     .ConfLimpa:        equ 0b00110100
+
+; Rotinas do modulo PS2
 
 _ps2:
     cs mov word [PS2.Simultaneos], 1
@@ -371,8 +379,11 @@ _ps2PodeEnviar:
     call __ps2LiberaExclusivo
     retf
 
+; Rotina principal
+
 inicial:
     cs call far [PS2]
+    ; Se mantem na memoria porem sem uma tarefa principal
     cs call far [HUSIS.EntraEmModoBiblioteca]
     retf
 

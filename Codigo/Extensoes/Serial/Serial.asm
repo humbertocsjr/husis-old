@@ -15,6 +15,8 @@
 ; - 23/08/2022 - Humberto - Prototipo inicial
 %include '../../Incluir/Prog.asm'
 
+; Cabecalho do executavel
+
 nome: db 'Serial',0
 versao: dw 0,1,1
 tipo: dw TipoProg.Executavel
@@ -33,6 +35,8 @@ exportar:
     dw Serial
     db 'Serial',0
     dw 0
+
+; Enumeradores usados
 
 TipoConexaoSerial:
     .Trans8SemPariedade1Parada:       equ 0xb00000011
@@ -55,6 +59,8 @@ TipoConexaoSerial:
     .Trans7PariedadePar2Parada:       equ 0xb00011110
     .Trans7PariedadeAlta2Parada:      equ 0xb00101110
     .Trans7PariedadeBaixa2Parada:     equ 0xb00111110
+
+; Modulos exportados
 
 Serial: dw _serial, 0
     .IniciaPorta: dw _serialIniciaPorta,0
@@ -83,6 +89,8 @@ Serial: dw _serial, 0
         dw 0x2F8
         dw 0x3E8
         dw 0x2E8
+
+; Rotinas do modulo Serial
 
 _serial:
     retf
@@ -308,6 +316,8 @@ _serialPodeEnviar:
     pop ax
     retf
 
+
+; Rotina principal
 inicial:
     cs call far [Serial]
     cs call far [HUSIS.EntraEmModoBiblioteca]

@@ -15,6 +15,8 @@
 ; - 25/08/2022 - Humberto - Prototipo inicial
 %include '../../Incluir/Prog.asm'
 
+; Cabecalho do executavel
+
 nome: db 'CGA',0
 versao: dw 0,1,1
 tipo: dw TipoProg.Executavel
@@ -30,7 +32,9 @@ importar:
 exportar:
     dw 0
 
+; Rotinas Auxiliares
 
+; Desenha um pixel
 ; ax = X
 ; bx = Y
 ; si = Cor
@@ -40,6 +44,9 @@ Pixel:
     push bx
     push cx
     push dx
+    ; TEMPORARIO
+    ; Faz uma chamada a BIOS, substituir pela escrita direta na memoria de 
+    ; video
     mov cx, ax
     mov dx, bx
     mov ax, si
@@ -53,6 +60,7 @@ Pixel:
     stc
     retf
 
+; Rotina Principal
 
 inicial:
     mov ax, 5

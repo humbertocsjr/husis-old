@@ -1,4 +1,4 @@
-
+; Arquivo de inclusao das funcoes do nucleo
 HUSIS: dw ._Fim
     db 'HUSIS',0
     db 'HUSIS',0

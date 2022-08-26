@@ -1,4 +1,4 @@
-
+; Arquivo de inclusao da interface grafica
 Interface: dw ._Fim
     db 'Interface',0
     db 'Interface',0

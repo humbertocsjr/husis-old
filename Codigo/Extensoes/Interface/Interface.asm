@@ -17,6 +17,7 @@
 ;                           do hardware disponivel para teste
 %include '../../Incluir/Prog.asm'
 
+; Cabecalho do executavel
 nome: db 'Interface',0
 versao: dw 0,1,1
 tipo: dw TipoProg.Executavel
@@ -24,9 +25,8 @@ modulos:
     dw Interface
     dw 0
 
+; Inclusao dos demais arquivo do projeto
 
-; 23/08/2022 - Comentado na remocao do codigo da interface grafica
-;    %include 'FontePipoca.asm'
     %include '../../Incluir/ObjFonte.asm'
     %include '../../Incluir/ObjControle.asm'
     %include 'FontePipoca.asm'
@@ -44,6 +44,8 @@ exportar:
     db 'Interface',0
     dw 0
 
+; Enumeradores usados pela biblioteca
+
 TipoBorda:
     .SupEsq: equ 218
     .InfDir: equ 217
@@ -56,6 +58,8 @@ TipoBorda:
     .Central: equ 197
     .VertSup: equ 194
     .VertInf: equ 193
+
+; Descricao do Modulo exportado
 
 Interface: dw _interface, 0
     .AlocaControleRemoto: dw _interfaceAlocaControleRemoto,0
@@ -165,6 +169,8 @@ Interface: dw _interface, 0
     .JanelaAtual: dw 0
     .TemaCorBorda: dw TipoCor.Ciano
     .TemaCorTitulo: dw TipoCor.CianoClaro
+
+; Rotinas da Interface
 
 _interface:
     push ax
@@ -725,9 +731,13 @@ __interfaceCalcularCoordenadas:
     pop ds
     ret
 
+
+; Rotina principal
 inicial:
+    ; Inicia o modulo Interface
     cs call far [Interface]
     .processa:
+        ; Fica esperando eternamente
         cs call far [HUSIS.ProximaTarefa]
         jmp .processa
     retf
