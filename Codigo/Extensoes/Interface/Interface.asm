@@ -29,6 +29,7 @@ modulos:
 ;    %include 'FontePipoca.asm'
     %include '../../Incluir/ObjFonte.asm'
     %include '../../Incluir/ObjControle.asm'
+    %include 'FontePipoca.asm'
     %include 'CtlJanela.asm'
     %include 'CtlRotulo.asm'
 
@@ -36,6 +37,7 @@ importar:
     %include '../../Incluir/Texto.asm'
     %include '../../Incluir/Memoria.asm'
     %include '../../Incluir/HUSIS.asm'
+    %include '../../Incluir/Video.asm'
     dw 0
 exportar:
     dw Interface
@@ -56,39 +58,6 @@ TipoBorda:
     .VertInf: equ 193
 
 Interface: dw _interface, 0
-    .RegistraTela: dw _interfaceRegistraTela,0
-        ; Registra a tela (Inicialmente apenas suporta uma)
-        ; O Buffer eh opcional, neste caso a rotina dx deve apenas retornar 
-        ; cf=1 apenas efetuando a limpeza via os parametros
-        ; ax = Segmento das rotinas
-        ; bx = Rotina de desenho um caractere no buffer
-        ;      cx = X
-        ;      dx = Y
-        ;      ax = Cor
-        ;      ret: cf = 1=Ok | 0=Falha
-        ; cx = Quantidade de cores
-        ; dx = Rotina que atualiza a tela com o buffer / limpa tela
-        ;      ax = Acao:
-        ;           0 = Atualiza a tela com o buffer
-        ;           1 = Limpa a tela e o buffer
-        ;           2 = Limpa o buffer
-        ;      ret: cf = 1=Ok | 0=Falha
-        ; si = Largura em Pixels
-        ; di = Altura em Pixels
-        ; ret: cf = 1=Ok | 0=Falha
-    .DesenhaCaractere: dw _interfaceDesenhaCaractere,0
-        ; Desenha um caractere
-        ; cx = X
-        ; dx = Y
-        ; ah = Cor
-        ; al = Caractere
-        ; ret: cf = 1=Ok | 0=Falha
-    .DesenhaFundoRemoto: dw _interfaceDesenhaFundoRemoto, 0
-        ; es:di = ObjControle
-        ; ret: cf = 1=Ok | 0=Falha
-    .DesenhaCaixaRemoto: dw _interfaceDesenhaCaixaRemoto, 0
-        ; es:di = ObjControle
-        ; ret: cf = 1=Ok | 0=Falha
     .AlocaControleRemoto: dw _interfaceAlocaControleRemoto,0
         ; ret: cf = 1=Ok | 0=Falha
         ;      es:di = ObjControle
@@ -185,22 +154,146 @@ Interface: dw _interface, 0
         ; ds:si = Traducao (ds=cs)
         ; ret: cf = 1=Ok | 0=Falha
     dw 0
-    .PtrDesenhaCaractere: dw 0, 0
-    .PtrAtualizaTela: dw 0, 0
     .Largura: dw 0
     .Altura: dw 0
     .Cores: dw 0
     .PtrBuffer: dw 0
-    ; 23/08/2022 - Comentado na remocao do codigo da interface grafica
-    ;._CapacidadeFontes: equ 32
-    ;.Fontes: times ._CapacidadeFontes dw 0,0
+    ._CapacidadeFontes: equ 32
+    .Fontes: times ._CapacidadeFontes dw 0,0
     ._CapacidadeJanelas: equ 32
     .Janelas: times ._CapacidadeJanelas dw 0,0
     .JanelaAtual: dw 0
     .TemaCorBorda: dw TipoCor.Ciano
     .TemaCorTitulo: dw TipoCor.CianoClaro
 
+_interface:
+    push ax
+    mov ax, cs
+    cs mov [Interface.Fontes+2], ax
+    cs mov word [Interface.Fontes], FontePipoca
+    pop ax
+    retf
 
+
+; es:di = ObjControle
+;         Usa coordenadas Internas
+; al    = Caractere
+; ret: Incrementa ObjControle.InternoX1
+__interfaceDesenhaCaractere:
+    push ax
+    push bx
+    push cx
+    push dx
+    push ds
+    push si
+    push es
+    push di
+    push bp
+    mov bp, sp
+    xor ah, ah
+    push ax
+    .varCaractere: equ -2
+    es push word [di+ObjControle.InternoX1]
+    .varX: equ -4
+    es push word [di+ObjControle.InternoY1]
+    .varY: equ -6
+    xor ax, ax
+    push ax
+    .varLargura: equ -8
+    push ax
+    .varAltura: equ -10
+    push ax
+    .varX2: equ -12
+    push ax
+    .varY2: equ -14
+    ; Carrega a fonte
+    es mov bx, [di+ObjControle.Fonte]
+    shl bx, 1
+    shl bx, 1
+    add bx, Interface.Fontes
+    cs mov si, [bx]
+    cs mov ax, [bx+2]
+    mov ds, ax
+    ; Le parametros da fonte
+    mov ax, [si+ObjFonte.PrimeiroCaractere]
+    cmp [bp+.varCaractere], ax
+    jb .fim
+        sub [bp+.varCaractere], ax
+        mov ax, [si+ObjFonte.Altura]
+        mov [bp+.varAltura], ax
+        mov ax, [bp+.varCaractere]
+        mov cx, [si+ObjFonte.BytesPorCaractere]
+        mul cx
+        mov si, [si+ObjFonte.PtrLocalInicio]
+        add si, ax
+        xor ax, ax
+        lodsb
+        mov [bp+.varLargura], ax
+        ; Valida altura e largura com espaco disponivel
+        es mov ax, [di+ObjControle.InternoX2]
+        es sub ax, [di+ObjControle.InternoX1]
+        cmp [bp+.varLargura], ax
+        jb .larguraOk
+            mov [bp+.varLargura], ax
+        .larguraOk:
+        es mov ax, [di+ObjControle.InternoY2]
+        es sub ax, [di+ObjControle.InternoY1]
+        cmp [bp+.varAltura], ax
+        jb .alturaOk
+            mov [bp+.varAltura], ax
+        .alturaOk:
+        es mov ax, [di+ObjControle.InternoX1]
+        add ax, [bp+.varLargura]
+        mov [bp+.varX2], ax
+        es mov ax, [di+ObjControle.InternoY1]
+        add ax, [bp+.varAltura]
+        mov [bp+.varY2], ax
+
+        ; Desenha o caractere
+        mov bx, [bp+.varY]
+        .vert:
+            ; Verifica se chegou ao fim
+            cmp bx, [bp+.varY2]
+            jae .fimVert
+            ; Le byte da fonte
+            push ax
+            lodsb
+            mov dx, ax
+            pop ax
+            ; Desenha uma linha da fonte
+            mov ax, [bp+.varX]
+            .horiz:
+                ; Verifica se chegou ao fim da linha
+                cmp ax, [bp+.varX2]
+                ja .fimHoriz
+                shl dl, 1
+                push si
+                jnc .pula
+                    es mov si, [di+ObjControle.InternoCor]
+                    cs call far [Video.Pixel]
+                .pula:
+                pop si
+                inc ax
+                jmp .horiz
+            .fimHoriz:
+            inc bx
+            jmp .vert
+        .fimVert:
+
+    .fim:
+    mov ax, [bp+.varLargura]
+    es add [di+ObjControle.InternoX1], ax
+    mov sp, bp
+    pop bp
+    pop di
+    pop es
+    pop si
+    pop ds
+    pop dx
+    pop cx
+    pop bx
+    pop ax
+    ret
 
 _interfaceAdicionaRemota:
     push ax
@@ -372,97 +465,6 @@ _interfaceAdicionaJanRemota:
     pop si
     retf
 
-
-_interfaceDesenhaCaixaRemoto:
-    push ax
-    push bx
-    push cx
-    push dx
-    cs call far [Interface.DesenhaFundoRemoto]
-    cs mov ah, [Interface.TemaCorBorda]
-    es mov cx, [di+ObjControle.X1]
-    es mov dx, [di+ObjControle.Y1]
-    mov al, TipoBorda.SupEsq
-    cs call far [Interface.DesenhaCaractere]
-    es mov cx, [di+ObjControle.X2]
-    es mov dx, [di+ObjControle.Y2]
-    mov al, TipoBorda.InfDir
-    cs call far [Interface.DesenhaCaractere]
-    es mov cx, [di+ObjControle.X2]
-    es mov dx, [di+ObjControle.Y1]
-    mov al, TipoBorda.SupDir
-    cs call far [Interface.DesenhaCaractere]
-    es mov cx, [di+ObjControle.X1]
-    es mov dx, [di+ObjControle.Y2]
-    mov al, TipoBorda.InfEsq
-    cs call far [Interface.DesenhaCaractere]
-
-    es mov cx, [di+ObjControle.X1]
-    inc cx
-    mov al, TipoBorda.Horiz
-    .horizontal:
-        es cmp cx, [di+ObjControle.X2]
-        jb .contHorizontal
-        jmp .fimHorizontal
-        .contHorizontal:
-        es mov dx, [di+ObjControle.Y1]
-        cs call far [Interface.DesenhaCaractere]
-        es mov dx, [di+ObjControle.Y2]
-        cs call far [Interface.DesenhaCaractere]
-        inc cx
-        jmp .horizontal
-    .fimHorizontal:
-
-    es mov dx, [di+ObjControle.Y1]
-    inc dx
-    mov al, TipoBorda.Vert
-    .vertical:
-        es cmp dx, [di+ObjControle.Y2]
-        jb .contVertical
-        jmp .fimVertical
-        .contVertical:    
-        es mov cx, [di+ObjControle.X1]
-        cs call far [Interface.DesenhaCaractere]
-        es mov cx, [di+ObjControle.X2]
-        cs call far [Interface.DesenhaCaractere]
-        inc dx
-        jmp .vertical
-    .fimVertical:
-    pop dx
-    pop cx
-    pop bx
-    pop ax
-    retf
-
-_interfaceDesenhaFundoRemoto:
-    push ax
-    push bx
-    push cx
-    push dx
-    es mov cx, [di+ObjControle.X1]
-    es mov dx, [di+ObjControle.Y1]
-    es mov ah, [di+ObjControle.CorFundo]
-    mov al, ' '
-    .vert:
-        es cmp dx, [di+ObjControle.Y2]
-        ja .fim
-        es mov bx, [di+ObjControle.X2]
-        .horiz:
-            cmp cx, bx
-            ja .continua
-            cs call far [Interface.DesenhaCaractere]
-            inc cx
-            jmp .horiz
-        .continua:
-            inc dx
-            jmp .vert
-    .fim:
-    pop dx
-    pop cx
-    pop bx
-    pop ax
-    retf
-
 _interfaceExibeRemoto:
     es mov word [di+ObjControle.Visivel], 1
     cs call far [Interface.RenderizaRemoto]
@@ -482,9 +484,9 @@ _interfaceIniciaRemoto:
     es mov word [di+ObjControle.PtrConteudo+2], 0
     es mov word [di+ObjControle.PtrRenderiza], 0
     es mov word [di+ObjControle.PtrRenderiza+2], 0
-    es mov word [di+ObjControle.PtrFonte], 0
-    mov ax, cs
-    es mov [di+ObjControle.PtrFonte+2], ax
+    es mov word [di+ObjControle.PtrExtensao], 0
+    es mov word [di+ObjControle.PtrExtensao+2], 0
+    es mov word [di+ObjControle.Fonte], 0
     es mov word [di+ObjControle.X1], 0
     es mov word [di+ObjControle.Y1], 0
     es mov word [di+ObjControle.X2], 0
@@ -625,47 +627,6 @@ _interfaceRenderizaRemoto:
     pop ax
     retf
 
-_interfaceDesenhaCaractere:
-    clc
-    retf
-    times 50 nop
-    .inicio:
-    cs push word [Interface.PtrDesenhaCaractere+2]
-    cs push word [Interface.PtrDesenhaCaractere]
-    retf
-    .fim:
-
-_interfaceRegistraTela:
-    push ds
-    push es
-    push si
-    push di
-    push cx
-    cs mov [Interface.Cores], cx
-    cs mov [Interface.Largura], si
-    cs mov [Interface.Altura], di
-    cs mov [Interface.PtrDesenhaCaractere+2], ax
-    cs mov [Interface.PtrDesenhaCaractere], bx
-    cs mov [Interface.PtrAtualizaTela+2], ax
-    cs mov [Interface.PtrAtualizaTela], dx
-    push cs
-    pop ds
-    push cs
-    pop es
-    mov si, _interfaceDesenhaCaractere.inicio
-    mov di, _interfaceDesenhaCaractere
-    mov cx, _interfaceDesenhaCaractere.fim - _interfaceDesenhaCaractere.inicio
-    rep movsb
-    mov ax, 1
-    cs call far [Interface.PtrAtualizaTela]
-    stc
-    pop cx
-    pop di
-    pop si
-    pop es
-    pop ds
-    retf
-
 _interfaceAlocaControleRemoto:
     push ax
     push cx
@@ -709,18 +670,6 @@ __interfacePtrConteudoLocal:
         es mov ax, [di+ObjControle.PtrConteudo+2]
         mov ds, ax
         es mov si, [di+ObjControle.PtrConteudo]
-        stc
-    .fim:
-    pop ax
-    ret
-
-__interfacePtrFonteLocal:
-    push ax
-    es cmp word [di+ObjControle.PtrFonte], 0
-    je .fim
-        es mov ax, [di+ObjControle.PtrFonte+2]
-        mov ds, ax
-        es mov si, [di+ObjControle.PtrFonte]
         stc
     .fim:
     pop ax
@@ -778,20 +727,9 @@ __interfaceCalcularCoordenadas:
 
 inicial:
     cs call far [Interface]
-    .aguardaTela:
-        cs cmp word [Interface.PtrDesenhaCaractere], 0
-        je .continuaAguardando
-        cs cmp word [Interface.PtrAtualizaTela], 0
-        je .continuaAguardando
-            jmp .fimAguarda
-        .continuaAguardando:
-        cs call far [HUSIS.ProximaTarefa]
-        jmp .aguardaTela
-    .fimAguarda:
     .processa:
         cs call far [HUSIS.ProximaTarefa]
         jmp .processa
     retf
-    .teste: db 'Oieeee',0
 
 Trad: dw 0

@@ -54,7 +54,7 @@ FontePipoca: db 'FONTE',0
     dw ._Fim
     .Altura: dw 11
     .Largura: dw 8
-    .BytesPorCaractere: dw 12 * 1
+    .BytesPorCaractere: dw 12
     .PrimeiroCaractere: dw 32
     .Inicio: dw .Dados
 
@@ -1099,7 +1099,7 @@ FontePipoca: db 'FONTE',0
     db 00000000b
 
 
-    db 6
+    db 7
     db 00000000b
     db 00000000b
     db 00000000b

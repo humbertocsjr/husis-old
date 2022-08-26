@@ -2,11 +2,16 @@
 
 Sistema Operacional para PC/XT e compatíveis.
 
-![](Telas/v0.1.3-alpha.png)
+![](Telas/v0.2.0-alpha.png)
 
 
 
 ## Versões
+
+- 0.2.0 - 25/08/2022 - Interface Gráfica
+  - Implementação da Biblioteca de Video entre o Controlador de Vídeo e a Interface Gráfica, a Biblioteca implementa rotinas não otimizadas que podem ser substituidas por rotinas otimizadas do Controlador de Vídeo, facilitando a implementação de novos controladores, bastando implementar o desenho de pixel para conseguir funcionar
+  - Criado o primeiro Controlador de Video CGA, por enquanto apenas foi implementado a rotina de desenhar um pixel, e esta de forma não otimizada, usando a BIOS, sendo assim o desempenho é bem lento.
+  - Implementado a renderização de fontes simples, aproveitando a importação da Fonte Paçoca vinda do antigo projeto HCSO.
 
 - 0.1.3 - 24/08/2022 - Melhorias na Extensão Interface e criação do primeiro aplicativo
   

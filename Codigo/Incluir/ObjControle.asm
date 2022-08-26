@@ -15,7 +15,7 @@ ObjControle:
     .CorFundo: equ 32
     .CorFrente: equ 34
     .Visivel: equ 36
-    .PtrFonte: equ 38
+    .PtrExtensao: equ 38
     .PtrAbaixo: equ 42
     .PtrProximo: equ 46
     .MargemX1: equ 50
@@ -26,7 +26,13 @@ ObjControle:
     .CalcY1: equ 60
     .CalcX2: equ 62
     .CalcY2: equ 64
-    ._Tam: equ 66
+    .InternoX1: equ 66
+    .InternoY1: equ 68
+    .InternoX2: equ 70
+    .InternoY2: equ 72
+    .InternoCor: equ 74
+    .Fonte: equ 76
+    ._Tam: equ 78
 
 TipoCor:
     .Preto: equ 0

@@ -42,8 +42,8 @@ _arquivos:
     mov cx, 10
     mov dx, 10
     cs call far [Interface.AlteraPosInicialRemoto]
-    mov cx, 40
-    mov dx, 11
+    mov cx, 230
+    mov dx, 70
     cs call far [Interface.AlteraTamanhoRemoto]
     cs call far [Interface.ExibeRemoto]
     cs call far [Interface.AdicionaJanelaRemota]
@@ -57,8 +57,8 @@ _arquivos:
     mov cx, 2
     mov dx, 2
     cs call far [Interface.AlteraPosInicialRemoto]
-    mov cx, 40
-    mov dx, 1
+    mov cx, 220
+    mov dx, 11
     cs call far [Interface.AlteraTamanhoRemoto]
     cs call far [Interface.ExibeRemoto]
 
@@ -69,10 +69,10 @@ _arquivos:
     mov si, Arquivos.Copyright
     cs call far [Interface.IniciaRotuloRemoto]
     mov cx, 2
-    mov dx, 4
+    mov dx, 15
     cs call far [Interface.AlteraPosInicialRemoto]
-    mov cx, 40
-    mov dx, 3
+    mov cx, 220
+    mov dx, 40
     cs call far [Interface.AlteraTamanhoRemoto]
     cs call far [Interface.ExibeRemoto]
     retf

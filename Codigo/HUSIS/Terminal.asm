@@ -645,7 +645,7 @@ _terminalEscrevaDebugDSSI:
     push cx
     mov cx, 16
     cs call far [Terminal.Escreva]
-    db 'DS:SI:', 0
+    db 'DS:SI: [', 0
     xor ax, ax
     .escreve:
         lodsb
@@ -659,11 +659,13 @@ _terminalEscrevaDebugDSSI:
             db '"%ac"', 0
         .ignora:
         loop .escreve
+    cs call far [Terminal.Escreva]
+    db ' ]\n', 0
     pop cx
     pop si
     pop ax
     popf
-    jmp Terminal.EscrevaDebug
+    cs jmp far [Terminal.EscrevaDebug]
 
 _terminalEscrevaDebugESDI:
     pushf
@@ -695,7 +697,7 @@ _terminalEscrevaDebugESDI:
     pop si
     pop ax
     popf
-    jmp Terminal.EscrevaDebug
+    cs jmp far [Terminal.EscrevaDebug]
 
 _terminalEscrevaDebugESSI:
     pushf
@@ -720,7 +722,7 @@ _terminalEscrevaDebugESSI:
     pop si
     pop ax
     popf
-    jmp Terminal.EscrevaDebug
+    cs jmp far [Terminal.EscrevaDebug]
 
 _terminalEscrevaDebugPilha:
     pushf
@@ -746,7 +748,7 @@ _terminalEscrevaDebugPilha:
     pop si
     pop ax
     popf
-    jmp Terminal.EscrevaDebug
+    cs jmp far [Terminal.EscrevaDebug]
 
 _terminalEscrevaRemoto:
     pushf
