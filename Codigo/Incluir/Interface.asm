@@ -35,6 +35,14 @@ Interface: dw ._Fim
         ; es:di = ObjControle
         ; ds:si = Traducao (ds=cs)
         ; ret: cf = 1=Ok | 0=Falha
+    .AlteraExtensaoRemoto: dw 1, 0
+        ; es:di = ObjControle
+        ; ds:si = Novo conteudo extendido
+        ; ret: cf = 1=Ok | 0=Falha
+    .AlteraExtensaoTradRemoto: dw 1, 0
+        ; es:di = ObjControle
+        ; ds:si = Traducao (ds=cs)
+        ; ret: cf = 1=Ok | 0=Falha
     .AlteraValorARemoto: dw 1, 0
         ; es:di = ObjControle
         ; ax = Valor A

@@ -21,7 +21,7 @@
 ; Cabecalho do executavel
 
 nome: db 'HUSIS',0
-versao: dw 0,2,0,'Alpha',0
+versao: dw 0,2,1,'Alpha',0
 tipo: dw TipoProg.Nucleo
 
 ; Modulos dentro deste executavel

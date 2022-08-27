@@ -95,6 +95,14 @@ Interface: dw _interface, 0
         ; es:di = ObjControle
         ; ds:si = Traducao (ds=cs)
         ; ret: cf = 1=Ok | 0=Falha
+    .AlteraExtensaoRemoto: dw _interfaceAlteraExtensaoRemoto, 0
+        ; es:di = ObjControle
+        ; ds:si = Novo conteudo extendido
+        ; ret: cf = 1=Ok | 0=Falha
+    .AlteraExtensaoTradRemoto: dw _interfaceAlteraExtensaoTradRemoto, 0
+        ; es:di = ObjControle
+        ; ds:si = Traducao (ds=cs)
+        ; ret: cf = 1=Ok | 0=Falha
     .AlteraValorARemoto: dw _interfaceAlteraValorARemoto, 0
         ; es:di = ObjControle
         ; ax = Valor A
@@ -594,6 +602,33 @@ _interfaceAlteraConteudoTradRemoto:
     add si, [Prog.Traducao]
     es mov [di+ObjControle.PtrConteudo+2], ax
     es mov [di+ObjControle.PtrConteudo], si
+    cs call far [Interface.RenderizaRemoto]
+    pop ax
+    pop si
+    pop bp
+    stc
+    retf
+
+_interfaceAlteraExtensaoRemoto:
+    push ax
+    mov ax, ds
+    es mov [di+ObjControle.PtrExtensao+2], ax
+    es mov [di+ObjControle.PtrExtensao], si
+    cs call far [Interface.RenderizaRemoto]
+    pop ax
+    stc
+    retf
+
+_interfaceAlteraExtensaoTradRemoto:
+    push bp
+    mov bp, sp
+    push si
+    push ax
+    mov ax, ds
+    mov si, [si]
+    add si, [Prog.Traducao]
+    es mov [di+ObjControle.PtrExtensao+2], ax
+    es mov [di+ObjControle.PtrExtensao], si
     cs call far [Interface.RenderizaRemoto]
     pop ax
     pop si

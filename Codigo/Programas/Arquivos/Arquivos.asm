@@ -35,10 +35,33 @@ Arquivos: dw _arquivos, 0
     dw 0
     .Copyright: db 'Copyright (c) 2022\nHumberto Costa dos Santos Junior\n(humbertocsjr)',0
 
+icone:
+    dw 0,16,16
+    db 0b00000000,0b00000000
+    db 0b00100000,0b00000000
+    db 0b01110110,0b11101100
+    db 0b00100000,0b00000000
+    db 0b00000100,0b00000000
+    db 0b00101110,0b11011100
+    db 0b00000100,0b00000000
+    db 0b00100000,0b00000000
+    db 0b00000100,0b00000000
+    db 0b00101110,0b11101100
+    db 0b00000100,0b00000000
+    db 0b00100000,0b00000000
+    db 0b00000100,0b00000000
+    db 0b00101110,0b10110100
+    db 0b00000100,0b00000000
+    db 0b00000000,0b00000000
+
 _arquivos:
     cs call far [Interface.AlocaControleRemoto]
     mov si, Trad.Titulo
     cs call far [Interface.IniciaJanelaTradRemoto]
+    push cs
+    pop ds
+    mov si, icone
+    cs call far [Interface.AlteraExtensaoRemoto]
     mov cx, 10
     mov dx, 10
     cs call far [Interface.AlteraPosInicialRemoto]

@@ -269,12 +269,116 @@ _videoLimpaTela:
 ; bx = Y1
 ; cx = X2
 ; dx = Y2
-; es:di = Imagem
+; ds:si = Imagem
 ; ret: cf = 1=Ok | 0=Falha
 _videoImagemLocal:
     cs jmp far [Video.PtrImagem]
     .inicio:
+    push si
+    push ax
+    push bx
+    push cx
+    push dx
+    push bp
+    mov bp, sp
+    push ax
+    .varX: equ -2
+    push bx
+    .varY: equ -4
+    push cx
+    .varX2: equ -6
+    push dx
+    .varY2: equ -8
+    xor ax, ax
+    push ax
+    .varLargura: equ -10
+    push ax
+    .varTemp: equ -12
+    push ax
+    .varLarguraBytes: equ -14
+    lodsw
+    cmp ax, 0
+    je .tipo0
+    jmp .falha
+        .tipo0:
+            lodsw
+            mov [bp+.varLargura], ax
+            mov bx, [bp+.varX2]
+            sub bx, [bp+.varX]
+            cmp ax, bx
+            ja .larguraOk
+                add ax, [bp+.varX]
+                mov [bp+.varX2], ax
+            .larguraOk:
+            mov ax, [bp+.varLargura]
+            xor dx, dx
+            mov bx, 8
+            div bx
+            cmp dx, 0
+            je .ignoraByteExtra
+                inc ax
+            .ignoraByteExtra:
+            mov [bp+.varLarguraBytes], ax
+            lodsw
+            mov bx, [bp+.varY2]
+            sub bx, [bp+.varY]
+            cmp ax, bx
+            ja .alturaOk
+                add ax, [bp+.varY]
+                mov [bp+.varY2], ax
+            .alturaOk:
+            mov bx, [bp+.varY]
+            .vert:
+                cmp bx, [bp+.varY2]
+                ja .fimVert
+                mov dx, [bp+.varLargura]
+                mov ax, [bp+.varX]
+                push si
+                .horiz
+                    cmp ax, [bp+.varX2]
+                    ja .fimHoriz
+                    mov cx, 8
+                    push ax
+                    lodsb
+                    mov [bp+.varTemp], al
+                    pop ax
+                    .horizByte:
+                        cmp dx, 0
+                        je .ignora
+                            shl byte [bp+.varTemp], 1
+                            push si
+                            jc .corSim
+                                mov si, 0
+                                jmp .fimCor
+                            .corSim:
+                                mov si, 15
+                            .fimCor:
+                            cs call far [Video.Pixel]
+                            pop si
+                            dec dx
+                        .ignora:
+                        inc ax
+                        loop .horizByte
+                jmp .horiz
+                .fimHoriz
+                pop si
+                add si, [bp+.varLarguraBytes]
+                inc bx
+                jmp .vert
+            .fimVert:
+    .ok:
+    stc 
+    jmp .fim
+    .falha:
     clc
+    .fim:
+    mov sp, bp
+    pop bp
+    pop dx
+    pop cx
+    pop bx
+    pop ax
+    pop si
     retf
 
 ; cs:si = DesenhaPixel
