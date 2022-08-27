@@ -34,6 +34,7 @@ exportar:
 Arquivos: dw _arquivos, 0
     dw 0
     .Copyright: db 'Copyright (c) 2022\nHumberto Costa dos Santos Junior\n(humbertocsjr)',0
+    .JanelaPrincipal: dw 0,0
 
 icone:
     dw 0,16,16
@@ -56,6 +57,9 @@ icone:
 
 _arquivos:
     cs call far [Interface.AlocaControleRemoto]
+    mov ax, es
+    cs mov [Arquivos.JanelaPrincipal+2], ax
+    cs mov [Arquivos.JanelaPrincipal], di
     mov si, Trad.Titulo
     cs call far [Interface.IniciaJanelaTradRemoto]
     push cs
@@ -66,7 +70,7 @@ _arquivos:
     mov dx, 10
     cs call far [Interface.AlteraPosInicialRemoto]
     mov cx, 230
-    mov dx, 70
+    mov dx, 74
     cs call far [Interface.AlteraTamanhoRemoto]
     cs call far [Interface.ExibeRemoto]
     cs call far [Interface.AdicionaJanelaRemota]
@@ -103,6 +107,10 @@ _arquivos:
 inicial:
     cs call far [Arquivos]
     .loop:
+        ;cs mov di, [Arquivos.JanelaPrincipal]
+        ;cs mov ax, [Arquivos.JanelaPrincipal+2]
+        ;mov es, ax
+        ;cs call far [Interface.ExibeRemoto]
         cs call far [HUSIS.ProximaTarefa]
         jmp .loop
     retf

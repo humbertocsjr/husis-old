@@ -234,11 +234,11 @@ Config:
     .VersaoConfig: dw 1
     .Destino: dw 0x880
     .Disco: dw 0
-    .Cilindros: dw 80
-    .Cabecas: dw 2
-    .Setores: dw 18
-    .SetoresCabecas: dw 36
-    .Debug: dw 1
+    .Cilindros: dw DEFCILINDROS
+    .Cabecas: dw DEFCABECAS
+    .Setores: dw DEFSETORES
+    .SetoresCabecas: dw DEFSETORES * DEFCABECAS
+    .Debug: dw 0
     .ArquivoCodigo: dw 2
     .PosItens: dw 0
     .QtdBlocosItens: dw 0

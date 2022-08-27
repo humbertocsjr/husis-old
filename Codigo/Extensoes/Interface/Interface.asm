@@ -175,8 +175,8 @@ Interface: dw _interface, 0
     ._CapacidadeJanelas: equ 32
     .Janelas: times ._CapacidadeJanelas dw 0,0
     .JanelaAtual: dw 0
-    .TemaCorBorda: dw TipoCor.Ciano
-    .TemaCorTitulo: dw TipoCor.CianoClaro
+    .TemaCorBorda: dw TipoCor.Branco
+    .TemaCorTitulo: dw TipoCor.Branco
 
 ; Rotinas da Interface
 
@@ -220,13 +220,16 @@ __interfaceDesenhaCaractere:
     .varLargura: equ -8
 
     push ax
-    .varAltura: equ -10
+    .varLarguraGeral: equ -10
 
     push ax
-    .varX2: equ -12
+    .varAltura: equ -12
 
     push ax
-    .varY2: equ -14
+    .varX2: equ -14
+
+    push ax
+    .varY2: equ -16
 
     ; Carrega a fonte da lista de fontes
     es mov bx, [di+ObjControle.Fonte]
@@ -248,6 +251,9 @@ __interfaceDesenhaCaractere:
         ; Le a altura da fonte
         mov ax, [si+ObjFonte.Altura]
         mov [bp+.varAltura], ax
+        ; Le a largura da fonte
+        mov ax, [si+ObjFonte.Largura]
+        mov [bp+.varLarguraGeral], ax
         ; Le o caractere/indice para ler na fonte
         mov ax, [bp+.varCaractere]
         ; Multiplica o indice pelo tamanho em bytes de cada desenho de um
@@ -263,6 +269,15 @@ __interfaceDesenhaCaractere:
         xor ax, ax
         lodsb
         mov [bp+.varLargura], ax
+        es cmp word [di+ObjControle.FonteMonoespacada], 0
+        je .ignoraMonoespacada
+            shr ax, 1
+            es add [di+ObjControle.InternoX1], ax
+            mov cx, ax
+            mov ax, [bp+.varLarguraGeral]
+            sub ax, cx
+            mov [bp+.varLargura], ax
+        .ignoraMonoespacada:
         
         ; Valida altura e largura com espaco disponivel
 
@@ -542,6 +557,7 @@ _interfaceIniciaRemoto:
     es mov word [di+ObjControle.PtrExtensao], 0
     es mov word [di+ObjControle.PtrExtensao+2], 0
     es mov word [di+ObjControle.Fonte], 0
+    es mov word [di+ObjControle.FonteMonoespacada], 0
     es mov word [di+ObjControle.X1], 0
     es mov word [di+ObjControle.Y1], 0
     es mov word [di+ObjControle.X2], 0

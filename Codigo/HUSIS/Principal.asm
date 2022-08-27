@@ -302,7 +302,6 @@ inicial:
     .constCilindros: dw 0
     .constCabecas: dw 0
     .constSetores: dw 0
-    .constNumero: db '7c0',0
     .constArqConf: dw 0
     ._constLinhaComandoTam: equ 256
     .constLinhaComando: times ._constLinhaComandoTam db 0

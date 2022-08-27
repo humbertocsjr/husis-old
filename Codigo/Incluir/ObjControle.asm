@@ -32,7 +32,8 @@ ObjControle:
     .InternoY2: equ 72
     .InternoCor: equ 74
     .Fonte: equ 76
-    ._Tam: equ 78
+    .FonteMonoespacada: equ 78
+    ._Tam: equ 80
 
 TipoCor:
     .Preto: equ 0

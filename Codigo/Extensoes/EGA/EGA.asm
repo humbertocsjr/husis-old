@@ -1,9 +1,9 @@
 ; =================
-;  Controlador CGA
+;  Controlador EGA
 ; =================
 ;
-; Prototipo........: 25/08/2022
-; Versao Inicial...: 25/08/2022
+; Prototipo........: 27/08/2022
+; Versao Inicial...: 27/08/2022
 ; Autor............: Humberto Costa dos Santos Junior
 ;
 ; Funcao...........: Controla dispositivo de video 
@@ -12,12 +12,12 @@
 ;
 ; Historico........:
 ;
-; - 25/08/2022 - Humberto - Prototipo inicial
+; - 27/08/2022 - Humberto - Prototipo inicial
 %include '../../Incluir/Prog.asm'
 
 ; Cabecalho do executavel
 
-nome: db 'CGA',0
+nome: db 'EGA',0
 versao: dw 0,1,1
 tipo: dw TipoProg.Executavel
 modulos:
@@ -48,13 +48,10 @@ Pixel:
     ; Faz uma chamada a BIOS, substituir pela escrita direta na memoria de 
     ; video
     mov cx, ax
-    shl cx, 1
     mov dx, bx
     mov ax, si
     mov ah, 0xc
     xor bx, bx
-    int 0x10
-    inc cx
     int 0x10
     pop dx
     pop cx
@@ -66,11 +63,11 @@ Pixel:
 ; Rotina Principal
 
 inicial:
-    mov ax, 6
+    mov ax, 15
     int 0x10
     mov si, Pixel
-    mov cx, 320
-    mov dx, 200
+    mov cx, 640
+    mov dx, 350
     mov ax, 2
     cs call far [Video.RegistraVideo]
     cs call far [HUSIS.EntraEmModoBiblioteca]
