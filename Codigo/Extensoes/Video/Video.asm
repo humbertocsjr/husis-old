@@ -147,7 +147,7 @@ _videoFundo:
             jnc .fim
             inc bx
             jmp .vert
-        .fimVert
+        .fimVert:
         inc ax
         jmp .horiz
     .fimHoriz:
@@ -240,7 +240,142 @@ _videoCaixa:
 _videoLinha:
     cs jmp far [Video.PtrLinha]
     .inicio:
-    clc
+    push ax
+    push bx
+    push cx
+    push dx
+    push bp
+    mov bp, sp
+    push ax
+    .varX1: equ -2
+    push bx
+    .varY1: equ -4
+    push cx
+    .varX2: equ -6
+    push dx
+    .varY2: equ -8
+    push ax
+    .varDeltaX: equ -10
+    push ax
+    .varDeltaY: equ -12
+    push ax
+    .varDelta: equ -14
+    push ax
+    .varInclusao: equ -16
+    push ax
+    .varPixels: equ -18
+    push ax
+    .varXInc: equ -20
+    push ax
+    .varYInc: equ -22
+    mov ax, [bp+.varY1]
+    cmp ax, [bp+.varY2]
+    jl .yOk
+        mov ax, [bp+.varX1]
+        mov bx, [bp+.varX2]
+        mov [bp+.varX1], bx
+        mov [bp+.varX2], ax
+        mov ax, [bp+.varY1]
+        mov bx, [bp+.varY2]
+        mov [bp+.varY1], bx
+        mov [bp+.varY2], ax
+    .yOk:
+    mov ax, [bp+.varX1]
+    cmp ax, [bp+.varX2]
+    jl .xOk
+        mov ax, [bp+.varX1]
+        mov bx, [bp+.varX2]
+        mov [bp+.varX1], bx
+        mov [bp+.varX2], ax
+        mov ax, [bp+.varY1]
+        mov bx, [bp+.varY2]
+        mov [bp+.varY1], bx
+        mov [bp+.varY2], ax
+    .xOk:
+    
+    mov cx, [bp+.varX2]
+    sub cx, [bp+.varX1]
+    mov [bp+.varDeltaX], cx
+    mov dx, [bp+.varY2]
+    sub dx, [bp+.varY1]
+    mov [bp+.varDeltaY], dx
+    cmp cx, dx
+    jl .dxMenor
+        mov word [bp+.varYInc], 1
+        cmp word [bp+.varDeltaY], 0
+        jge .deltaYOk
+            neg word [bp+.varYInc]
+            neg word [bp+.varDeltaY]
+        .deltaYOk:
+        mov ax, [bp+.varDeltaY]
+        sal ax, 1
+        sub ax, [bp+.varDeltaX]
+        mov [bp+.varDelta], ax
+        mov ax, [bp+.varX1]
+        mov bx, [bp+.varY1]
+        .desenhaX:
+            cs call far [Video.Pixel]
+            cmp ax, [bp+.varX2]
+            jae .dxFim
+            cmp word [bp+.varDelta], 0
+            jle .deltaMaiorX
+                add bx, [bp+.varYInc]
+                mov cx, [bp+.varDeltaY]
+                sub cx, [bp+.varDeltaX]
+                sal cx, 1
+                add [bp+.varDelta], cx
+                inc ax
+                jmp .desenhaX
+            .deltaMaiorX
+                mov cx, [bp+.varDeltaY]
+                sal cx, 1
+                add [bp+.varDelta], cx
+                inc ax
+                jmp .desenhaX
+    .dxMenor:
+        mov word [bp+.varXInc], 1
+        cmp word [bp+.varDeltaX], 0
+        jge .deltaXOk
+            neg word [bp+.varXInc]
+            neg word [bp+.varDeltaX]
+        .deltaXOk:
+        mov ax, [bp+.varDeltaX]
+        sal ax, 1
+        sub ax, [bp+.varDeltaY]
+        mov [bp+.varDelta], ax
+        mov ax, [bp+.varX1]
+        mov bx, [bp+.varY1]
+        .desenhaY:
+            cs call far [Video.Pixel]
+            cmp bx, [bp+.varY2]
+            jae .dxFim
+            cmp word [bp+.varDelta], 0
+            jle .deltaMaiorY
+                add ax, [bp+.varXInc]
+                mov cx, [bp+.varDeltaX]
+                sub cx, [bp+.varDeltaY]
+                sal cx, 1
+                add [bp+.varDelta], cx
+                inc bx
+                jmp .desenhaY
+            .deltaMaiorY
+                mov cx, [bp+.varDeltaX]
+                sal cx, 1
+                add [bp+.varDelta], cx
+                inc bx
+                jmp .desenhaY
+
+    .dxFim:
+
+    .ok:
+    stc
+    .fim:
+    mov sp, bp
+    pop bp
+    pop dx
+    pop cx
+    pop bx
+    pop ax
     retf
 
 ; di = Cor de Fundo
@@ -334,7 +469,7 @@ _videoImagemLocal:
                 mov dx, [bp+.varLargura]
                 mov ax, [bp+.varX]
                 push si
-                .horiz
+                .horiz:
                     cmp ax, [bp+.varX2]
                     ja .fimHoriz
                     mov cx, 8
@@ -360,7 +495,7 @@ _videoImagemLocal:
                         inc ax
                         loop .horizByte
                 jmp .horiz
-                .fimHoriz
+                .fimHoriz:
                 pop si
                 add si, [bp+.varLarguraBytes]
                 inc bx

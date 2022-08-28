@@ -13,6 +13,7 @@
 ; Historico........:
 ;
 ; - 25/08/2022 - Humberto - Prototipo inicial
+; - 27/08/2022 - Humberto - Implementado rotina direta de desenho de pixel
 %include '../../Incluir/Prog.asm'
 
 ; Cabecalho do executavel
@@ -40,28 +41,73 @@ exportar:
 ; si = Cor
 ; ret: cf = 1=Ok | 0=Falha
 Pixel:
+    push ds
+    push di
+    push si
     push ax
     push bx
     push cx
     push dx
-    ; TEMPORARIO
-    ; Faz uma chamada a BIOS, substituir pela escrita direta na memoria de 
-    ; video
+    shl ax, 1
+    cmp ax, 640
+    jb .larguraOk
+        clc
+        jmp .fim
+    .larguraOk:
+    cmp bx, 200
+    jb .alturaOk
+        clc
+        jmp .fim
+    .alturaOk:
+    shr bx, 1
+    jc .inpar
+        push ax
+        mov ax, 0xb800
+        mov di, 0
+        mov ds, ax
+        pop ax
+        jmp .fimPonteiro
+    .inpar:
+        push ax
+        mov ax, 0xb800
+        mov di, 0x2000
+        mov ds, ax
+        pop ax
+    .fimPonteiro:
+    mov dx, ax
+    and dx, 7
+    mov cx, 3
+    shr ax, cl
     mov cx, ax
-    shl cx, 1
-    mov dx, bx
-    mov ax, si
-    mov ah, 0xc
-    xor bx, bx
-    int 0x10
-    inc cx
-    int 0x10
+    mov ax, 640/8
+    push dx
+    mul bx
+    pop dx
+    add ax, cx
+    add di, ax
+    mov cx, dx
+    mov ax, 0b11000000
+    shr al, cl
+    cmp si, 0
+    jne .mantem
+        not ax
+        and [di], al
+        jmp .ok
+    .mantem:
+        or [di], al
+        jmp .ok
+    .ok:
+    stc
+    .fim:
     pop dx
     pop cx
     pop bx
     pop ax
-    stc
+    pop si
+    pop di
+    pop ds
     retf
+
 
 ; Rotina Principal
 

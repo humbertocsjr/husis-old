@@ -25,6 +25,7 @@ importar:
     %include '../../Incluir/Texto.asm'
     %include '../../Incluir/Memoria.asm'
     %include '../../Incluir/HUSIS.asm'
+    %include '../../Incluir/Video.asm'
     %include '../../Incluir/Interface.asm'
     %include '../../Incluir/ObjControle.asm'
     dw 0
@@ -106,6 +107,7 @@ _arquivos:
 
 inicial:
     cs call far [Arquivos]
+
     .loop:
         ;cs mov di, [Arquivos.JanelaPrincipal]
         ;cs mov ax, [Arquivos.JanelaPrincipal+2]
