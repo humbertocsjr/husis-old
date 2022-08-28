@@ -21,6 +21,8 @@ conteudo_imagem:
 	@Ferramentas/minixfs add ./enus.img Temp/Video System/Extensions/Video
 	@Ferramentas/minixfs add ./ptbr.img Temp/CGA Sistema/Extensoes/CGA
 	@Ferramentas/minixfs add ./enus.img Temp/CGA System/Extensions/CGA
+	@Ferramentas/minixfs add ./ptbr.img Temp/CGAAceleradora Sistema/Extensoes/CGAAceleradora
+	@Ferramentas/minixfs add ./enus.img Temp/CGAAceleradora System/Extensions/CGAAccelerator
 	@Ferramentas/minixfs add ./ptbr.img Temp/EGA Sistema/Extensoes/EGA
 	@Ferramentas/minixfs add ./enus.img Temp/EGA System/Extensions/EGA
 	@Ferramentas/minixfs add ./ptbr.img Temp/VGA Sistema/Extensoes/VGA

@@ -46,10 +46,15 @@ Video: dw ._Fim
         ; dx = Y2
         ; ds:si = Imagem
         ; ret: cf = 1=Ok | 0=Falha
+    .AtualizaTela: dw 1, 0
+        ; ret: cf = 1=Ok | 0=Falha
     .RegistraVideo: dw 1,0
         ; cs:si = DesenhaPixel
         ; ax = Cores Simultaneas
         ; cx = Largura
         ; dx = Altura
+        ; ret: cf = 1=Ok | 0=Falha
+    .RegistraAtualizaTela: dw 1,0
+        ; cs:si = AtualizaTela
         ; ret: cf = 1=Ok | 0=Falha
     ._Fim:

@@ -81,11 +81,16 @@ Video: dw _video,0
         ; dx = Y2
         ; ds:si = Imagem
         ; ret: cf = 1=Ok | 0=Falha
+    .AtualizaTela: dw _videoAtualizaTela, 0
+        ; ret: cf = 1=Ok | 0=Falha
     .RegistraVideo: dw _videoRegistraVideo,0
         ; cs:si = DesenhaPixel
         ; ax = Cores Simultaneas
         ; cx = Largura
         ; dx = Altura
+        ; ret: cf = 1=Ok | 0=Falha
+    .RegistraAtualizaTela: dw _videoRegistraAtualizaTela,0
+        ; cs:si = AtualizaTela
         ; ret: cf = 1=Ok | 0=Falha
 ;------------------------------------------
     .PtrPixel: dw _videoPixel.inicio,0
@@ -95,6 +100,7 @@ Video: dw _video,0
     .PtrLinha: dw _videoLinha.inicio,0
     .PtrLimpaTela: dw _videoLimpaTela.inicio,0
     .PtrImagem: dw _videoImagemLocal.inicio,0
+    .PtrAtualizaTela: dw _videoAtualizaTela.inicio, 0
     dw 0
     .Largura: dw 0
     .Altura: dw 0
@@ -328,7 +334,7 @@ _videoLinha:
                 add [bp+.varDelta], cx
                 inc ax
                 jmp .desenhaX
-            .deltaMaiorX
+            .deltaMaiorX:
                 mov cx, [bp+.varDeltaY]
                 sal cx, 1
                 add [bp+.varDelta], cx
@@ -362,7 +368,7 @@ _videoLinha:
                 add [bp+.varDelta], cx
                 inc bx
                 jmp .desenhaY
-            .deltaMaiorY
+            .deltaMaiorY:
                 mov cx, [bp+.varDeltaX]
                 sal cx, 1
                 add [bp+.varDelta], cx
@@ -398,6 +404,7 @@ _videoLimpaTela:
     cs mov dx, [Video.Altura]
     dec dx
     cs call far [Video.Fundo]
+    cs call far [Video.AtualizaTela]
     pop dx
     pop cx
     pop bx
@@ -520,6 +527,13 @@ _videoImagemLocal:
     pop si
     retf
 
+; ret: cf = 1=Ok | 0=Falha
+_videoAtualizaTela:
+    cs jmp far [Video.PtrAtualizaTela]
+    .inicio:
+    stc
+    retf
+
 ; cs:si = DesenhaPixel
 ; ax = Cores Simultaneas
 ; cx = Largura
@@ -536,6 +550,22 @@ _videoRegistraVideo:
     cs mov [Video.Largura], cx
     cs mov [Video.Altura], dx
     cs mov [Video.Cores], ax
+    pop bx
+    popf
+    pop bp
+    retf
+
+; cs:si = AtualizaTela
+; ret: cf = 1=Ok | 0=Falha
+_videoRegistraAtualizaTela:
+    push bp
+    mov bp, sp
+    pushf
+    push bx
+    cli
+    mov bx, [bp+4]
+    cs mov [Video.PtrAtualizaTela+2], bx
+    cs mov [Video.PtrAtualizaTela], si
     pop bx
     popf
     pop bp

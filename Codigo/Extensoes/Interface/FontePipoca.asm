@@ -455,7 +455,7 @@ FontePipoca: db 'FONTE',0
     db 00000000b
 
     ;60
-    db 6
+    db 5
     db 00000000b
     db 00000000b
     db 00001000b

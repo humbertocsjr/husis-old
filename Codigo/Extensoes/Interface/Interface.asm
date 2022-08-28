@@ -182,6 +182,7 @@ Interface: dw _interface, 0
     .Janelas: times ._CapacidadeJanelas dw 0,0
     .JanelaAtual: dw 0xffff
     .RedesenhaTela: dw 0
+    .Contador: dw 0
     .TemaCorBorda: dw TipoCor.Branco
     .TemaCorTitulo: dw TipoCor.Branco
 
@@ -476,6 +477,8 @@ _interfaceAdicionaLocal:
     mov ax, ds
     es mov [di+ObjControle.PtrAcima+2], ax
     es mov [di+ObjControle.PtrAcima], si
+    mov ax, [si+ObjControle.Janela]
+    es mov [di+ObjControle.Janela], ax
     cmp word [si+ObjControle.PtrAbaixo+2],0
     je .abaixoOk
         mov ax, [si+ObjControle.PtrAbaixo+2]
@@ -787,6 +790,7 @@ _interfaceRenderizaRemoto:
     es cmp ax, [di+ObjControle.Y1]
     jb .falha
     call __interfaceRedesenha
+    cs mov word [Interface.Contador], 0xffff
     .ok:
     stc
     jmp .fim
@@ -952,6 +956,8 @@ __interfaceRedesenha:
 inicial:
     ; Inicia o modulo Interface
     cs call far [Interface]
+    cs mov word [Interface.RedesenhaTela], 1
+    cs mov word [Interface.Contador], 0xffff
     .processa:
         cs cmp word [Interface.RedesenhaTela], 0
         je .ignora
@@ -990,7 +996,14 @@ inicial:
             pop di
             pop es
             cs mov word [Interface.RedesenhaTela], 0
+            cs mov word [Interface.Contador], 0xffff
         .ignora:
+        cs cmp word [Interface.Contador], 5
+        jb .ignoraContador
+            cs call far [Video.AtualizaTela]
+            cs mov word [Interface.Contador], 0
+        .ignoraContador:
+        cs inc word [Interface.Contador]
         ; Fica esperando eternamente
         cs call far [HUSIS.ProximaTarefa]
         jmp .processa
