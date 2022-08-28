@@ -313,6 +313,10 @@ _videoLinha:
         mov [bp+.varDelta], ax
         mov ax, [bp+.varX1]
         mov bx, [bp+.varY1]
+        mov cx, [bp+.varDeltaY]
+        sub cx, [bp+.varDeltaX]
+        sal cx, 1
+        mov [bp+.varInclusao], cx
         .desenhaX:
             cs call far [Video.Pixel]
             cmp ax, [bp+.varX2]
@@ -320,9 +324,7 @@ _videoLinha:
             cmp word [bp+.varDelta], 0
             jle .deltaMaiorX
                 add bx, [bp+.varYInc]
-                mov cx, [bp+.varDeltaY]
-                sub cx, [bp+.varDeltaX]
-                sal cx, 1
+                mov cx, [bp+.varInclusao]
                 add [bp+.varDelta], cx
                 inc ax
                 jmp .desenhaX
@@ -345,6 +347,10 @@ _videoLinha:
         mov [bp+.varDelta], ax
         mov ax, [bp+.varX1]
         mov bx, [bp+.varY1]
+        mov cx, [bp+.varDeltaX]
+        sub cx, [bp+.varDeltaY]
+        sal cx, 1
+        mov [bp+.varInclusao], cx
         .desenhaY:
             cs call far [Video.Pixel]
             cmp bx, [bp+.varY2]
@@ -352,9 +358,7 @@ _videoLinha:
             cmp word [bp+.varDelta], 0
             jle .deltaMaiorY
                 add ax, [bp+.varXInc]
-                mov cx, [bp+.varDeltaX]
-                sub cx, [bp+.varDeltaY]
-                sal cx, 1
+                mov cx, [bp+.varInclusao]
                 add [bp+.varDelta], cx
                 inc bx
                 jmp .desenhaY

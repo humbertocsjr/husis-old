@@ -105,4 +105,10 @@ Interface: dw ._Fim
         ; es:di = ObjControle
         ; ds:si = Traducao (ds=cs)
         ; ret: cf = 1=Ok | 0=Falha
+    .Alerta: dw 1,0
+        ; ds:si = Mensagem
+        ; ax = Valor A
+        ; bx = Valor B
+        ; cx = Valor C
+        ; dx = Valor D
     ._Fim:

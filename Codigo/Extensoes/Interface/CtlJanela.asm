@@ -3,13 +3,11 @@
 
 ; Versao usando um texto como titulo
 _interfaceIniciaJanelaRemoto:
-    cs call far [Interface.IniciaRemoto]
     cs call far [Interface.AlteraConteudoRemoto]
     jmp _interfaceIniciaJanelaRemotoInterno
 
 ; Versao usando um item da traducao como titulo
 _interfaceIniciaJanelaTradRemoto:
-    cs call far [Interface.IniciaRemoto]
     cs call far [Interface.AlteraConteudoTradRemoto]
     jmp _interfaceIniciaJanelaRemotoInterno
 
@@ -159,7 +157,7 @@ _interfaceJanelaRemoto:
         push cs
         pop ds
         mov si, ctlJanelaIcone
-    .ignorarIconePadrao
+    .ignorarIconePadrao:
     cs call far [Video.ImagemLocal]
 
 

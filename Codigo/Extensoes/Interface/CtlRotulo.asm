@@ -2,13 +2,11 @@
 
 ; Versao usando um texto como titulo
 _interfaceIniciaRotuloRemoto:
-    cs call far [Interface.IniciaRemoto]
     cs call far [Interface.AlteraConteudoRemoto]
     jmp _interfaceIniciaRotuloRemotoInterno
 
 ; Versao usando um item da traducao como titulo
 _interfaceIniciaRotuloTradRemoto:
-    cs call far [Interface.IniciaRemoto]
     cs call far [Interface.AlteraConteudoTradRemoto]
     jmp _interfaceIniciaRotuloRemotoInterno
 

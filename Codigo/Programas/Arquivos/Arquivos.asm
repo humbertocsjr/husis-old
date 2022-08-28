@@ -61,7 +61,7 @@ _arquivos:
     mov ax, es
     cs mov [Arquivos.JanelaPrincipal+2], ax
     cs mov [Arquivos.JanelaPrincipal], di
-    mov si, Trad.Titulo
+    mov si, Trad.Sobre
     cs call far [Interface.IniciaJanelaTradRemoto]
     push cs
     pop ds
@@ -73,13 +73,11 @@ _arquivos:
     mov cx, 230
     mov dx, 74
     cs call far [Interface.AlteraTamanhoRemoto]
-    cs call far [Interface.ExibeRemoto]
     cs call far [Interface.AdicionaJanelaRemota]
-    push es
-    push di
 
     ; Rotulo
     cs call far [Interface.AlocaSubControleRemoto]
+    jnc .fim
     mov si, Trad.Titulo
     cs call far [Interface.IniciaRotuloTradRemoto]
     mov cx, 2
@@ -89,9 +87,11 @@ _arquivos:
     mov dx, 11
     cs call far [Interface.AlteraTamanhoRemoto]
     cs call far [Interface.ExibeRemoto]
+    
+    cs mov ax, [Arquivos.JanelaPrincipal+2] 
+    mov es, ax
+    cs mov di, [Arquivos.JanelaPrincipal]
 
-    pop di
-    pop es
     ; Rotulo
     cs call far [Interface.AlocaSubControleRemoto]
     mov si, Arquivos.Copyright
@@ -103,16 +103,33 @@ _arquivos:
     mov dx, 40
     cs call far [Interface.AlteraTamanhoRemoto]
     cs call far [Interface.ExibeRemoto]
+    
+    cs mov ax, [Arquivos.JanelaPrincipal+2] 
+    mov es, ax
+    cs mov di, [Arquivos.JanelaPrincipal]
+    cs call far [Interface.ExibeRemoto]
+    .fim:
     retf
 
 inicial:
     cs call far [Arquivos]
 
+        cs mov di, [Arquivos.JanelaPrincipal]
+        cs mov ax, [Arquivos.JanelaPrincipal+2]
+        mov es, ax
+        ;cs call far [Interface.OcultaRemoto]
+        ;
+        ; VER PQ NAO TA GRAVANDO O ABAIXO
+        ;
+        ; se tivesse um abaixo ele deveria reexibir a tela como ta ali
+        es cmp word [di+ObjControle.PtrAbaixo+2],0
+        je .loop
+            mov cx, 10
+            .tmp:
+                cs call far [HUSIS.ProximaTarefa]
+                loop .tmp
+            ;cs call far [Interface.ExibeRemoto]
     .loop:
-        ;cs mov di, [Arquivos.JanelaPrincipal]
-        ;cs mov ax, [Arquivos.JanelaPrincipal+2]
-        ;mov es, ax
-        ;cs call far [Interface.ExibeRemoto]
         cs call far [HUSIS.ProximaTarefa]
         jmp .loop
     retf
