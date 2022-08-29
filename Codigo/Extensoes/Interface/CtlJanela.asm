@@ -42,10 +42,11 @@ _janelaRenderiza:
     push dx
     ; Desenha Borda
     push di
-    es mov ax, [di+ObjControle.X1]
-    es mov bx, [di+ObjControle.Y1]
-    es mov cx, [di+ObjControle.X2]
-    es mov dx, [di+ObjControle.Y2]
+    call __interfaceCalcIguala
+    es mov ax, [di+ObjControle.CalcX1]
+    es mov bx, [di+ObjControle.CalcY1]
+    es mov cx, [di+ObjControle.CalcX2]
+    es mov dx, [di+ObjControle.CalcY2]
     es mov di, [di+ObjControle.CorFundo]
     cs call far [VideoTexto.Limpa]
     pop di
@@ -79,33 +80,10 @@ _janelaRenderiza:
         cs call far [VideoTexto.Texto]
         pop di
     .ignoraTexto:
-    push es
-    pop ds
-    mov si, di
-    call __interfaceCalcIguala
-    mov dx, si
-    add si, ObjControle.Itens
-    mov cx, ObjControle._CapacidadeItens
-    .subItens:
-        lodsw
-        mov di, ax
-        lodsw
-        cmp ax, 0
-        je .ignoraSubItem
-        mov es, ax
-        es cmp word [di+ObjControle.PtrRenderiza+2], 0
-        je .ignoraSubItem
-            push si
-            mov si, dx
-            call __interfaceCalcAcimaAbaixo
-            jnc .foraDosParametros
-                es call far [di+ObjControle.PtrRenderiza]
-            .foraDosParametros:
-            pop si
-        .ignoraSubItem:
-        loop .subItens
+    call __interfaceRenderizaSubItens
     .fim:
-    cs call far [VideoTexto.Atualiza]
+    call __interfaceSolicitaAtualizacao
+    stc
     pop dx
     pop cx
     pop bx

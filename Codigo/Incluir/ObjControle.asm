@@ -30,7 +30,9 @@ ObjControle:
     .PtrAcaoAux: equ 74
     .PtrAcaoFoco: equ 78
     .PtrAcaoSemFoco: equ 82
-    .Itens: equ 86
+    .PtrTela: equ 86
+    .PtrJanela: equ 90
+    .Itens: equ 94
     ._CapacidadeItens: equ 32
     ._Tam: equ .Itens + (._CapacidadeItens * 4)
 
@@ -43,7 +45,7 @@ TipoCor:
     .Magenta: equ 5
     .Marrom: equ 6
     .CinzaClaro: equ 7
-    .CinzaEscuro: equ 8
+    .Cinza: equ 8
     .AzulClaro: equ 9
     .VerdeClaro: equ 10
     .CianoClaro: equ 11
@@ -51,6 +53,25 @@ TipoCor:
     .MagentaClaro: equ 13
     .Amarelo: equ 14
     .Branco: equ 15
+
+TipoCorFundo:
+    .Preto: equ 0x00
+    .Azul: equ 0x10
+    .Verde: equ 0x20
+    .Ciano: equ 0x30
+    .Vermelho: equ 0x40
+    .Magenta: equ 0x50
+    .Marrom: equ 0x60
+    .CinzaClaro: equ 0x70
+    .Cinza: equ 0x80
+    .AzulClaro: equ 0x90
+    .VerdeClaro: equ 0xa0
+    .CianoClaro: equ 0xb0
+    .VermelhoClaro: equ 0xc0
+    .MagentaClaro: equ 0xd0
+    .Amarelo: equ 0xe0
+    .Branco: equ 0xf0
+
 
 TipoControle:
     .Indefinido: equ 0

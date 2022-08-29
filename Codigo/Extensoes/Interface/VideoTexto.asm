@@ -1,6 +1,7 @@
 VideoTexto: dw _videotexto,0
     .Atualiza: dw _videotextoAtualiza,0
     .LimpaTela: dw _videotextoLimpaTela,0
+        ; di = Cor unificada
     .Texto: dw _videotextoTexto, 0
         ; ax = X1
         ; bx = Y1
@@ -19,7 +20,6 @@ VideoTexto: dw _videotexto,0
         ; bx = Y1
         ; cx = X2
         ; dx = Y2
-        ; ds:si = Texto
         ; di = Cor unificada
     .Borda: dw _videotextoBorda, 0
         ; ax = X1
@@ -32,6 +32,20 @@ VideoTexto: dw _videotexto,0
         ; ax = X
         ; bx = Y
         ; di = Cor unificada
+    .Preenche: dw _videotextoPreenche,0
+        ; ax = X1
+        ; bx = Y1
+        ; cx = X2
+        ; dx = Y2
+        ; si = Caractere
+        ; di = Cor unificada
+    .PreencheTela: dw _videotextoPreencheTela,0
+        ; si = Caractere
+        ; di = Cor unificada
+    .Info: dw _videotextoInfo, 0
+        ; ret: cx = Largura
+        ;      dx = Altura
+        ;      ax = Cores: 2=MDA | 16=Colorido
     dw 0
     .SegVideo: dw 0,0
 
@@ -47,7 +61,8 @@ ObjVideoTexto:
     .CursorMouse: equ .CursorTeclado + 2
     .ExibeCursorTeclado: equ .CursorMouse + 2
     .ExibeCursorMouse: equ .ExibeCursorTeclado + 2
-    .UsoInterno: equ .ExibeCursorMouse + 2
+    .Cores: equ .ExibeCursorMouse + 2
+    .UsoInterno: equ .Cores + 2
     ._CapacidadeUsoInterno: equ 16
     .Dados: equ .UsoInterno + ._CapacidadeUsoInterno
     ._Tam: equ .Dados
@@ -147,23 +162,7 @@ __videotextoPonteiroDados:
     ret
 
 _videotexto:
-    cs call far [HUSIS.ProcessoAtual]
-    mov cx, 80*25*2+ObjVideoTexto._Tam
-    cs call far [Memoria.AlocaRemoto]
-    jnc .fim
-    es mov word [ObjVideoTexto.Largura],80
-    es mov word [ObjVideoTexto.Altura],25
-    es mov word [ObjVideoTexto.UltimaLinhaAlterada], 0
-    es mov word [ObjVideoTexto.Simultaneos], 0
-    mov ax, cs
-    es mov word [ObjVideoTexto.PtrAtualiza+2], ax
-    es mov word [ObjVideoTexto.PtrAtualiza], _videotextoAtualizaCGA
-    es mov word [ObjVideoTexto.ExibeCursorMouse], 0
-    es mov word [ObjVideoTexto.ExibeCursorTeclado], 0
-    es mov word [ObjVideoTexto.UsoInterno], 0
-    mov ax, es
-    cs mov [VideoTexto.SegVideo], ax
-    .fim:
+    call __videotextoCGA
     retf
 
 _videotextoAtualiza:
@@ -324,15 +323,16 @@ _videotextoRepete:
 ; bx = Y1
 ; cx = X2
 ; dx = Y2
-; ds:si = Texto
-; di = Cor unificada: Byte Alto=Fundo | Byte Baixo=Texto
+; di = Cor unificada
 _videotextoLimpa:
     push es
     push di
+    push si
     push ax
     push bx
     push cx
     push dx
+    mov si, di
     call __videotextoCarregaPonteiro
     sub dx, bx
     inc dx
@@ -356,7 +356,9 @@ _videotextoLimpa:
         push di
         push cx
         mov cx, dx
-        xor ax, ax
+        mov ax, si
+        xchg ah, al
+        mov al, ' '
         rep stosw
         call __videotextoMarcarLinhaAlterada
         pop cx
@@ -371,6 +373,7 @@ _videotextoLimpa:
     pop cx
     pop bx
     pop ax
+    pop si
     pop di
     pop es
     retf
@@ -524,5 +527,107 @@ _videotextoCaractere:
     pop ax
     pop si
     pop di
+    pop es
+    retf
+
+; ax = X1
+; bx = Y1
+; cx = X2
+; dx = Y2
+; si = Caractere
+; di = Cor unificada
+_videotextoPreenche:
+    push es
+    push di
+    push si
+    push ax
+    push bx
+    push cx
+    push dx
+    call __interfaceShl8DI
+    and si, 0xff
+    or si, di
+    call __videotextoCarregaPonteiro
+    sub dx, bx
+    inc dx
+    sub cx, ax
+    inc cx
+    xchg cx, dx
+    push dx
+    push cx
+    push ax
+    es mov ax, [ObjVideoTexto.Largura]
+    mul bx
+    shl ax, 1
+    mov di, ax
+    pop ax
+    shl ax, 1
+    add di, ax
+    pop cx
+    pop dx
+    add di, ObjVideoTexto.Dados
+    .limpa:
+        push di
+        push cx
+        mov cx, dx
+        mov ax, si
+        rep stosw
+        call __videotextoMarcarLinhaAlterada
+        pop cx
+        pop di
+        es mov ax, [ObjVideoTexto.Largura]
+        shl ax, 1
+        add di, ax
+        inc bx
+        loop .limpa
+    stc
+    pop dx
+    pop cx
+    pop bx
+    pop ax
+    pop si
+    pop di
+    pop es
+    retf
+
+; si = Caractere
+; di = Cor unificada
+_videotextoPreencheTela:
+    push es
+    push di
+    push si
+    push ax
+    push bx
+    push cx
+    push dx
+    
+    push si
+    push di
+    call __videotextoCarregaPonteiro
+    xor ax, ax
+    xor bx, bx
+    es mov cx, [ObjVideoTexto.Largura]
+    dec cx
+    es mov dx, [ObjVideoTexto.Altura]
+    dec dx
+    pop di
+    pop si
+    cs call far [VideoTexto.Preenche]
+    
+    pop dx
+    pop cx
+    pop bx
+    pop ax
+    pop si
+    pop di
+    pop es
+    retf
+
+_videotextoInfo:
+    push es
+    call __videotextoCarregaPonteiro
+    es mov ax, [ObjVideoTexto.Cores]
+    es mov cx, [ObjVideoTexto.Largura]
+    es mov dx, [ObjVideoTexto.Altura]
     pop es
     retf
