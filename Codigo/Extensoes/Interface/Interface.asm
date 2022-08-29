@@ -53,11 +53,13 @@ Interface: dw _interface,0
         ; es:0 = Bloco de Controles Alocado
         ; es:di = ObjControle Atual/Acima
         ; ret: cf = 1=Ok | 0=Estouro da Lista
+        ;      cx = Posicao
         ;      es:di = Novo item da lista
     .CriaItemRaiz: dw _interfaceCriaItemRaiz,0
         ; Cria um item na tela
         ; es:0 = Bloco de Controles Alocado
         ; ret: cf = 1=Ok | 0=Estouro da Lista
+        ;      cx = Posicao
         ;      es:di = Novo item da lista
     .ConfigTela: dw _tela,0
         ; es:di = ObjControle
