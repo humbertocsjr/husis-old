@@ -59,10 +59,9 @@ _janelaRenderiza:
     push dx
     mov ax, cx
     sub ax, 2
-    mov cx, 1
     mov dl, 'x'
     cs mov di, [Interface.TemaCorBotaoFechar]
-    cs call far [VideoTexto.Repete]
+    cs call far [VideoTexto.Caractere]
     pop dx
     pop cx
     pop ax

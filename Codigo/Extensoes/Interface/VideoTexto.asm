@@ -27,6 +27,11 @@ VideoTexto: dw _videotexto,0
         ; cx = X2
         ; dx = Y2
         ; di = Cor unificada
+    .Caractere: dw _videotextoCaractere,0
+        ; dl = Caractere
+        ; ax = X
+        ; bx = Y
+        ; di = Cor unificada
     dw 0
     .SegVideo: dw 0,0
 
@@ -523,6 +528,39 @@ _videotextoBorda:
     pop cx
     pop bx
     pop ax
+    .fim:
+    pop dx
+    pop cx
+    pop bx
+    pop ax
+    pop si
+    pop di
+    pop es
+    retf
+
+; dl = Caractere
+; ax = X
+; bx = Y
+; di = Cor unificada
+_videotextoCaractere:
+    push es
+    push di
+    push si
+    push ax
+    push bx
+    push cx
+    push dx
+    mov si, di
+    call __videotextoCarregaPonteiro
+    jnc .fim
+    call __videotextoMarcarLinhaAlterada
+    call __videotextoPonteiroDados
+    jnc .fim
+    mov ax, si
+    mov ah, dl
+    xchg al, ah
+    stosw
+    stc
     .fim:
     pop dx
     pop cx

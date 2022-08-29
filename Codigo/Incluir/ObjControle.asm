@@ -26,13 +26,12 @@ ObjControle:
     .CalcY1: equ 64
     .CalcX2: equ 66
     .CalcY2: equ 68
-    .InternoX1: equ 70
-    .InternoY1: equ 72
-    .InternoX2: equ 74
-    .InternoY2: equ 76
-    .InternoCor: equ 78
-    .Itens: equ 80
-    ._CapacidadeItens: equ 24
+    .PtrAcao: equ 70
+    .PtrAcaoAux: equ 74
+    .PtrAcaoFoco: equ 78
+    .PtrAcaoSemFoco: equ 82
+    .Itens: equ 86
+    ._CapacidadeItens: equ 32
     ._Tam: equ .Itens + (._CapacidadeItens * 4)
 
 TipoCor:

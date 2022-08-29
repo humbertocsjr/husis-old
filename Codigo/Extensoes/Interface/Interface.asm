@@ -406,7 +406,6 @@ inicial:
     mov di, 2
     es call far [di+ObjControle.PtrRenderiza]
     jnc .erro
-    cs call far [VideoTexto.Atualiza]
 
     jmp .loop
     .erro:
