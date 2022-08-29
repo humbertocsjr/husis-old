@@ -166,50 +166,6 @@ _videotexto:
     .fim:
     retf
 
-_videotextoAtualizaCGA:
-    push es
-    push ds
-    push si
-    push di
-    push ax
-    push cx
-    mov ax, es
-    mov ds, ax
-    mov ax, 0xb800
-    mov es, ax
-    mov si, ObjVideoTexto.LinhasAlteradas
-    mov cx, [ObjVideoTexto.UltimaLinhaAlterada]
-    cmp cx, 0
-    ;je .fim
-        mov cx, 80*25
-        mov si, ObjVideoTexto.Dados
-        xor di, di
-        rep movsw
-    jmp .fim
-    .atualiza:
-        lodsw
-        lodsw
-        push cx
-        push si
-        mov si, [si]
-        mov di, si
-        add si, ObjVideoTexto.Dados
-        mov cx, 80
-        rep movsw
-        pop si
-        pop cx
-        loop .atualiza
-    .fim:
-    mov word [ObjVideoTexto.UltimaLinhaAlterada], 0
-    stc
-    pop cx
-    pop ax
-    pop di
-    pop si
-    pop ds
-    pop es
-    retf
-
 _videotextoAtualiza:
     push es
     push ax

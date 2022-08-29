@@ -23,6 +23,7 @@ modulos:
     dw VideoTexto
     dw 0
     %include 'VideoTexto.asm'
+    %include 'VideoTextoCGA.asm'
     %include 'CtlJanela.asm'
     %include 'CtlRotulo.asm'
 importar:
