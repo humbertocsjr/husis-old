@@ -13,20 +13,6 @@ conteudo_imagem:
 	@Ferramentas/minixfs mkdir ./enus.img System/Extensions
 	@Ferramentas/minixfs add ./ptbr.img Temp/Interface Sistema/Extensoes/Interface
 	@Ferramentas/minixfs add ./enus.img Temp/Interface System/Extensions/Interface
-	@Ferramentas/minixfs add ./ptbr.img Temp/Serial Sistema/Extensoes/Serial
-	@Ferramentas/minixfs add ./enus.img Temp/Serial System/Extensions/Serial
-	@Ferramentas/minixfs add ./ptbr.img Temp/PS2 Sistema/Extensoes/PS2
-	@Ferramentas/minixfs add ./enus.img Temp/PS2 System/Extensions/PS2
-	@Ferramentas/minixfs add ./ptbr.img Temp/Video Sistema/Extensoes/Video
-	@Ferramentas/minixfs add ./enus.img Temp/Video System/Extensions/Video
-	@Ferramentas/minixfs add ./ptbr.img Temp/CGA Sistema/Extensoes/CGA
-	@Ferramentas/minixfs add ./enus.img Temp/CGA System/Extensions/CGA
-	@Ferramentas/minixfs add ./ptbr.img Temp/CGAAceleradora Sistema/Extensoes/CGAAceleradora
-	@Ferramentas/minixfs add ./enus.img Temp/CGAAceleradora System/Extensions/CGAAccelerator
-	@Ferramentas/minixfs add ./ptbr.img Temp/EGA Sistema/Extensoes/EGA
-	@Ferramentas/minixfs add ./enus.img Temp/EGA System/Extensions/EGA
-	@Ferramentas/minixfs add ./ptbr.img Temp/VGA Sistema/Extensoes/VGA
-	@Ferramentas/minixfs add ./enus.img Temp/VGA System/Extensions/VGA
 	@Ferramentas/minixfs mkdir ./ptbr.img Programas
 	@Ferramentas/minixfs mkdir ./enus.img Programs
 	@Ferramentas/minixfs add ./ptbr.img Temp/ArquivosPtBr Programas/Arquivos

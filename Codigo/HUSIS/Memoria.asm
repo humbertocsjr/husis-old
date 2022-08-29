@@ -351,6 +351,7 @@ _memoriaAlocaBlocoRemoto:
             mov ax, [bp+.varEndereco]
             mov es, ax
             xor di, di
+            xor ax, ax
             rep stosb
             ; Registra espaco ocupado
             push ds
@@ -374,10 +375,6 @@ _memoriaAlocaBlocoRemoto:
         .continua:
         add dx, 16
         loop .busca
-
-cs call far [Memoria.CalculaLivre]
-cs call far [Terminal.Escreva]
-db '{LIVRE%bn}',0
     clc
     .fim:
     mov sp, bp
