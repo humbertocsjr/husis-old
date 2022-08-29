@@ -42,9 +42,7 @@ _rotuloRenderiza:
     es mov bx, [di+ObjControle.CalcY1]
     es mov cx, [di+ObjControle.CalcX2]
     es mov dx, [di+ObjControle.CalcY2]
-    es mov di, [di+ObjControle.CorFrente]
-    call __interfaceShl8DI
-    es or di, [di+ObjControle.CorFundo]
+    es mov di, [di+ObjControle.CorFundo]
     cs call far [VideoTexto.Limpa]
     pop di
     es cmp word [di+ObjControle.PtrConteudo + 2], 0
@@ -53,11 +51,10 @@ _rotuloRenderiza:
         es push word [di+ObjControle.PtrConteudo+2]
         pop ds
         es mov si, [di+ObjControle.PtrConteudo]
-        es mov di, [di+ObjControle.CorDestaque]
+        es mov di, [di+ObjControle.CorFrente]
         cs call far [VideoTexto.Texto]
         pop di
     .ignoraTexto:
-    cs call far [VideoTexto.Atualiza]
     pop dx
     pop cx
     pop bx

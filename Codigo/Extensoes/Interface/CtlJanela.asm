@@ -12,11 +12,11 @@ _janela:
     es mov word [di+ObjControle.Tipo], TipoControle.Janela
     cs mov ax, [Interface.TemaCorFrente]
     es mov [di+ObjControle.CorFrente], ax
-    cs mov ax, [Interface.TemaCorBorda]
+    cs mov ax, [Interface.TemaCorJanelaBorda]
     es mov [di+ObjControle.CorBorda], ax
     cs mov ax, [Interface.TemaCorFundo]
     es mov [di+ObjControle.CorFundo], ax
-    cs mov ax, [Interface.TemaCorTitulo]
+    cs mov ax, [Interface.TemaCorJanelaTitulo]
     es mov [di+ObjControle.CorDestaque], ax
     es mov word [di+ObjControle.MargemX1], 1
     es mov word [di+ObjControle.MargemY1], 1
@@ -46,9 +46,7 @@ _janelaRenderiza:
     es mov bx, [di+ObjControle.Y1]
     es mov cx, [di+ObjControle.X2]
     es mov dx, [di+ObjControle.Y2]
-    es mov di, [di+ObjControle.CorFrente]
-    call __interfaceShl8DI
-    es or di, [di+ObjControle.CorFundo]
+    es mov di, [di+ObjControle.CorFundo]
     cs call far [VideoTexto.Limpa]
     pop di
     push di
@@ -102,7 +100,7 @@ _janelaRenderiza:
             mov si, dx
             call __interfaceCalcAcimaAbaixo
             jnc .foraDosParametros
-                es call [di+ObjControle.PtrRenderiza]
+                es call far [di+ObjControle.PtrRenderiza]
             .foraDosParametros:
             pop si
         .ignoraSubItem:

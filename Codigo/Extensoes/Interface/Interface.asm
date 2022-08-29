@@ -68,11 +68,12 @@ Interface: dw _interface,0
     dw 0
     .Tela: times ObjControle._Tam db 0
     .TemaCorFrente: dw TipoCor.Ciano
-    .TemaCorTitulo: dw TipoCor.CianoClaro
     .TemaCorDestaque: dw TipoCor.CianoClaro
     .TemaCorBotaoFechar: dw TipoCor.VermelhoClaro
     .TemaCorBorda: dw TipoCor.Ciano
     .TemaCorFundo: dw TipoCor.Preto
+    .TemaCorJanelaTitulo: dw TipoCor.CianoClaro
+    .TemaCorJanelaBorda: dw TipoCor.CianoClaro
     .TemaCorTelaFundo: dw TipoCor.Preto
     .TemaCorTelaFrente: dw TipoCor.Ciano
 
