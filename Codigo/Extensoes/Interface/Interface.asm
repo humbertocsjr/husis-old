@@ -21,17 +21,21 @@ tipo: dw TipoProg.Executavel
 modulos:
     dw Interface
     dw VideoTexto
+    dw Teclado
     dw 0
     %include 'VideoTexto.asm'
     %include 'VideoTextoCGA.asm'
+    %include 'Teclado.asm'
     %include 'CtlTela.asm'
     %include 'CtlJanela.asm'
     %include 'CtlRotulo.asm'
+    %include 'CtlCampo.asm'
 importar:
     %include '../../Incluir/Texto.asm'
     %include '../../Incluir/Memoria.asm'
     %include '../../Incluir/HUSIS.asm'
     %include '../../Incluir/ObjControle.asm'
+    %include '../../Incluir/Semaforo.asm'
     dw 0
 exportar:
     dw 0
@@ -68,6 +72,9 @@ Interface: dw _interface,0
         ; es:di = ObjControle
         ; ret: cf = 1=Ok | 0=Falha
     .ConfigRotulo: dw _rotulo,0
+        ; es:di = ObjControle
+        ; ret: cf = 1=Ok | 0=Falha
+    .ConfigCampo: dw _campo,0
         ; es:di = ObjControle
         ; ret: cf = 1=Ok | 0=Falha
     .Renderiza: dw _interfaceRenderiza,0
@@ -143,8 +150,27 @@ Interface: dw _interface,0
         ; cx = Posicao
         ; ret: cf = 1=Ok | 0=Nao existe
         ;      es:di = ObjControle Abaixo
+    .EntraEmFoco: dw _interfaceEntraEmFoco,0
+        ; es:di = ObjControle
+    .LimpaFoco: dw _interfaceLimpaFoco,0
+    .ProcessaTecla: dw _interfaceProcessaTecla, 0
+        ; es:di = ObjControle
+        ; ax = X do ObjControle
+        ; bx = Y do ObjControle
+        ; cx = Scroll indo de -128 a +128
+        ; dx = TipoBotaoMouse (Contem mais de uma em paralelo)
+        ; ret: cf = 1=Renderiza | 0=Ignora
+    .ProcessaMouse: dw _interfaceProcessaMouse, 0
+        ; es:di = ObjControle
+        ; ax = X do ObjControle
+        ; bx = Y do ObjControle
+        ; cx = Scroll indo de -128 a +128
+        ; dx = TipoBotaoMouse (Contem mais de uma em paralelo)
+        ; ret: cf = 1=Renderiza | 0=Ignora
     dw 0
     .Solicitacoes: dw 0
+    .SemaforoFoco: dw 0
+    .ObjEmFoco: dw 0, 0
     .Tela: times ObjControle._Tam db 0
     .TemaCorFrente: dw TipoCor.Ciano | TipoCorFundo.Preto
     .TemaCorDestaque: dw TipoCor.Branco | TipoCorFundo.Preto
@@ -166,6 +192,8 @@ _interface:
     cs call far [Interface.ConfigTela]
     es call far [di+ObjControle.PtrRenderiza]
     cs call far [VideoTexto.Atualiza]
+    mov si, Interface.SemaforoFoco
+    cs call far [Semaforo.Cria]
     pop di
     pop ax
     retf
@@ -520,13 +548,38 @@ _interfaceRenderiza:
     es cmp word [di+ObjControle.PtrRenderiza + 2], 0
     je .fim
         es call far [di+ObjControle.PtrRenderiza]
+        call __interfaceSolicitaAtualizacao
     .fim:
     stc
     retf
 
 _interfaceExibe:
-    es mov word [di+ObjControle.Visivel], 1
-    cs call far [Interface.Renderiza]
+    push ax
+    push bx
+    es cmp word [di+ObjControle.Visivel], 0
+    jne .jaVisivel
+        es mov word [di+ObjControle.Visivel], 1
+        es cmp word [di+ObjControle.Tipo], TipoControle.Janela
+        jne .jaVisivel
+            push es
+            push di
+            es mov ax, [di+ObjControle.PtrObjEmFoco + 2]
+            cmp ax, 0
+            je .ignoraFoco
+                es mov bx, [di+ObjControle.PtrObjEmFoco]
+                mov es, ax
+                mov di, bx
+                es cmp word [di+ObjControle.Visivel], 0
+                je .ignoraFoco
+                    cs call far [Interface.EntraEmFoco]
+            .ignoraFoco
+            pop di
+            pop es
+    .jaVisivel:
+        cs call far [Interface.Renderiza]
+    .fim:
+    pop bx
+    pop ax
     retf
 
 _interfaceOculta:
@@ -664,7 +717,87 @@ __interfaceRenderizaSubItens:
     pop ds
     ret
 
+_interfaceEntraEmFoco:
+    push si
+    push ax
+    push bx
+    push es
+    push di
+    mov si, Interface.SemaforoFoco
+    cs call far [Semaforo.Solicita]
+    mov ax, es
+    mov bx, di
+    es cmp word [di+ObjControle.Visivel], 0
+    je .focoNaJanela
+        cs mov [Interface.ObjEmFoco + 2], ax
+        cs mov [Interface.ObjEmFoco], bx
+    .focoNaJanela:
+    cs call far [Interface.CarregaJanela]
+    es mov [di+ObjControle.PtrObjEmFoco + 2], ax
+    es mov [di+ObjControle.PtrObjEmFoco], bx
+    mov si, Interface.SemaforoFoco
+    cs call far [Semaforo.Libera]
+    stc
+    pop di
+    pop es
+    pop bx
+    pop ax
+    pop si
+    retf
+
+_interfaceLimpaFoco:
+    push si
+    mov si, Interface.SemaforoFoco
+    cs call far [Semaforo.Solicita]
+    cs mov word [Interface.ObjEmFoco + 2], 0
+    cs mov word [Interface.ObjEmFoco], 0
+    mov si, Interface.SemaforoFoco
+    cs call far [Semaforo.Libera]
+    pop si
+    retf
+
+_interfaceProcessaTecla:
+    push ax
+    push bx
+    push cx
+    push dx
+    push ds
+    push si
+    push es
+    push di
+    push si
+    mov si, Interface.SemaforoFoco
+    cs call far [Semaforo.Solicita]
+    pop si
+    push ax
+    cs mov ax, [Interface.ObjEmFoco + 2]
+    mov es, ax
+    pop ax
+    cs mov di, [Interface.ObjEmFoco]
+    es cmp word [di+ObjControle.PtrProcessaTecla], 0
+    je .fim
+        es call far [di+ObjControle.PtrProcessaTecla]
+        jnc .fim
+            cs call far [Interface.Renderiza]
+    .fim:
+    mov si, Interface.SemaforoFoco
+    cs call far [Semaforo.Libera]
+    pop di
+    pop es
+    pop si
+    pop ds
+    pop dx
+    pop cx
+    pop bx
+    pop ax
+    retf
+
+_interfaceProcessaMouse:
+    cli
+    retf
+
 inicial:
+    cs call far [Teclado]
     cs call far [VideoTexto]
     cs call far [Interface]
 
@@ -673,35 +806,70 @@ inicial:
     jnc .erro
     cs call far [Interface.CriaItemRaiz]
     jnc .erro
-    cs call far [Interface.ConfigJanela]
-    jnc .erro
-    mov ax, 10
-    mov bx, 10
-    cs call far [Interface.AlteraPosicao]
-    jnc .erro
-    mov ax, 40
-    mov bx, 20
-    cs call far [Interface.AlteraPosicao2]
-    jnc .erro
-    mov si, .constTeste
-    cs call far [Interface.AlteraPrincipalConst]
-    jnc .erro
+        cs call far [Interface.ConfigJanela]
+        jnc .erro
+        mov ax, 10
+        mov bx, 10
+        cs call far [Interface.AlteraPosicao]
+        jnc .erro
+        mov ax, 40
+        mov bx, 20
+        cs call far [Interface.AlteraPosicao2]
+        jnc .erro
+        mov si, .constTeste
+        cs call far [Interface.AlteraPrincipalConst]
+        jnc .erro
 
     cs call far [Interface.CriaItem]
     jnc .erro
+        cs call far [Interface.ConfigRotulo]
+        mov ax, 0
+        mov bx, 0
+        cs call far [Interface.AlteraPosicao]
+        jnc .erro
+        mov ax, 5
+        mov bx, 5
+        cs call far [Interface.AlteraTamanho]
+        jnc .erro
+        mov si, .constTeste
+        cs call far [Interface.AlteraPrincipalConst]
+        jnc .erro
 
-    cs call far [Interface.ConfigRotulo]
-    mov ax, 0
-    mov bx, 0
-    cs call far [Interface.AlteraPosicao]
+    cs call far [Interface.CarregaJanela]
     jnc .erro
-    mov ax, 5
-    mov bx, 5
-    cs call far [Interface.AlteraTamanho]
+    cs call far [Interface.CriaItem]
     jnc .erro
-    mov si, .constTeste
-    cs call far [Interface.AlteraPrincipalConst]
+        cs call far [Interface.ConfigCampo]
+        mov ax, 6
+        mov bx, 2
+        cs call far [Interface.AlteraPosicao]
+        jnc .erro
+        mov ax, 10
+        mov bx, 1
+        cs call far [Interface.AlteraTamanho]
+        jnc .erro
+        mov si, .constTeste
+        cs call far [Interface.AlteraPrincipalConst]
+        jnc .erro
+
+    cs call far [Interface.CarregaJanela]
     jnc .erro
+    cs call far [Interface.CriaItem]
+    jnc .erro
+        cs call far [Interface.ConfigCampo]
+        mov ax, 6
+        mov bx, 3
+        cs call far [Interface.AlteraPosicao]
+        jnc .erro
+        mov ax, 10
+        mov bx, 1
+        cs call far [Interface.AlteraTamanho]
+        jnc .erro
+        mov si, .constTeste
+        cs call far [Interface.AlteraPrincipalConst]
+        jnc .erro
+        cs call far [Interface.EntraEmFoco]
+        jnc .erro
 
     cs call far [Interface.CarregaJanela]
     jnc .erro
@@ -710,18 +878,23 @@ inicial:
     mov cx, 0
     cs call far [Interface.CarregaSubControle]
     jnc .erro
-    ;cs call far [Interface.Oculta]
-    ;jnc .erro
 
     jmp .loop
     .erro:
     cs call far [HUSIS.Debug]
+    cs mov word [Interface.Solicitacoes], 0
     .loop:
         cs cmp word [Interface.Solicitacoes], 0
         je .ignora
             cs mov word [Interface.Solicitacoes], 0
             cs call far [VideoTexto.Atualiza]
         .ignora:
+        cs call far [Teclado.Disponivel]
+        jnc .ignoraTeclado
+            cs call far [Teclado.Leia]
+            jnc .ignoraTeclado
+                cs call far [Interface.ProcessaTecla]
+        .ignoraTeclado:
         cs call far [HUSIS.ProximaTarefa]
         jmp .loop
     retf

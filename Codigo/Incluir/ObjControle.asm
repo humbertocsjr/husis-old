@@ -32,9 +32,74 @@ ObjControle:
     .PtrAcaoSemFoco: equ 82
     .PtrTela: equ 86
     .PtrJanela: equ 90
-    .Itens: equ 94
+    .ValorPosicao: equ 94
+    .ValorTamanho: equ 98
+    .PtrProcessaTecla: equ 102
+        ; es:di = ObjControle
+        ; ax = ASCII
+        ; bx = TipoTeclaEspecial
+        ; cx = TipoTeclaAdicional (Contem mais de uma em paralelo)
+        ; ret: cf = 1=Renderiza | 0=Ignora
+    .PtrProcessaMouse: equ 106
+        ; es:di = ObjControle
+        ; ax = X do ObjControle
+        ; bx = Y do ObjControle
+        ; cx = Scroll indo de -128 a +128
+        ; dx = TipoBotaoMouse (Contem mais de uma em paralelo)
+        ; ret: cf = 1=Renderiza | 0=Ignora
+    .PtrObjEmFoco: equ 110
+    .Itens: equ 114
     ._CapacidadeItens: equ 32
     ._Tam: equ .Itens + (._CapacidadeItens * 4)
+
+TipoBotaoMouse:
+    .Nenhum: equ 0
+    .Principal: equ 1
+    .Secundario: equ 2
+    .Terciario: equ 4
+
+TipoTeclaEspecial:
+    .Nenhuma: equ 0
+    .F1: equ 1
+    .F2: equ 2
+    .F3: equ 3
+    .F4: equ 4
+    .F5: equ 5
+    .F6: equ 6
+    .F7: equ 7
+    .F8: equ 8
+    .F9: equ 9
+    .F10: equ 10
+    .F11: equ 11
+    .F12: equ 12
+    .SetaAcima: equ 13
+    .SetaAbaixo: equ 14
+    .SetaEsquerda: equ 15
+    .SetaDireita: equ 16
+    .CapsLock: equ 17
+    .NumLock: equ 18
+    .ScrollLock: equ 19
+    .Esc: equ 20
+    .BackSpace: equ 21
+    .Delete: equ 22
+    .Enter: equ 23
+    .Home: equ 24
+    .End: equ 25
+    .Ins: equ 26
+    .PageUp: equ 27
+    .PageDown: equ 28
+    .PrintScreen: equ 29
+    .Tab: equ 30
+
+TipoTeclaAdicional:
+    .Nenhuma: equ 0
+    .Ctrl: equ 1
+    .Alt: equ 2
+    .Shift: equ 4
+    .CapsLock: equ 8
+    .NumLock: equ 16
+    .ScrollLock: equ 32
+    .Fn: equ 64
 
 TipoCor:
     .Preto: equ 0
@@ -78,3 +143,4 @@ TipoControle:
     .Tela: equ 1
     .Janela: equ 2
     .Rotulo: equ 3
+    .Campo: equ 4
