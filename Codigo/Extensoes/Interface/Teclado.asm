@@ -111,7 +111,7 @@ __tecladoProcessar:
         jmp .fim
     .encontrado:
         stc
-    .fim
+    .fim:
     pop si
     pop ds
     ret
@@ -241,6 +241,7 @@ _tecladoTabela:
 
     dw 8, TipoTeclaEspecial.BackSpace, 0x0E08, 0x0000, 0x0E7F, 0x0E00
     dw 0, TipoTeclaEspecial.Delete, 0x5300, 0x532E, 0x9300, 0xA300
+    dw 0, TipoTeclaEspecial.Delete, 0x53E0, 0x0000, 0x93E0, 0x0000
     dw 0, TipoTeclaEspecial.SetaAcima, 0x4800, 0x4838, 0x8D00, 0x8D00
     dw 0, TipoTeclaEspecial.SetaAbaixo, 0x5000, 0x5032, 0x9100, 0xA000
     dw 0, TipoTeclaEspecial.SetaEsquerda, 0x4B00, 0x4B34, 0x7300, 0x9B00

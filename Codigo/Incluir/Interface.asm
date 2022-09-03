@@ -2,113 +2,166 @@
 Interface: dw ._Fim
     db 'Interface',0
     db 'Interface',0
-    .AlocaControleRemoto: dw 1,0
-        ; ret: cf = 1=Ok | 0=Falha
-        ;      es:di = ObjControle
-    .AlocaSubControleRemoto: dw 1,0
-        ; es:di = ObjControle Acima
-        ; ret: cf = 1=Ok | 0=Falha
-        ;      es:di = ObjControle
-    .LiberaControleRemoto: dw 1,0
+    .Aloca: dw 1,0
+        ; cx = Quantidade de itens
+        ; ret: cf = 1=Ok | 0=Sem memoria
+        ;      es:0 = Bloco de Controles Alocado
+        ;      es:di = Controle 0
+    .Item: dw 1,0
+        ; es:0 = Bloco de Controles Alocado
+        ; cx = Item
+        ; ret: cf = 1=Ok | 0=Estouro da Lista
+        ;      es:di = Controle
+    .CriaItem: dw 1,0
+        ; Deve ser usado a partir do segundo item da lista
+        ; es:0 = Bloco de Controles Alocado
+        ; es:di = ObjControle Atual/Acima
+        ; ret: cf = 1=Ok | 0=Estouro da Lista
+        ;      cx = Posicao
+        ;      es:di = Novo item da lista
+    .CriaItemRaiz: dw 1,0
+        ; Cria um item na tela
+        ; es:0 = Bloco de Controles Alocado
+        ; ret: cf = 1=Ok | 0=Estouro da Lista
+        ;      cx = Posicao
+        ;      es:di = Novo item da lista
+    .ConfigTela: dw 1,0
         ; es:di = ObjControle
         ; ret: cf = 1=Ok | 0=Falha
-    .AlteraPosInicialRemoto: dw 1, 0
-        ; es:di = ObjControle
-        ; cx = X1
-        ; dx = Y1
-        ; ret: cf = 1=Ok | 0=Falha
-    .AlteraPosFinalRemoto: dw 1, 0
-        ; es:di = ObjControle
-        ; cx = X2
-        ; dx = Y2
-        ; ret: cf = 1=Ok | 0=Falha
-    .AlteraTamanhoRemoto: dw 1, 0
-        ; es:di = ObjControle
-        ; cx = Largura
-        ; dx = Altura
-        ; ret: cf = 1=Ok | 0=Falha
-    .AlteraConteudoRemoto: dw 1, 0
-        ; es:di = ObjControle
-        ; ds:si = Novo conteudo
-        ; ret: cf = 1=Ok | 0=Falha
-    .AlteraConteudoTradRemoto: dw 1, 0
-        ; es:di = ObjControle
-        ; ds:si = Traducao (ds=cs)
-        ; ret: cf = 1=Ok | 0=Falha
-    .AlteraExtensaoRemoto: dw 1, 0
-        ; es:di = ObjControle
-        ; ds:si = Novo conteudo extendido
-        ; ret: cf = 1=Ok | 0=Falha
-    .AlteraExtensaoTradRemoto: dw 1, 0
-        ; es:di = ObjControle
-        ; ds:si = Traducao (ds=cs)
-        ; ret: cf = 1=Ok | 0=Falha
-    .AlteraValorARemoto: dw 1, 0
-        ; es:di = ObjControle
-        ; ax = Valor A
-        ; ret: cf = 1=Ok | 0=Falha
-    .AlteraValorBRemoto: dw 1, 0
-        ; es:di = ObjControle
-        ; bx = Valor B
-        ; ret: cf = 1=Ok | 0=Falha
-    .AlteraValorCRemoto: dw 1, 0
-        ; es:di = ObjControle
-        ; cx = Valor C
-        ; ret: cf = 1=Ok | 0=Falha
-    .AlteraValorDRemoto: dw 1, 0
-        ; es:di = ObjControle
-        ; dx = Valor D
-        ; ret: cf = 1=Ok | 0=Falha
-    .RenderizaRemoto: dw 1, 0
+    .ConfigJanela: dw 1,0
         ; es:di = ObjControle
         ; ret: cf = 1=Ok | 0=Falha
-    .ExibeRemoto: dw 1, 0
+        ; Valores:
+        ; - Principal = Ponteiro para o Titulo da Janela ASCIZ
+    .ConfigRotulo: dw 1,0
         ; es:di = ObjControle
         ; ret: cf = 1=Ok | 0=Falha
-    .OcultaRemoto: dw 1, 0
+        ; Valores:
+        ; - Principal = Ponteiro para o Conteudo ASCIZ
+    .ConfigCampo: dw 1,0
         ; es:di = ObjControle
         ; ret: cf = 1=Ok | 0=Falha
-    .AdicionaJanelaRemota: dw 1,0
-        ; Adiciona uma janela a raiz
+        ; Valores:
+        ; - Principal = Ponteiro para o Conteudo ASCIZ
+        ; - ValorPosicao = Posicao no conteudo
+        ; - ValorTamanho = Tamanho do campo (Se nao definido calcula pelo 
+        ;                  tamanho do conteudo ate encontrar o fim do texto)
+        ; Eventos:
+        ; - Acao = Alterado o conteudo
+        ; - AcaoAux = Alterada a posicao no conteudo
+        ; - AcaoFoco = Quando entra em foco
+        ; - AcaoSemFoco = Quando sai do foco
+    .ConfigBotao: dw 1,0
         ; es:di = ObjControle
         ; ret: cf = 1=Ok | 0=Falha
-    .AdicionaRemota: dw 1,0
-        ; Adiciona um controle a um outro controle/janela
-        ; es:di = ObjControle Acima
-        ; ds:si = ObjControle Abaixo
-        ; ret: cf = 1=Ok | 0=Falha
-    .AdicionaLocal: dw 1,0
-        ; Adiciona um controle a um outro controle/janela
-        ; es:di = ObjControle Abaixo
-        ; ds:si = ObjControle Acima
-        ; ret: cf = 1=Ok | 0=Falha
-    .CopiaPonteiroRemotoParaLocal: dw 1,0
-        ; Copia es:di para ds:si de forma facil, ficando os dois identicos
-        ; ret: cf = 1=Ok | 0=Falha
-    .IniciaRemoto: dw 1, 0
-        ; Inicia um objeto em branco
+        ; Valores:
+        ; - Principal = Ponteiro para o Texto ASCIZ
+        ; Eventos:
+        ; - Acao = Ao pressionar o botao
+    .Renderiza: dw 1,0
         ; es:di = ObjControle
         ; ret: cf = 1=Ok | 0=Falha
-    .IniciaRotuloRemoto: dw 1,0
+    .AlteraPosicao: dw 1,0
         ; es:di = ObjControle
-        ; ds:si = Texto
+        ; ax = X1
+        ; bx = Y1
         ; ret: cf = 1=Ok | 0=Falha
-    .IniciaRotuloTradRemoto: dw 1,0
+    .AlteraPosicao2: dw 1,0
         ; es:di = ObjControle
-        ; ds:si = Traducao (ds=cs)
+        ; ax = X2
+        ; bx = Y2
         ; ret: cf = 1=Ok | 0=Falha
-    .IniciaJanelaRemoto: dw 1,0
+    .AlteraTamanho: dw 1,0
         ; es:di = ObjControle
-        ; ds:si = Texto
+        ; ax = Largura (Altera X2)
+        ; bx = Altura (Altera Y2)
         ; ret: cf = 1=Ok | 0=Falha
-    .IniciaJanelaTradRemoto: dw 1,0
+    .AlteraLargura: dw 1,0
         ; es:di = ObjControle
-        ; ds:si = Traducao (ds=cs)
+        ; ax = Largura (Altera X2)
         ; ret: cf = 1=Ok | 0=Falha
-    .Alerta: dw 1,0
-        ; ds:si = Mensagem
-        ; ax = Valor A
-        ; bx = Valor B
-        ; cx = Valor C
-        ; dx = Valor D
+    .AlteraAltura: dw 1,0
+        ; es:di = ObjControle
+        ; bx = Altura (Altera Y2)
+        ; ret: cf = 1=Ok | 0=Falha
+    .AlteraPrincipal: dw 1,0
+        ; es:di = ObjControle
+        ; ds:si = Ponteiro
+        ; ret: cf = 1=Ok | 0=Falha
+    .AlteraAuxiliar: dw 1,0
+        ; es:di = ObjControle
+        ; ds:si = Ponteiro
+        ; ret: cf = 1=Ok | 0=Falha
+    .AlteraPrincipalTrad: dw 1,0
+        ; es:di = ObjControle
+        ; cs:si = Ponteiro Traducao
+        ; ret: cf = 1=Ok | 0=Falha
+    .AlteraAuxiliarTrad: dw 1,0
+        ; es:di = ObjControle
+        ; cs:si = Ponteiro Traducao
+        ; ret: cf = 1=Ok | 0=Falha
+    .AlteraPrincipalConst: dw 1,0
+        ; es:di = ObjControle
+        ; cs:si = Ponteiro Constante
+        ; ret: cf = 1=Ok | 0=Falha
+    .AlteraAuxiliarConst: dw 1,0
+        ; es:di = ObjControle
+        ; cs:si = Ponteiro Constante
+        ; ret: cf = 1=Ok | 0=Falha
+    .AlteraAcao: dw 1,0
+        ; es:di = ObjControle
+        ; cs:si = Ponteiro
+        ; ret: cf = 1=Ok | 0=Falha
+    .AlteraAcaoAux: dw 1,0
+        ; es:di = ObjControle
+        ; cs:si = Ponteiro
+        ; ret: cf = 1=Ok | 0=Falha
+    .AlteraAcaoFoco: dw 1,0
+        ; es:di = ObjControle
+        ; cs:si = Ponteiro
+        ; ret: cf = 1=Ok | 0=Falha
+    .AlteraAcaoSemFoco: dw 1,0
+        ; es:di = ObjControle
+        ; cs:si = Ponteiro
+        ; ret: cf = 1=Ok | 0=Falha
+    .Exibe: dw 1,0
+        ; es:di = ObjControle
+        ; ret: cf = 1=Ok | 0=Falha
+    .Oculta: dw 1,0
+        ; es:di = ObjControle
+        ; ret: cf = 1=Ok | 0=Falha
+    .CarregaAcima: dw 1,0
+        ; es:di = ObjControle
+        ; ret: cf = 1=Ok | 0=Falha
+        ;      es:di = ObjControle Acima
+    .CarregaJanela: dw 1,0
+        ; es:di = ObjControle
+        ; ret: cf = 1=Ok | 0=Falha
+        ;      es:di = ObjControle Janela Acima
+    .CarregaTela: dw 1,0
+        ; es:di = ObjControle
+        ; ret: cf = 1=Ok | 0=Falha
+        ;      es:di = ObjControle Tela Acima
+    .CarregaSubControle: dw 1,0
+        ; es:di = ObjControle
+        ; cx = Posicao
+        ; ret: cf = 1=Ok | 0=Nao existe
+        ;      es:di = ObjControle Abaixo
+    .EntraEmFoco: dw 1,0
+        ; es:di = ObjControle
+    .LimpaFoco: dw 1,0
+    .ProcessaTecla: dw 1, 0
+        ; es:di = ObjControle
+        ; ax = X do ObjControle
+        ; bx = Y do ObjControle
+        ; cx = Scroll indo de -128 a +128
+        ; dx = TipoBotaoMouse (Contem mais de uma em paralelo)
+        ; ret: cf = 1=Renderiza | 0=Ignora
+    .ProcessaMouse: dw 1, 0
+        ; es:di = ObjControle
+        ; ax = X do ObjControle
+        ; bx = Y do ObjControle
+        ; cx = Scroll indo de -128 a +128
+        ; dx = TipoBotaoMouse (Contem mais de uma em paralelo)
+        ; ret: cf = 1=Renderiza | 0=Ignora
     ._Fim:

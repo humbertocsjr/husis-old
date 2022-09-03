@@ -9,6 +9,10 @@ _rotulo:
     es mov [di+ObjControle.PtrRenderiza+2], ax
     mov ax, _rotuloRenderiza
     es mov [di+ObjControle.PtrRenderiza], ax
+    mov ax, cs
+    es mov [di+ObjControle.PtrEntraNoFoco+2], ax
+    mov ax, _rotuloEntraNoFoco
+    es mov [di+ObjControle.PtrEntraNoFoco], ax
     es mov word [di+ObjControle.Tipo], TipoControle.Rotulo
     cs mov ax, [Interface.TemaCorFrente]
     es mov [di+ObjControle.CorFrente], ax
@@ -25,6 +29,11 @@ _rotulo:
     pop ax
     pop di
     pop es
+    retf
+
+_rotuloEntraNoFoco:
+    call __interfaceTab
+    stc
     retf
 
 _rotuloRenderiza:

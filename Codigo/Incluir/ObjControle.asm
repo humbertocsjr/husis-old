@@ -48,7 +48,11 @@ ObjControle:
         ; dx = TipoBotaoMouse (Contem mais de uma em paralelo)
         ; ret: cf = 1=Renderiza | 0=Ignora
     .PtrObjEmFoco: equ 110
-    .Itens: equ 114
+        ; es:di = ObjControle
+    .PtrEntraNoFoco: equ 114
+        ; es:di = ObjControle
+    .PtrSaiDoFoco: equ 118
+    .Itens: equ 122
     ._CapacidadeItens: equ 32
     ._Tam: equ .Itens + (._CapacidadeItens * 4)
 
@@ -144,3 +148,4 @@ TipoControle:
     .Janela: equ 2
     .Rotulo: equ 3
     .Campo: equ 4
+    .Botao: equ 5

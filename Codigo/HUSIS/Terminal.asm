@@ -42,6 +42,7 @@ Terminal: dw _terminal, 0
     .EscrevaDebugCurto: dw _terminalEscrevaDebugCurto, 0
     .EscrevaDebugDSSI: dw _terminalEscrevaDebugDSSI, 0
     .EscrevaDebugESDI: dw _terminalEscrevaDebugESDI, 0
+    .EscrevaDebugDSSIESDI: dw _terminalEscrevaDebugDSSIESDI, 0
     .EscrevaDebugESSI: dw _terminalEscrevaDebugESSI, 0
     .EscrevaDebugPilha: dw _terminalEscrevaDebugPilha, 0
     .EscrevaDebugPara: dw _terminalEscrevaDebugPara, 0
@@ -662,6 +663,67 @@ _terminalEscrevaDebugDSSI:
     cs call far [Terminal.Escreva]
     db ' ]\n', 0
     pop cx
+    pop si
+    pop ax
+    popf
+    cs jmp far [Terminal.EscrevaDebug]
+
+
+_terminalEscrevaDebugDSSIESDI:
+    pushf
+    push ax
+    push si
+    push cx
+    mov cx, 16
+    cs call far [Terminal.Escreva]
+    db 'DS:SI: [', 0
+    xor ax, ax
+    .escreve:
+        lodsb
+        cs call far [Terminal.Escreva]
+        db ' %ah', 0
+        cmp al, ' '
+        jb .ignora
+        cmp al, 'z'
+        ja .ignora
+            cs call far [Terminal.Escreva]
+            db '"%ac"', 0
+        .ignora:
+        loop .escreve
+    cs call far [Terminal.Escreva]
+    db ' ]\n', 0
+    pop cx
+    pop si
+    pop ax
+    popf
+    pushf
+    push ax
+    push si
+    push ds
+    push cx
+    mov cx, 16
+    cs call far [Terminal.Escreva]
+    db 'ES:DI: [', 0
+    push es
+    pop ds
+    mov si, di
+    xor ax, ax
+    .escreve2:
+        lodsb
+        cs call far [Terminal.Escreva]
+        db ' %ah', 0
+        cmp al, ' '
+        jb .ignora2
+        cmp al, 'z'
+        ja .ignora2
+            cs call far [Terminal.Escreva]
+            db '"%ac"', 0
+        .ignora2:
+        loop .escreve2
+    cs call far [Terminal.Escreva]
+    db ' ]\n', 0
+    pop cx
+    pop ds
     pop si
     pop ax
     popf

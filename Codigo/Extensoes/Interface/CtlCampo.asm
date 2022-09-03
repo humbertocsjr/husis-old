@@ -13,6 +13,14 @@ _campo:
     es mov [di+ObjControle.PtrProcessaTecla+2], ax
     mov ax, _campoProcessaTecla
     es mov [di+ObjControle.PtrProcessaTecla], ax
+    mov ax, cs
+    es mov [di+ObjControle.PtrEntraNoFoco+2], ax
+    mov ax, _campoEntraNoFoco
+    es mov [di+ObjControle.PtrEntraNoFoco], ax
+    mov ax, cs
+    es mov [di+ObjControle.PtrSaiDoFoco+2], ax
+    mov ax, _campoSaiDoFoco
+    es mov [di+ObjControle.PtrSaiDoFoco], ax
     es mov word [di+ObjControle.Tipo], TipoControle.Campo
     cs mov ax, [Interface.TemaCorFrente]
     es mov [di+ObjControle.CorFrente], ax
@@ -31,6 +39,54 @@ _campo:
     pop ax
     pop di
     pop es
+    retf
+
+_campoEntraNoFoco:
+    push ax
+    push bx
+    push cx
+    push dx
+    push ds
+    push si
+    es mov ax, [di+ObjControle.PtrConteudo + 2]
+    mov ds, ax
+    es mov si, [di+ObjControle.PtrConteudo]
+    es add ax, [di+ObjControle.ValorPosicao]
+    xor bx, bx
+    xor cx, cx
+    xor dx, dx
+    call __interfaceExecutaAcaoFoco
+    stc
+    pop si 
+    pop ds
+    pop dx
+    pop cx
+    pop bx
+    pop ax
+    retf
+
+_campoSaiDoFoco:
+    push ax
+    push bx
+    push cx
+    push dx
+    push ds
+    push si
+    es mov ax, [di+ObjControle.PtrConteudo + 2]
+    mov ds, ax
+    es mov si, [di+ObjControle.PtrConteudo]
+    es add ax, [di+ObjControle.ValorPosicao]
+    xor bx, bx
+    xor cx, cx
+    xor dx, dx
+    call __interfaceExecutaAcaoSemFoco
+    stc
+    pop si
+    pop ds
+    pop dx
+    pop cx
+    pop bx
+    pop ax
     retf
 
 ; ds:si = Texto terminado em 0
@@ -73,6 +129,52 @@ __campoRemoveCaractere:
     pop ax
     ret
 
+__campoExecutaAcao:
+    push ax
+    push bx
+    push cx
+    push dx
+    push ds
+    push si
+    es mov ax, [di+ObjControle.PtrConteudo + 2]
+    mov ds, ax
+    es mov si, [di+ObjControle.PtrConteudo]
+    es add ax, [di+ObjControle.ValorPosicao]
+    xor bx, bx
+    xor cx, cx
+    xor dx, dx
+    call __interfaceExecutaAcao
+    pop si
+    pop ds
+    pop dx
+    pop cx
+    pop bx
+    pop ax
+    ret
+
+__campoExecutaAcaoAux:
+    push ax
+    push bx
+    push cx
+    push dx
+    push ds
+    push si
+    es mov ax, [di+ObjControle.PtrConteudo + 2]
+    mov ds, ax
+    es mov si, [di+ObjControle.PtrConteudo]
+    es add ax, [di+ObjControle.ValorPosicao]
+    xor bx, bx
+    xor cx, cx
+    xor dx, dx
+    call __interfaceExecutaAcaoAux
+    pop si
+    pop ds
+    pop dx
+    pop cx
+    pop bx
+    pop ax
+    ret
+
 _campoProcessaTecla:
     push ax
     push bx
@@ -82,51 +184,73 @@ _campoProcessaTecla:
     push si
     cmp bx, TipoTeclaEspecial.SetaEsquerda
     jne .continuaEsquerda
-        es dec word [di+ObjControle.ValorPosicao]
-        es mov cx, [di+ObjControle.ValorPosicao]
-        cmp cx, [di+ObjControle.ValorPosicao + 2]
-        jae .fimEsquerda
-            es mov [di+ObjControle.ValorPosicao + 2], cx
-        .fimEsquerda:
-        jmp .fim
+        es cmp word [di+ObjControle.ValorPosicao], 0
+        ; Nao faz nada se ja estiver no inicio
+        je .fimEsquerda
+            ; Senao decrementa a posicao do cursor
+            es dec word [di+ObjControle.ValorPosicao]
+            es mov cx, [di+ObjControle.ValorPosicao]
+            es cmp cx, [di+ObjControle.ValorPosicao + 2]
+            ; Se a posicao do inicio do texto que esta exibindo estiver 
+            ; mostrando depois de onde o cursor esta agora
+            jae .fimEsquerda
+                ; Decrementa o inicio do recorte do texto tbm
+                es cmp word [di+ObjControle.ValorPosicao + 2], 0
+                je .fimEsquerda
+                    ; Apenas por desencargo, decrementa apenas se a posicao 
+                    ; nao for zero
+                    es dec word [di+ObjControle.ValorPosicao + 2]
+            .fimEsquerda:
+            ; Executa o Evento Auxiliar do Controle (Mudou a posicao do cursor)
+            call __campoExecutaAcaoAux
+            jmp .fim
     .continuaEsquerda:
     cmp bx, TipoTeclaEspecial.SetaDireita
     jne .continuaDireita
-        es dec word [di+ObjControle.ValorPosicao]
+        es inc word [di+ObjControle.ValorPosicao]
         es mov cx, [di+ObjControle.ValorPosicao]
-        es mov cx, [di+ObjControle.CalcX2]
-        es sub cx, [di+ObjControle.CalcX1]
-        sub cx, 2
-        cmp cx, [di+ObjControle.ValorPosicao]
-;cs call far [HUSIS.Debug]
-        ;jb .fimDireita
-            es inc word [di+ObjControle.ValorPosicao]
+        es sub cx, [di+ObjControle.ValorPosicao + 2]
+        es mov dx, [di+ObjControle.CalcX2]
+        es sub dx, [di+ObjControle.CalcX1]
+        sub dx, 2
+        cmp cx, dx
+        jb .fimDireita
             es inc word [di+ObjControle.ValorPosicao + 2]
         .fimDireita:
+        call __campoExecutaAcaoAux
         jmp .fim
     .continuaDireita:
     cmp bx, TipoTeclaEspecial.BackSpace
     jne .continuaBackSpace
         es cmp word [di+ObjControle.ValorPosicao], 0
         je .fimBackSpace
-            es push word [di+ObjControle.PtrConteudo]
+            es push word [di+ObjControle.PtrConteudo + 2]
             pop ds
             es mov si, [di+ObjControle.PtrConteudo]
             es add si, [di+ObjControle.ValorPosicao]
             dec si
             call __campoRemoveCaractere
+            mov ax, 0
+            mov bx, TipoTeclaEspecial.SetaEsquerda
+            mov cx, TipoTeclaAdicional.Nenhuma
+            push cs
+            call _campoProcessaTecla
+            call __campoExecutaAcao
         .fimBackSpace:
         jmp .fim
     .continuaBackSpace:
     cmp bx, TipoTeclaEspecial.Delete
     jne .continuaDelete
-        es cmp word [di+ObjControle.ValorPosicao], 0
-        je .fimDelete
-            es push word [di+ObjControle.PtrConteudo]
-            pop ds
+        es push word [di+ObjControle.PtrConteudo + 2]
+        pop ds
+        es mov si, [di+ObjControle.PtrConteudo]
+        cs call far [Texto.CalculaTamanhoLocal]
+        es cmp word [di+ObjControle.ValorPosicao], cx
+        jae .fimDelete
             es mov si, [di+ObjControle.PtrConteudo]
             es add si, [di+ObjControle.ValorPosicao]
             call __campoRemoveCaractere
+            call __campoExecutaAcao
         .fimDelete:
         jmp .fim
     .continuaDelete:
@@ -134,7 +258,7 @@ _campoProcessaTecla:
     je .continuaAscii
         cmp ax, ' '
         jb .continuaAscii
-        es push word [di+ObjControle.PtrConteudo]
+        es push word [di+ObjControle.PtrConteudo + 2]
         pop ds
         es mov si, [di+ObjControle.PtrConteudo]
         cs call far [Texto.CalculaTamanhoLocal]
@@ -144,12 +268,18 @@ _campoProcessaTecla:
         cmp byte [si], 0
         je .fimLinha
             call __campoInsereCaractere
+            mov ax, 0
+            mov bx, TipoTeclaEspecial.SetaDireita
+            mov cx, TipoTeclaAdicional.Nenhuma
+            push cs
+            call _campoProcessaTecla
             jmp .continuaAscii
         .fimLinha:
             es add [di+ObjControle.ValorPosicao], cx
             mov [si], al
             inc si
             mov byte [si], 0
+            call __campoExecutaAcao
     .continuaAscii:
     .fim:
     stc
@@ -183,14 +313,26 @@ _campoRenderiza:
     push cs
     pop ds
     mov si, .constInicio
-    es mov di, [di+ObjControle.CorBorda]
+    call __interfaceVerificaFoco
+    jc .corBordaDestaqueInicio
+        es mov di, [di+ObjControle.CorBorda]
+        jmp .fimCorBordaInicio
+    .corBordaDestaqueInicio:
+        es mov di, [di+ObjControle.CorDestaque]
+    .fimCorBordaInicio:
     cs call far [VideoTexto.Texto]
     pop di
     push di
     push ax
     mov si, .constFim
     mov ax, cx
-    es mov di, [di+ObjControle.CorBorda]
+    call __interfaceVerificaFoco
+    jc .corBordaDestaqueFim
+        es mov di, [di+ObjControle.CorBorda]
+        jmp .fimCorBordaFim
+    .corBordaDestaqueFim:
+        es mov di, [di+ObjControle.CorDestaque]
+    .fimCorBordaFim:
     cs call far [VideoTexto.Texto]
     pop ax
     pop di
@@ -231,12 +373,8 @@ _campoRenderiza:
                 push ax
                 push cx
                 es mov ax, [di+ObjControle.CorFrente]
-                push es
-                pop cx
-                cs cmp [Interface.ObjEmFoco + 2], cx
-                jne .ignoraInversao
-                cs cmp [Interface.ObjEmFoco], di
-                jne .ignoraInversao
+                call __interfaceVerificaFoco
+                jnc .ignoraInversao
                     mov ah, al
                     mov cx, 4
                     shl ah, cl
@@ -260,6 +398,7 @@ _campoRenderiza:
             jmp .desenha
         .fimDesenho:
     .ignoraTexto:
+    .fim:
     stc
     pop dx
     pop cx

@@ -88,7 +88,7 @@ HUSIS: dw _husis,0
         retf
 
     _husisDebug:
-        cs call far [Terminal.EscrevaDebugDSSI]
+        cs call far [Terminal.EscrevaDebugDSSIESDI]
         retf
 
     _husisProcessoAtual:

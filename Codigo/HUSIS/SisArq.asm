@@ -86,6 +86,10 @@ ObjSisArq:
         ; ret: cf = 1=Lido | 0=Nao lido
         ;      cx = Qtd de Bytes lidos
     .CalculaTamanho: equ 54
+        ; es:di = ObjSisArq
+        ; ret: cf = 1=Lido | 0=Nao lido
+        ;      cx = KiB
+        ;      dx:ax = Bytes
     ._Tam: equ 58
 
 ObjSisArqItem:
