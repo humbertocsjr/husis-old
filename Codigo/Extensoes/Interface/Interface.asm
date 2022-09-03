@@ -26,6 +26,7 @@ modulos:
     dw 0
     %include 'VideoTexto.asm'
     %include 'VideoTextoCGA.asm'
+    %include 'VideoTextoEGA.asm'
     %include 'Teclado.asm'
     %include 'CtlTela.asm'
     %include 'CtlJanela.asm'

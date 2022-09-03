@@ -79,7 +79,7 @@ MinixFS: dw _minixfs,0
         ; bx = Unidae
         ; ret: cf = 1=Ok | 0=Falha
     dw 0
-    .Debug: dw 0
+    .Debug: dw 1
     .Trava: dw 0
 
 _minixfs:
@@ -234,7 +234,7 @@ __minixfsCarregaDoItemRemoto:
     mov bx, 32
     mul bx
     cmp cx, 7
-    ja .blocoIndireto
+    jae .blocoIndireto
         add si, ObjSisArqMinixFSRaiz.Itens
         mov bx, cx
         shl bx, 1
@@ -245,23 +245,32 @@ __minixfsCarregaDoItemRemoto:
         call __minixfsCarregaBufferRemoto
         jmp .fim
     .blocoIndireto:
+        cmp cx, 7+256
+        jae .blocoDuploIndireto
         push si
         add si, ObjSisArqMinixFSRaiz.Itens
-        cmp cx, 7+256
-        ja .blocoDuploIndireto
         mov bx, cx
-        sub bx, 7
         shl bx, 1
-        ds mov ax, [si+ObjMinixFSItem.ZonaIndireta]
+        add bx, ax
+        ds mov ax, [si+bx+ObjMinixFSItem.Zonas]
+        cs cmp word [MinixFS.Debug], 0
+        je .ignoraDebug
+            cs call far [Terminal.Escreva]
+            db '[ INDIRETA: %Lh:%an POS: %cn ]',0
+        .ignoraDebug:
         pop si
         cmp ax, 0
         je .falha
         call __minixfsCarregaBufferLocal
         add si, ObjSisArqMinixFS.Buffer
+        mov bx, cx
+        sub bx, 7
+        shl bx, 1
         ds mov ax, [si+bx]
         cmp ax, 0
         je .falha
         call __minixfsCarregaBufferRemoto
+        jmp .fim
     .blocoDuploIndireto:
     .falha:
         clc
