@@ -9,9 +9,9 @@ _tela:
     es mov [di+ObjControle.PtrAcima+2], ax
     es mov [di+ObjControle.PtrAcima], di
     mov ax, cs
-    es mov [di+ObjControle.PtrRenderiza+2], ax
+    es mov [di+ObjControle.FuncRenderiza+2], ax
     mov ax, _telaRenderiza
-    es mov [di+ObjControle.PtrRenderiza], ax
+    es mov [di+ObjControle.FuncRenderiza], ax
     es mov word [di+ObjControle.Tipo], TipoControle.Tela
     cs mov ax, [Interface.TemaCorFrente]
     es mov [di+ObjControle.CorFrente], ax

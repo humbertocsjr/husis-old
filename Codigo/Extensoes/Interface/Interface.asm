@@ -46,6 +46,39 @@ exportar:
     db 'Interface',0
     dw 0
 
+_interfaceRetNao:
+    clc
+    retf
+
+_interfaceRetSim:
+    stc
+    retf
+
+; es:di = ObjControle
+__interfaceIniciaObj:
+    push ax
+    mov ax, cs
+    es mov      [di+ObjControle.FuncRenderiza + 2], ax
+    es mov word [di+ObjControle.FuncRenderiza], _interfaceRetNao
+    es mov      [di+ObjControle.FuncAcao + 2], ax
+    es mov word [di+ObjControle.FuncAcao], _interfaceRetSim
+    es mov      [di+ObjControle.FuncAcaoAux + 2], ax
+    es mov word [di+ObjControle.FuncAcaoAux], _interfaceRetSim
+    es mov      [di+ObjControle.FuncAcaoFoco + 2], ax
+    es mov word [di+ObjControle.FuncAcaoFoco], _interfaceRetSim
+    es mov      [di+ObjControle.FuncAcaoSemFoco + 2], ax
+    es mov word [di+ObjControle.FuncAcaoSemFoco], _interfaceRetSim
+    es mov      [di+ObjControle.FuncProcessaMouse + 2], ax
+    es mov word [di+ObjControle.FuncProcessaMouse], _interfaceRetSim
+    es mov      [di+ObjControle.FuncProcessaTecla + 2], ax
+    es mov word [di+ObjControle.FuncProcessaTecla], _interfaceRetSim
+    es mov      [di+ObjControle.FuncEntraNoFoco + 2], ax
+    es mov word [di+ObjControle.FuncEntraNoFoco], _interfaceRetSim
+    es mov      [di+ObjControle.FuncSaiDoFoco + 2], ax
+    es mov word [di+ObjControle.FuncSaiDoFoco], _interfaceRetSim
+
+    pop ax
+    ret
 
 Interface: dw _interface,0
     .Aloca: dw _interfaceAloca,0
@@ -233,7 +266,7 @@ _interface:
     mov es, ax
     mov di, Interface.Tela
     cs call far [Interface.ConfigTela]
-    es call far [di+ObjControle.PtrRenderiza]
+    es call far [di+ObjControle.FuncRenderiza]
     cs call far [VideoTexto.Atualiza]
     mov si, Interface.SemaforoFoco
     cs call far [Semaforo.Cria]
@@ -406,8 +439,8 @@ _interfaceAlteraAcao:
     mov bp, sp
     push ax
     mov ax, [bp+4]
-    es mov [di+ObjControle.PtrAcao + 2], ax
-    es mov [di+ObjControle.PtrAcao], si
+    es mov [di+ObjControle.FuncAcao + 2], ax
+    es mov [di+ObjControle.FuncAcao], si
     stc
     pop ax
     pop bp
@@ -418,8 +451,8 @@ _interfaceAlteraAcaoAux:
     mov bp, sp
     push ax
     mov ax, [bp+4]
-    es mov [di+ObjControle.PtrAcaoAux + 2], ax
-    es mov [di+ObjControle.PtrAcaoAux], si
+    es mov [di+ObjControle.FuncAcaoAux + 2], ax
+    es mov [di+ObjControle.FuncAcaoAux], si
     stc
     pop ax
     pop bp
@@ -430,8 +463,8 @@ _interfaceAlteraAcaoFoco:
     mov bp, sp
     push ax
     mov ax, [bp+4]
-    es mov [di+ObjControle.PtrAcaoFoco + 2], ax
-    es mov [di+ObjControle.PtrAcaoFoco], si
+    es mov [di+ObjControle.FuncAcaoFoco + 2], ax
+    es mov [di+ObjControle.FuncAcaoFoco], si
     stc
     pop ax
     pop bp
@@ -442,8 +475,8 @@ _interfaceAlteraAcaoSemFoco:
     mov bp, sp
     push ax
     mov ax, [bp+4]
-    es mov [di+ObjControle.PtrAcaoSemFoco + 2], ax
-    es mov [di+ObjControle.PtrAcaoSemFoco], si
+    es mov [di+ObjControle.FuncAcaoSemFoco + 2], ax
+    es mov [di+ObjControle.FuncAcaoSemFoco], si
     stc
     pop ax
     pop bp
@@ -641,7 +674,7 @@ _interfaceRenderiza:
     push ax
     es cmp word [di+ObjControle.Visivel], 0
     je .fim
-    es cmp word [di+ObjControle.PtrRenderiza + 2], 0
+    es cmp word [di+ObjControle.FuncRenderiza + 2], 0
     je .fim
         es cmp word [di+ObjControle.Tipo], TipoControle.Tela
         je .ok
@@ -665,7 +698,7 @@ _interfaceRenderiza:
             pop es
             jmp .fim
         .ok:
-        es call far [di+ObjControle.PtrRenderiza]
+        es call far [di+ObjControle.FuncRenderiza]
         call __interfaceSolicitaAtualizacao
     .fim:
     stc
@@ -811,7 +844,7 @@ __interfaceRenderizaSubItens:
         cmp ax, 0
         je .ignoraSubItem
         mov es, ax
-        es cmp word [di+ObjControle.PtrRenderiza+2], 0
+        es cmp word [di+ObjControle.FuncRenderiza+2], 0
         je .ignoraSubItem
             push si
             push ds
@@ -822,7 +855,7 @@ __interfaceRenderizaSubItens:
             je .foraDosParametros
             call __interfaceCalcAcimaAbaixo
             jnc .foraDosParametros
-                es call far [di+ObjControle.PtrRenderiza]
+                es call far [di+ObjControle.FuncRenderiza]
             .foraDosParametros:
             pop ds
             pop si
@@ -850,9 +883,9 @@ __interfaceExecutaAcao:
     push di
     push ds
     push si
-    es cmp word [di+ObjControle.PtrAcao + 2], 0
+    es cmp word [di+ObjControle.FuncAcao + 2], 0
     je .fim
-        es call far [di+ObjControle.PtrAcao]
+        es call far [di+ObjControle.FuncAcao]
     .fim:
     pop si
     pop ds
@@ -873,9 +906,9 @@ __interfaceExecutaAcaoAux:
     push di
     push ds
     push si
-    es cmp word [di+ObjControle.PtrAcaoAux + 2], 0
+    es cmp word [di+ObjControle.FuncAcaoAux + 2], 0
     je .fim
-        es call far [di+ObjControle.PtrAcaoAux]
+        es call far [di+ObjControle.FuncAcaoAux]
     .fim:
     pop si
     pop ds
@@ -896,9 +929,9 @@ __interfaceExecutaAcaoFoco:
     push di
     push ds
     push si
-    es cmp word [di+ObjControle.PtrAcaoFoco + 2], 0
+    es cmp word [di+ObjControle.FuncAcaoFoco + 2], 0
     je .fim
-        es call far [di+ObjControle.PtrAcaoFoco]
+        es call far [di+ObjControle.FuncAcaoFoco]
     .fim:
     pop si
     pop ds
@@ -919,9 +952,9 @@ __interfaceExecutaAcaoSemFoco:
     push di
     push ds
     push si
-    es cmp word [di+ObjControle.PtrAcaoSemFoco + 2], 0
+    es cmp word [di+ObjControle.FuncAcaoSemFoco + 2], 0
     je .fim
-        es call far [di+ObjControle.PtrAcaoSemFoco]
+        es call far [di+ObjControle.FuncAcaoSemFoco]
     .fim:
     pop si
     pop ds
@@ -970,9 +1003,9 @@ _interfaceEntraEmFoco:
             mov di, bx
             mov si, Interface.SemaforoFoco
             cs call far [Semaforo.Libera]
-            es cmp word [di+ObjControle.PtrSaiDoFoco + 2],0
+            es cmp word [di+ObjControle.FuncSaiDoFoco + 2],0
             je .ignoraSaida
-                es call far [di+ObjControle.PtrSaiDoFoco]
+                es call far [di+ObjControle.FuncSaiDoFoco]
                 jnc .ignoraRenderizaSaida
             .ignoraSaida:
             cs call far [Interface.Renderiza]
@@ -998,9 +1031,9 @@ _interfaceEntraEmFoco:
         mov di, bx
         mov si, Interface.SemaforoFoco
         cs call far [Semaforo.Libera]
-        es cmp word [di+ObjControle.PtrEntraNoFoco + 2], 0
+        es cmp word [di+ObjControle.FuncEntraNoFoco + 2], 0
         je .ignoraEntrada
-            es call far [di+ObjControle.PtrEntraNoFoco]
+            es call far [di+ObjControle.FuncEntraNoFoco]
             jnc .ignoraRenderizaEntrada
         .ignoraEntrada:
         mov si, Interface.SemaforoFoco
@@ -1049,9 +1082,9 @@ _interfaceProcessaTecla:
     mov es, ax
     pop ax
     cs mov di, [Interface.ObjEmFoco]
-    es cmp word [di+ObjControle.PtrProcessaTecla], 0
+    es cmp word [di+ObjControle.FuncProcessaTecla], 0
     je .fim
-        es call far [di+ObjControle.PtrProcessaTecla]
+        es call far [di+ObjControle.FuncProcessaTecla]
         jnc .fim
             cs call far [Interface.Renderiza]
     .fim:

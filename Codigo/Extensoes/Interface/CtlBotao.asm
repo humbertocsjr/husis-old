@@ -6,21 +6,21 @@ _botao:
     push cx
     push dx
     mov ax, cs
-    es mov [di+ObjControle.PtrRenderiza+2], ax
+    es mov [di+ObjControle.FuncRenderiza+2], ax
     mov ax, _botaoRenderiza
-    es mov [di+ObjControle.PtrRenderiza], ax
+    es mov [di+ObjControle.FuncRenderiza], ax
     mov ax, cs
-    es mov [di+ObjControle.PtrProcessaTecla+2], ax
+    es mov [di+ObjControle.FuncProcessaTecla+2], ax
     mov ax, _botaoProcessaTecla
-    es mov [di+ObjControle.PtrProcessaTecla], ax
+    es mov [di+ObjControle.FuncProcessaTecla], ax
     mov ax, cs
-    es mov [di+ObjControle.PtrEntraNoFoco+2], ax
+    es mov [di+ObjControle.FuncEntraNoFoco+2], ax
     mov ax, _botaoEntraNoFoco
-    es mov [di+ObjControle.PtrEntraNoFoco], ax
+    es mov [di+ObjControle.FuncEntraNoFoco], ax
     mov ax, cs
-    es mov [di+ObjControle.PtrSaiDoFoco+2], ax
+    es mov [di+ObjControle.FuncSaiDoFoco+2], ax
     mov ax, _botaoSaiDoFoco
-    es mov [di+ObjControle.PtrSaiDoFoco], ax
+    es mov [di+ObjControle.FuncSaiDoFoco], ax
     es mov word [di+ObjControle.Tipo], TipoControle.Botao
     cs mov ax, [Interface.TemaCorFrente]
     es mov [di+ObjControle.CorFrente], ax

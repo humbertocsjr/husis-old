@@ -17,9 +17,9 @@ _lista:
     push cx
     push dx
     mov ax, cs
-    es mov [di+ObjControle.PtrRenderiza+2], ax
+    es mov [di+ObjControle.FuncRenderiza+2], ax
     mov ax, _listaRenderiza
-    es mov [di+ObjControle.PtrRenderiza], ax
+    es mov [di+ObjControle.FuncRenderiza], ax
     es mov word [di+ObjControle.Tipo], TipoControle.Lista
     cs mov ax, [Interface.TemaCorFrente]
     es mov [di+ObjControle.CorFrente], ax

@@ -6,21 +6,21 @@ _campo:
     push cx
     push dx
     mov ax, cs
-    es mov [di+ObjControle.PtrRenderiza+2], ax
+    es mov [di+ObjControle.FuncRenderiza+2], ax
     mov ax, _campoRenderiza
-    es mov [di+ObjControle.PtrRenderiza], ax
+    es mov [di+ObjControle.FuncRenderiza], ax
     mov ax, cs
-    es mov [di+ObjControle.PtrProcessaTecla+2], ax
+    es mov [di+ObjControle.FuncProcessaTecla+2], ax
     mov ax, _campoProcessaTecla
-    es mov [di+ObjControle.PtrProcessaTecla], ax
+    es mov [di+ObjControle.FuncProcessaTecla], ax
     mov ax, cs
-    es mov [di+ObjControle.PtrEntraNoFoco+2], ax
+    es mov [di+ObjControle.FuncEntraNoFoco+2], ax
     mov ax, _campoEntraNoFoco
-    es mov [di+ObjControle.PtrEntraNoFoco], ax
+    es mov [di+ObjControle.FuncEntraNoFoco], ax
     mov ax, cs
-    es mov [di+ObjControle.PtrSaiDoFoco+2], ax
+    es mov [di+ObjControle.FuncSaiDoFoco+2], ax
     mov ax, _campoSaiDoFoco
-    es mov [di+ObjControle.PtrSaiDoFoco], ax
+    es mov [di+ObjControle.FuncSaiDoFoco], ax
     es mov word [di+ObjControle.Tipo], TipoControle.Campo
     cs mov ax, [Interface.TemaCorFrente]
     es mov [di+ObjControle.CorFrente], ax

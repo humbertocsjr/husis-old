@@ -6,13 +6,13 @@ _rotulo:
     push cx
     push dx
     mov ax, cs
-    es mov [di+ObjControle.PtrRenderiza+2], ax
+    es mov [di+ObjControle.FuncRenderiza+2], ax
     mov ax, _rotuloRenderiza
-    es mov [di+ObjControle.PtrRenderiza], ax
+    es mov [di+ObjControle.FuncRenderiza], ax
     mov ax, cs
-    es mov [di+ObjControle.PtrEntraNoFoco+2], ax
+    es mov [di+ObjControle.FuncEntraNoFoco+2], ax
     mov ax, _rotuloEntraNoFoco
-    es mov [di+ObjControle.PtrEntraNoFoco], ax
+    es mov [di+ObjControle.FuncEntraNoFoco], ax
     es mov word [di+ObjControle.Tipo], TipoControle.Rotulo
     cs mov ax, [Interface.TemaCorFrente]
     es mov [di+ObjControle.CorFrente], ax

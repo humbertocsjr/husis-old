@@ -6,7 +6,7 @@ ObjControle:
     .Y1: equ 10
     .X2: equ 12
     .Y2: equ 14
-    .PtrRenderiza: equ 16
+    .FuncRenderiza: equ 16
     .PtrConteudo: equ 20
     .PtrAuxiliar: equ 24
     .ValorA: equ 28
@@ -26,21 +26,21 @@ ObjControle:
     .CalcY1: equ 64
     .CalcX2: equ 66
     .CalcY2: equ 68
-    .PtrAcao: equ 70
-    .PtrAcaoAux: equ 74
-    .PtrAcaoFoco: equ 78
-    .PtrAcaoSemFoco: equ 82
+    .FuncAcao: equ 70
+    .FuncAcaoAux: equ 74
+    .FuncAcaoFoco: equ 78
+    .FuncAcaoSemFoco: equ 82
     .PtrTela: equ 86
     .PtrJanela: equ 90
     .ValorPosicao: equ 94
     .ValorTamanho: equ 98
-    .PtrProcessaTecla: equ 102
+    .FuncProcessaTecla: equ 102
         ; es:di = ObjControle
         ; ax = ASCII
         ; bx = TipoTeclaEspecial
         ; cx = TipoTeclaAdicional (Contem mais de uma em paralelo)
         ; ret: cf = 1=Renderiza | 0=Ignora
-    .PtrProcessaMouse: equ 106
+    .FuncProcessaMouse: equ 106
         ; es:di = ObjControle
         ; ax = X do ObjControle
         ; bx = Y do ObjControle
@@ -48,10 +48,10 @@ ObjControle:
         ; dx = TipoBotaoMouse (Contem mais de uma em paralelo)
         ; ret: cf = 1=Renderiza | 0=Ignora
     .PtrObjEmFoco: equ 110
+    .FuncEntraNoFoco: equ 114
         ; es:di = ObjControle
-    .PtrEntraNoFoco: equ 114
+    .FuncSaiDoFoco: equ 118
         ; es:di = ObjControle
-    .PtrSaiDoFoco: equ 118
     .Itens: equ 122
     ._CapacidadeItens: equ 32
     ._Tam: equ .Itens + (._CapacidadeItens * 4)
