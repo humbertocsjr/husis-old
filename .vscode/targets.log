@@ -6,8 +6,9 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 # PARTICULAR PURPOSE.
 
 # This program built for i386-apple-darwin11.3.0
+ 
 
-# Make data base, printed on Sat Aug 27 15:42:56 2022
+# Make data base, printed on Sat Sep  3 11:03:52 2022
 
 # Variables
 
@@ -16,6 +17,7 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 # automatic
 ?F = $(notdir $?)
 # automatic
+ 
 ?D = $(patsubst %/,%,$(dir $?))
 # automatic
 @D = $(patsubst %/,%,$(dir $@))
@@ -97,6 +99,7 @@ MallocNanoZone = 0
 MAKEFLAGS = Rrqp
 # environment
 MFLAGS = -Rrqp
+ 
 # automatic
 *D = $(patsubst %/,%,$(dir $*))
 # environment
@@ -136,9 +139,9 @@ VSCODE_PID = 566
 
 # Directories
 
-# . (device 16777225, inode 1431528): 16 files, no impossibilities.
+# . (device 16777225, inode 1431528): 18 files, no impossibilities.
 
-# 16 files, no impossibilities in 1 directories.
+# 18 files, no impossibilities in 1 directories.
 
 # Implicit Rules
 
@@ -154,6 +157,7 @@ all:
 #  File has been updated.
 #  Needs to be updated (-q is set).
 # automatic
+ 
 # @ := all
 # automatic
 # % := 
@@ -180,13 +184,12 @@ all:
 .SUFFIXES:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
- 
 #  File has not been updated.
 
 # Not a target:
 Makefile:
 #  Implicit rule search has been done.
-#  Last modified 2022-08-25 21:54:49
+#  Last modified 2022-08-28 17:33:15
 #  File has been updated.
 #  Successfully updated.
 # variable set hash-table stats:
@@ -196,9 +199,30 @@ enus:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  commands to execute (from `Makefile', line 41):
+#  commands to execute (from `Makefile', line 42):
 	@make all
-	@qemu-system-i386 -fda enus.img
+	@qemu-system-i386 -fda enus1440.img
+	
+
+conteudo_imagem:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 6):
+	@Ferramentas/minixfs add ./ptbr.img Temp/HUSISPtBr HUSIS
+	@Ferramentas/minixfs add ./enus.img Temp/HUSISEnUs HUSIS
+	@Ferramentas/minixfs mkdir ./ptbr.img Sistema
+	@Ferramentas/minixfs mkdir ./enus.img System
+	@Ferramentas/minixfs add ./ptbr.img ConfigPtBr.cfg Sistema/Config.cfg
+	@Ferramentas/minixfs add ./enus.img ConfigEnUs.cfg System/Config.cfg
+	@Ferramentas/minixfs mkdir ./ptbr.img Sistema/Extensoes
+	@Ferramentas/minixfs mkdir ./enus.img System/Extensions
+	@Ferramentas/minixfs add ./ptbr.img Temp/Interface Sistema/Extensoes/Interface
+	@Ferramentas/minixfs add ./enus.img Temp/Interface System/Extensions/Interface
+	@Ferramentas/minixfs mkdir ./ptbr.img Programas
+	@Ferramentas/minixfs mkdir ./enus.img Programs
+	@Ferramentas/minixfs add ./ptbr.img Temp/ArquivosPtBr Programas/Arquivos
+	@Ferramentas/minixfs add ./enus.img Temp/ArquivosEnUs Programs/Files
 	
 
 # Not a target:
@@ -211,50 +235,36 @@ imagem:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  commands to execute (from `Makefile', line 6):
+#  commands to execute (from `Makefile', line 22):
 	@echo " -= Gerar imagem inicializavel =-"
-	@Ferramentas/minixfs mkfs ./ptbr.img -s 1440 -i 256 -n 30 -1
+	@Ferramentas/minixfs mkfs ./ptbr.img -s 360 -i 256 -n 30 -1
+	@dd if=Temp/Inicial360 of=ptbr.img conv=notrunc
 	@cp ptbr.img enus.img
-	@Ferramentas/minixfs add ./ptbr.img Temp/HUSISPtBr HUSIS
-	@Ferramentas/minixfs add ./enus.img Temp/HUSISEnUs HUSIS
-	@Ferramentas/minixfs mkdir ./ptbr.img Sistema
-	@Ferramentas/minixfs mkdir ./enus.img System
-	@Ferramentas/minixfs add ./ptbr.img ConfigPtBr.cfg Sistema/Config.cfg
-	@Ferramentas/minixfs add ./enus.img ConfigEnUs.cfg System/Config.cfg
-	@Ferramentas/minixfs mkdir ./ptbr.img Sistema/Extensoes
-	@Ferramentas/minixfs mkdir ./enus.img System/Extensions
-	@Ferramentas/minixfs add ./ptbr.img Temp/Interface Sistema/Extensoes/Interface
-	@Ferramentas/minixfs add ./enus.img Temp/Interface System/Extensions/Interface
-	@Ferramentas/minixfs add ./ptbr.img Temp/Serial Sistema/Extensoes/Serial
-	@Ferramentas/minixfs add ./enus.img Temp/Serial System/Extensions/Serial
-	@Ferramentas/minixfs add ./ptbr.img Temp/PS2 Sistema/Extensoes/PS2
-	@Ferramentas/minixfs add ./enus.img Temp/PS2 System/Extensions/PS2
-	@Ferramentas/minixfs add ./ptbr.img Temp/Video Sistema/Extensoes/Video
-	@Ferramentas/minixfs add ./enus.img Temp/Video System/Extensions/Video
-	@Ferramentas/minixfs add ./ptbr.img Temp/CGA Sistema/Extensoes/CGA
-	@Ferramentas/minixfs add ./enus.img Temp/CGA System/Extensions/CGA
-	@Ferramentas/minixfs mkdir ./ptbr.img Programas
-	@Ferramentas/minixfs mkdir ./enus.img Programs
-	@Ferramentas/minixfs add ./ptbr.img Temp/ArquivosPtBr Programas/Arquivos
-	@Ferramentas/minixfs add ./enus.img Temp/ArquivosEnUs Programs/Files
-	@dd if=Temp/Inicial of=ptbr.img conv=notrunc
-	@dd if=Temp/Inicial of=enus.img conv=notrunc
+	@make conteudo_imagem
+	@mv -f ptbr.img ptbr360.img
+	@mv -f enus.img enus360.img
+	@Ferramentas/minixfs mkfs ./ptbr.img -s 1440 -i 256 -n 30 -1
+	@dd if=Temp/Inicial1440 of=ptbr.img conv=notrunc
+	@cp ptbr.img enus.img
+	@make conteudo_imagem
+	@mv -f ptbr.img ptbr1440.img
+	@mv -f enus.img enus1440.img
 	@echo " -= Imagens geradas =-"
-	@ls -l ptbr.img
 	@ls -l Temp/*
 	
 
 ptbr:
 #  Implicit rule search has not been done.
+ 
 #  Modification time never checked.
 #  File has not been updated.
-#  commands to execute (from `Makefile', line 38):
+#  commands to execute (from `Makefile', line 39):
 	@make all
-	@qemu-system-i386 -fda ptbr.img
+	@qemu-system-i386 -fda ptbr1440.img
 	
 
 # files hash-table stats:
-# Load=7/1024=1%, Rehash=0, Collisions=0/21=0%
+# Load=8/1024=1%, Rehash=0, Collisions=0/22=0%
 # VPATH Search Paths
 
 # No `vpath' search paths.
@@ -266,6 +276,6 @@ ptbr:
 # strcache size: total = 4096 / max = 4096 / min = 4096 / avg = 4096
 # strcache free: total = 4087 / max = 4087 / min = 4087 / avg = 4087
 
-# Finished Make data base on Sat Aug 27 15:42:56 2022
+# Finished Make data base on Sat Sep  3 11:03:52 2022
 
  

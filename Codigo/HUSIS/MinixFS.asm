@@ -79,7 +79,7 @@ MinixFS: dw _minixfs,0
         ; bx = Unidae
         ; ret: cf = 1=Ok | 0=Falha
     dw 0
-    .Debug: dw 1
+    .Debug: dw 0
     .Trava: dw 0
 
 _minixfs:

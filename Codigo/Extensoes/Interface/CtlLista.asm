@@ -62,13 +62,31 @@ _listaRenderiza:
     cs call far [VideoTexto.Borda]
     pop di
     push di
+    inc ax
+    dec cx
     es cmp word [di+ObjControle.PtrConteudo + 2], 0
     je .ignoraConteudo
         es push word [di+ObjControle.PtrConteudo+2]
         pop ds
         es mov si, [di+ObjControle.PtrConteudo]
         .lista:
-            
+            es cmp bx, [di+ObjControle.Y2]
+            jae .ignoraConteudo
+            mov dx, bx
+            push si
+            add si, 8
+            push di
+            es mov di, [di+ObjControle.CorFrente]
+            cs call far [VideoTexto.Texto]
+            pop di
+            pop si
+            cmp word [si+2], 0
+            je .ignoraConteudo
+            push word [si+2]
+            pop ds
+            mov si, [si]
+            inc bx
+            jmp .lista
     .ignoraConteudo:
     .fim:
     call __interfaceSolicitaAtualizacao

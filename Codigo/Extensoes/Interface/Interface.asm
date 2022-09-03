@@ -27,6 +27,7 @@ modulos:
     %include 'VideoTexto.asm'
     %include 'VideoTextoCGA.asm'
     %include 'VideoTextoEGA.asm'
+    %include 'VideoTextoVGA.asm'
     %include 'Teclado.asm'
     %include 'CtlTela.asm'
     %include 'CtlJanela.asm'

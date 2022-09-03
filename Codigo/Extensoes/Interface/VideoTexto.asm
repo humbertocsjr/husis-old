@@ -162,8 +162,34 @@ __videotextoPonteiroDados:
     ret
 
 _videotexto:
-    call __videotextoCGA
+    push si
+    push di
+    mov si, Prog.Argumentos
+    mov di, .constCGA
+    cs call far [Texto.IgualLocalLocal]
+    jc .cga
+    mov di, .constEGA
+    cs call far [Texto.IgualLocalLocal]
+    jc .ega
+    mov di, .constVGA
+    cs call far [Texto.IgualLocalLocal]
+    jc .ega
+    ; Padrao CGA
+    .cga:
+        call __videotextoCGA
+        jmp .fim
+    .ega:
+        call __videotextoEGA
+        jmp .fim
+    .vga:
+        call __videotextoVGA
+    .fim:
+    pop di
+    pop si
     retf
+    .constCGA: db 'CGA',0
+    .constEGA: db 'EGA',0
+    .constVGA: db 'VGA',0
 
 _videotextoAtualiza:
     push es
