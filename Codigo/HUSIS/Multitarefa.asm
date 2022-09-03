@@ -225,6 +225,7 @@ __multitarefaPonteiro:
     ret
 
 ; ds:si = Endereco do arquivo
+;         Formato: {Endereco do Arquivo}?{Argumentos}
 ; ret: cf = 1=Ok | 0=Falha
 ;      ax = Numero do Processo
 _multitarefaExecutaArquivo:
@@ -279,9 +280,47 @@ _multitarefaExecutaArquivo:
     mov cx, ax
     add cx, 0x100
     mov ax, bx
+    mov bx, si
+    push ds
+    pop dx
     cs call far [Memoria.AlocaLocal]
     jnc .falhaArquivo
+    push es
+    push di
+    push ax
+    push cx
+    xor si, si
+    mov di, bx
+    push dx
+    pop es
+    .buscaArgumento:
+        es cmp byte [di], 0
+        je .ignoraArgumentos
+        es cmp byte [di], '?'
+        je .argumentoEncontrado
+        inc di
+        jmp .buscaArgumento
+    .argumentoEncontrado:
+        inc di
+        mov si, 0
+        mov cx, 255
+        .argumentos:
+            es mov al, [di]
+            mov [si], al
+            cmp al, 0
+            je .ignoraArgumentos 
+            inc si
+            inc di
+            loop .argumentos
+    .ignoraArgumentos:
+    pop cx
+    pop ax
+    pop di
+    pop es
+    ; Restaura o Numero do Processo
+    mov bx, ax
     mov si, 0x100
+    sub cx, 0x100
     cs call far [SisArq.LeiaLocal]
     jnc .falhaArquivo
     cmp word [Prog.Assinatura], 1989

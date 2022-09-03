@@ -143,6 +143,8 @@ _sisarqAbreEnderecoRemoto:
         .continuaBusca:
         cmp byte [si], 0
         je .encerra
+        cmp byte [si], '?'
+        je .encerra
         push cx
         push es
         push si
@@ -169,6 +171,8 @@ _sisarqAbreEnderecoRemoto:
             cmp byte [si], 0
             je .fimNome
             cmp byte [si], '/'
+            je .fimNome
+            cmp byte [si], '?'
             je .fimNome
             cmpsb
             jne .proxItem
