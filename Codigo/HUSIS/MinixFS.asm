@@ -558,6 +558,10 @@ _minixfsAbrir:
             mov cx, _minixfsSubItem
             es mov [di+ObjSisArq.SubItem], cx
 
+            es mov [di+ObjSisArq.CalculaQtdItens+2], ax
+            mov cx, _minixfsQtdItens
+            es mov [di+ObjSisArq.CalculaQtdItens], cx
+
             es mov [di+ObjSisArq.CalculaTamanho+2], ax
             mov cx, _minixfsCalculaTamanho
             es mov [di+ObjSisArq.CalculaTamanho], cx
@@ -752,4 +756,43 @@ _minixfsCalculaTamanho:
     pop si
     pop ds
     pop cx
+    retf
+
+; es:di = ObjSisArq
+; ret: cf = 1=Ok | 0=Falha
+;      cx = Quantidade de itens no diretorio
+_minixfsQtdItens:
+    push ax
+    push bx
+    push dx
+    push es
+    push di
+    push si
+    call __minixfsTravaMultitarefa
+    xor ax, ax
+    xor cx, cx
+    xor dx, dx
+    .carrega:
+        call __minixfsCarregaDoItemRemoto
+        jnc .fim
+        mov si, ObjSisArqMinixFS.Buffer
+        mov cx, ObjMinixFSItem._QtdPorBloco
+        .calcula:
+            es cmp word [si], 0
+            je .fim
+            add si, ObjMinixFSItem._Tam
+            inc dx
+            loop .calcula
+        inc ax
+        jmp .carrega
+    .fim:
+    mov cx, dx
+    stc
+    call __minixfsLiberaMultitarefa
+    pop si
+    pop di
+    pop es
+    pop dx
+    pop bx
+    pop ax
     retf

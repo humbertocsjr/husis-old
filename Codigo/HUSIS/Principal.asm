@@ -53,6 +53,7 @@ modulos:
 %include 'Multitarefa.asm'
 %include 'Semaforo.asm'
 %include 'DMA.asm'
+%include '../Incluir/ObjSisArq.asm'
 
 ; Modulos importados de outros executaveis
 importar:
@@ -68,6 +69,8 @@ exportar:
     db 'Texto',0
     dw Semaforo
     db 'Semaforo',0
+    dw SisArq
+    db 'SisArq',0
     dw 0
 
 ; Definicao do modulo HUSIS

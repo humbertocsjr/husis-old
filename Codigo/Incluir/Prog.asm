@@ -15,6 +15,7 @@
 ; - 17/08/2022 - Humberto - Prototipo inicial
 
 cpu 8086
+org 0x100
 Prog:
     .Assinatura: dw 1989
     ._CompatibilidadeNivel: equ 1
@@ -29,6 +30,7 @@ Prog:
     .PtrModulos: dw modulos
     .PtrImportar: dw importar
     .PtrExportar: dw exportar
+    .Argumentos: equ 0
 
 TipoProg:
     .Biblioteca: equ 0

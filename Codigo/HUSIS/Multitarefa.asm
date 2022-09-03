@@ -277,10 +277,11 @@ _multitarefaExecutaArquivo:
     cs call far [SisArq.CalculaTamanhoRemoto]
     jnc .falhaArquivo
     mov cx, ax
+    add cx, 0x100
     mov ax, bx
     cs call far [Memoria.AlocaLocal]
     jnc .falhaArquivo
-    xor si, si
+    mov si, 0x100
     cs call far [SisArq.LeiaLocal]
     jnc .falhaArquivo
     cmp word [Prog.Assinatura], 1989

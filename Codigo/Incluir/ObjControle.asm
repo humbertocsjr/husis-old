@@ -149,3 +149,4 @@ TipoControle:
     .Rotulo: equ 3
     .Campo: equ 4
     .Botao: equ 5
+    .Lista: equ 6

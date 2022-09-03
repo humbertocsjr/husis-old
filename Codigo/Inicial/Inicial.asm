@@ -142,7 +142,7 @@ Inicio:
     mov ax, [Config.Destino]
     mov es, ax
 
-    xor di, di
+    mov di, 0x100
     .carrega:
         mov ax, [si]
         cmp ax, 0
@@ -191,7 +191,7 @@ Inicio:
     db 'Iniciando',0
 
     xor si, si
-    es mov [si+6], di
+    es mov [si+6+256], di
 
     xor di, di
     mov cx, [Config.Cilindros]
@@ -206,7 +206,7 @@ Inicio:
     mov ax, LoopInfinito
     push ax
     push ds
-    mov ax, [si+4]
+    mov ax, [si+4+256]
     push ax
     mov ax, 1989
     call TermEscreva
