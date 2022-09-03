@@ -38,6 +38,7 @@ modulos:
     dw Multitarefa
     dw Semaforo
     dw DMA
+    dw ListaLocal
     dw 0
 
 ; Inclusao dos arquivos que contem os modulos
@@ -53,6 +54,8 @@ modulos:
 %include 'Multitarefa.asm'
 %include 'Semaforo.asm'
 %include 'DMA.asm'
+%include 'ListaLocal.asm'
+%include 'ListaRemota.asm'
 %include '../Incluir/ObjSisArq.asm'
 
 ; Modulos importados de outros executaveis
@@ -71,6 +74,10 @@ exportar:
     db 'Semaforo',0
     dw SisArq
     db 'SisArq',0
+    dw ListaLocal
+    db 'ListaLocal',0
+    dw ListaRemota
+    db 'ListaRemota',0
     dw 0
 
 ; Definicao do modulo HUSIS
