@@ -58,6 +58,8 @@ _janprincipal:
         ; Define o conteudo como uma lista
         cs cmp byte [Prog.Argumentos], '/'
         je .dirInicialArg
+        cs cmp byte [Prog.Argumentos], '['
+        je .dirInicialArg
             mov si, .constRaiz
             jmp .fimDirInicial
         .dirInicialArg:
