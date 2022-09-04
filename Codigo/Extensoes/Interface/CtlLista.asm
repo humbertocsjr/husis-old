@@ -1,13 +1,3 @@
-; Formato:
-;
-; | Pos | Tam | Nome                      |
-; |-----|-----|---------------------------|
-; | 000 | 004 | Ponteiro para o prox item |
-; | 004 | 004 | Identificador             |
-; | 008 | 032 | Texto                     |
-;
-
-
 
 _lista:
     push es
@@ -61,30 +51,31 @@ _listaRenderiza:
     es mov di, [di+ObjControle.CorBorda]
     cs call far [VideoTexto.Borda]
     pop di
-    push di
     inc ax
+    inc bx
     dec cx
     es cmp word [di+ObjControle.PtrConteudo + 2], 0
     je .ignoraConteudo
         es push word [di+ObjControle.PtrConteudo+2]
         pop ds
         es mov si, [di+ObjControle.PtrConteudo]
+        cs call far [ListaLocal.NavInicio]
+        jnc .ignoraConteudo
         .lista:
             es cmp bx, [di+ObjControle.Y2]
             jae .ignoraConteudo
+            push bx
             mov dx, bx
             push si
-            add si, 8
+            es add si, [di+ObjControle.ValorA]
             push di
             es mov di, [di+ObjControle.CorFrente]
             cs call far [VideoTexto.Texto]
             pop di
             pop si
-            cmp word [si+2], 0
-            je .ignoraConteudo
-            push word [si+2]
-            pop ds
-            mov si, [si]
+            cs call far [ListaLocal.NavProximo]
+            pop bx
+            jnc .ignoraConteudo
             inc bx
             jmp .lista
     .ignoraConteudo:

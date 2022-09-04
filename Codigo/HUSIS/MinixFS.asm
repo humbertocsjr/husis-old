@@ -345,6 +345,8 @@ _minixfsMonta:
     xor di, di
     ; Grava a unidade
     es mov [ObjSisArq.Unidade], bx
+    ; Grava o tipo
+    es mov word [ObjSisArq.Tipo], TipoSisArq.Diretorio
     ; Carrega buffer
     call __minixfsCarregaBufferRemoto
     jnc .fimRemoto
@@ -393,6 +395,10 @@ _minixfsMonta:
     ; Grava o SubItem
     es mov word [ObjSisArq.SubItem], _minixfsSubItem
     es mov      [ObjSisArq.SubItem + 2], ax
+    
+    ; Grava o QtdItens
+    es mov word [ObjSisArq.CalculaQtdItens], _minixfsQtdItens
+    es mov      [ObjSisArq.CalculaQtdItens + 2], ax
     
     ; Carrega primeiro bloco da lista de itens
     mov di, ObjSisArqMinixFSRaiz.Itens
@@ -464,9 +470,9 @@ _minixfsSubItem:
     mov ax, es
     ds mov [si+ObjSisArqItem.Acima], ax
     mov ax, cs
-    ds mov [si+ObjSisArqItem.Abrir + 2], ax
-    mov ax, _minixfsAbrir
-    ds mov [si+ObjSisArqItem.Abrir], ax
+    ds mov [si+ObjSisArqItem.Abre + 2], ax
+    mov ax, _minixfsAbre
+    ds mov [si+ObjSisArqItem.Abre], ax
     add di, 2
     add si, ObjSisArqItem.Nome
     mov cx, 30
@@ -511,7 +517,7 @@ _minixfsEjeta:
 ; ds:si = ObjSisArqItem
 ; ret: cf = 1=Aberto | 0=Nao foi possivel abrir
 ;      es:di = ObjSisArq
-_minixfsAbrir:
+_minixfsAbre:
     push ax
     push cx
     push dx
@@ -776,6 +782,7 @@ _minixfsQtdItens:
     push dx
     push es
     push di
+    push ds
     push si
     call __minixfsTravaMultitarefa
     xor ax, ax
@@ -796,9 +803,10 @@ _minixfsQtdItens:
         jmp .carrega
     .fim:
     mov cx, dx
-    stc
     call __minixfsLiberaMultitarefa
+    stc
     pop si
+    pop ds
     pop di
     pop es
     pop dx

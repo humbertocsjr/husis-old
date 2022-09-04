@@ -65,7 +65,7 @@ ObjSisArqItem:
         ; Identificador unico no sistema de arquivos (Ate 8 Bytes)
     .Acima: equ 8
         ; Segmento onde esta o ObjSisArq (Acima)
-    .Abrir: equ 12
+    .Abre: equ 12
         ; Abre um item e cria um ObjSisArq para ele
         ; ds:si = ObjSisArqItem
         ; ret: cf = 1=Aberto | 0=Nao foi possivel abrir

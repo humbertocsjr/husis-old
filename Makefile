@@ -1,4 +1,5 @@
 all: 
+	@rm Temp/*
 	@make -C ./Codigo all
 	@make imagem
 

@@ -58,6 +58,18 @@ Interface: dw ._Fim
         ; - Principal = Ponteiro para o Texto ASCIZ
         ; Eventos:
         ; - Acao = Ao pressionar o botao
+    .ConfigLista: dw 1,0
+        ; es:di = ObjControle
+        ; ret: cf = 1=Ok | 0=Falha
+        ; Valores:
+        ; - Principal = Ponteiro para a Lista
+        ;               Formato em bytes:
+        ;                0 ate 3 = Ignorado
+        ;                4 em diante = Rotulo
+        ; - ValorPosicao = Posicao na Lista
+        ; Eventos:
+        ; - Acao = Ao ativar um item
+        ; - AcaoAux = Ao mudar de item
     .Renderiza: dw 1,0
         ; es:di = ObjControle
         ; ret: cf = 1=Ok | 0=Falha

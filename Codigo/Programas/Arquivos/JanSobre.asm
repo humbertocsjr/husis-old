@@ -2,7 +2,14 @@ JanSobre: dw _jansobre,0
     dw 0
 
 _jansobre:
-
+    push ax
+    push bx
+    push cx
+    push dx
+    push ds
+    push si
+    push es
+    push di
     ; Aloca espaço na memoria pra 10 Controles da Interface
     mov cx, 10
     cs call far [Interface.Aloca]
@@ -110,6 +117,14 @@ _jansobre:
     cs call far [Interface.Exibe]
     jnc .erro
     .erro:
+    pop di
+    pop es
+    pop si
+    pop ds
+    pop dx
+    pop cx
+    pop bx
+    pop ax
     retf
 
 _jansobreFecharClick:

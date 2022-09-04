@@ -39,6 +39,7 @@ modulos:
     dw Semaforo
     dw DMA
     dw ListaLocal
+    dw ListaRemota
     dw 0
 
 ; Inclusao dos arquivos que contem os modulos

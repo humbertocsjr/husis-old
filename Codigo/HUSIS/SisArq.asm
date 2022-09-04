@@ -71,6 +71,18 @@ SisArq: dw _sisarq,0
         ; es:di = ObjSisArq
         ; ret: cf = 1=Lido | 0=Nao lido
         ;      cx = Qtd de itens no diretorio
+    .GeraLista: dw _sisarqGeraLista,0
+        ; es:di = ObjSisArq
+        ; ret: cf = 1=Ok | 0=Falha
+        ;      ds = Lista de Arquivos (Registro de tamanho 39)
+        ;           Formato:
+        ;           | Pos | Tam | Descricao                    |
+        ;           |-----|-----|------------------------------|
+        ;           | 000 | 008 | Id do Item                   |
+        ;           | 008 | 004 | ObjSisArq                    |
+        ;           | 012 | 004 | Funcao Abre                  |
+        ;           | 016 | 037 | Nome do arquivo              |
+        ;           | 038 | 001 | Sempre Zero                  |
     dw 0
 
 _sisarq:
@@ -180,7 +192,7 @@ _sisarqAbreEnderecoRemoto:
             .encontradoNome:
                 pop di
                 push di
-                es mov bx, [di+ObjSisArqItem.Abrir]
+                es mov bx, [di+ObjSisArqItem.Abre]
                 cmp bx, 0
                 je .falhaNome
                 push ds
@@ -189,7 +201,7 @@ _sisarqAbreEnderecoRemoto:
                 pop ds
                 push di
                 pop si
-                ds call far [si+ObjSisArqItem.Abrir]
+                ds call far [si+ObjSisArqItem.Abre]
                 pop si
                 pop ds
                 jnc .falhaNome
@@ -328,4 +340,86 @@ _sisarqCalculaQtdItens:
     pop di
     pop es
     pop bx
+    retf
+
+; es:di = ObjSisArq
+; ret: cf = 1=Ok | 0=Falha
+;      ds = Lista de Arquivos (Registro de tamanho 39)
+;           Formato:
+;           | Pos | Tam | Descricao                    |
+;           |-----|-----|------------------------------|
+;           | 000 | 008 | Id do Item                   |
+;           | 008 | 004 | ObjSisArq                    |
+;           | 012 | 004 | Funcao Abre                  |
+;           | 016 | 037 | Nome do arquivo              |
+;           | 038 | 001 | Sempre Zero                  |
+_sisarqGeraLista:
+    push ax
+    push bx
+    push cx
+    push dx
+    push es
+    push di
+    es cmp word [di+ObjSisArq.Tipo], TipoSisArq.Diretorio
+    je .ok
+        clc
+        jmp .fim
+    .ok:
+    cs call far [SisArq.CalculaQtdItens]
+    jnc .fim
+    inc cx
+    mov ax, 39
+    cs call far [ListaLocal.Cria]
+    jnc .fim
+    xor cx, cx
+    .monta:
+        push ds
+        push si
+        mov ax, ds
+        mov bx, si
+        cs call far [SisArq.SubItem]
+        jc .continua
+            pop si
+            pop ds
+            jmp .fimOk
+        .continua:
+        push cx
+        push es
+        push di
+        mov es, ax
+        mov di, bx
+        cs call far [ListaRemota.Adiciona]
+        jc .adicionaOk
+            pop di
+            pop es
+            pop cx
+            pop si
+            pop ds
+            clc
+            jmp .fim
+        .adicionaOk:
+        push ds
+        push si
+        mov cx, 38
+        rep movsb 
+        xor ax, ax
+        stosb
+        pop si
+        pop ds
+        pop di
+        pop es
+        pop cx
+        pop si
+        pop ds
+        inc cx
+        jmp .monta
+    .fimOk:
+    stc
+    .fim:
+    pop di
+    pop es
+    pop dx
+    pop cx
+    pop bx
+    pop ax
     retf

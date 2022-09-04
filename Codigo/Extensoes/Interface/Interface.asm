@@ -34,12 +34,14 @@ modulos:
     %include 'CtlRotulo.asm'
     %include 'CtlCampo.asm'
     %include 'CtlBotao.asm'
+    %include 'CtlLista.asm'
 importar:
     %include '../../Incluir/Texto.asm'
     %include '../../Incluir/Memoria.asm'
     %include '../../Incluir/HUSIS.asm'
     %include '../../Incluir/ObjControle.asm'
     %include '../../Incluir/Semaforo.asm'
+    %include '../../Incluir/Listas.asm'
     dw 0
 exportar:
     dw Interface
@@ -137,6 +139,19 @@ Interface: dw _interface,0
         ; - Principal = Ponteiro para o Texto ASCIZ
         ; Eventos:
         ; - Acao = Ao pressionar o botao
+    .ConfigLista: dw _lista,0
+        ; es:di = ObjControle
+        ; ret: cf = 1=Ok | 0=Falha
+        ; Valores:
+        ; - Principal = Ponteiro para a Lista
+        ;               Formato em bytes:
+        ;                0 ate 3 = Ignorado
+        ;                4 em diante = Rotulo
+        ; - ValorPosicao = Posicao na Lista
+        ; - ValorA = Posicao dentro do item onde comeca o texto ASCIZ
+        ; Eventos:
+        ; - Acao = Ao ativar um item
+        ; - AcaoAux = Ao mudar de item
     .Renderiza: dw _interfaceRenderiza,0
         ; es:di = ObjControle
         ; ret: cf = 1=Ok | 0=Falha

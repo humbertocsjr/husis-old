@@ -86,6 +86,8 @@ _listaLCria:
     pop cx
     jnc .fim
     mov word [ObjLista.Assinatura], ObjLista._Assinatura
+    mov ax, ds
+    mov [ObjLista.SegConjInicio], ax
     mov [ObjLista.CapacidadeGeral], cx
     mov [ObjLista.CapacidadeLocal], cx
     mov [ObjLista.TamanhoItem], bx
@@ -237,6 +239,7 @@ _listaLAdiciona:
         mov si, ObjLista.Conteudo
         mov [ObjLista.PtrPrimeiroItem], si
         xor ax, ax
+        mov es, ax
         mov di, ax
         jmp .encontrado
     .iniciaBusca:
@@ -258,7 +261,7 @@ _listaLAdiciona:
                 jnc .fim
                 mov ax, ds
                 es mov [di+ObjListaItem.PtrProximo + 2], ax
-                es mov [di+ObjListaItem.PtrProximo], di
+                es mov [di+ObjListaItem.PtrProximo], si
     .encontrado:
         mov byte [si], TipoListaStatus.Ocupado
         push si
@@ -272,6 +275,7 @@ _listaLAdiciona:
         sub cx, ObjListaItem._Tam
         push ds
         pop es
+        add si, ObjListaItem.Dados
         mov di, si
         xor ax, ax
         rep stosb
@@ -299,7 +303,7 @@ _listaLRemove:
     call __listaLVerificaAssinatura
     jnc .fim
     sub si, ObjListaItem._Tam
-    cmp word [si+ObjListaItem.Status], TipoListaStatus.Ocupado
+    cmp byte [si+ObjListaItem.Status], TipoListaStatus.Ocupado
     je .ok
         clc
         jmp .fim
@@ -362,6 +366,7 @@ _listaLNavInicio:
     .ok:
     mov ax, [ObjLista.PtrPrimeiroItem+2]
     mov si, [ObjLista.PtrPrimeiroItem]
+    add si, ObjListaItem._Tam
     mov ds, ax
     stc
     .fim:
@@ -372,7 +377,7 @@ _listaLNavProximo:
     push ax
     call __listaLVerificaAssinatura
     jnc .fim
-    call __ListaLCarregaInicio
+    sub si, ObjListaItem._Tam
     cmp word [si+ObjListaItem.PtrProximo+2],0
     jne .ok
         clc
@@ -380,6 +385,7 @@ _listaLNavProximo:
     .ok:
     mov ax, [si+ObjListaItem.PtrProximo+2]
     mov si, [si+ObjListaItem.PtrProximo]
+    add si, ObjListaItem._Tam
     mov ds, ax
     stc
     .fim:
@@ -390,7 +396,7 @@ _listaLNavAnterior:
     push ax
     call __listaLVerificaAssinatura
     jnc .fim
-    call __ListaLCarregaInicio
+    sub si, ObjListaItem._Tam
     cmp word [si+ObjListaItem.PtrAnterior+2],0
     jne .ok
         clc
@@ -398,6 +404,7 @@ _listaLNavAnterior:
     .ok:
     mov ax, [si+ObjListaItem.PtrAnterior+2]
     mov si, [si+ObjListaItem.PtrAnterior]
+    add si, ObjListaItem._Tam
     mov ds, ax
     stc
     .fim:
