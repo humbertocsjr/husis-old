@@ -57,17 +57,7 @@ _janprincipal:
         jnc .erro
         ; Define o conteudo como uma lista
         mov si, .constRaiz
-        push es
-        push di
-        cs call far [SisArq.AbreEnderecoRemoto]
-        jc .abreOk
-            pop di
-            pop es
-            jmp .erro
-        .abreOk:
-        cs call far [SisArq.GeraLista]
-        pop di
-        pop es
+        cs call far [SisArq.GeraListaDoEndereco]
         jnc .erro
         mov byte [si+4], 'C'
         cs call far [Interface.AlteraPrincipal]

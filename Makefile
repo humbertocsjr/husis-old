@@ -12,12 +12,12 @@ conteudo_imagem:
 	@Ferramentas/minixfs add ./enus.img ConfigEnUs.cfg System/Config.cfg
 	@Ferramentas/minixfs mkdir ./ptbr.img Sistema/Extensoes
 	@Ferramentas/minixfs mkdir ./enus.img System/Extensions
-	@Ferramentas/minixfs add ./ptbr.img Temp/Interface Sistema/Extensoes/Interface
-	@Ferramentas/minixfs add ./enus.img Temp/Interface System/Extensions/Interface
+	@Ferramentas/minixfs add ./ptbr.img Temp/Interface.prog Sistema/Extensoes/Interface.prog
+	@Ferramentas/minixfs add ./enus.img Temp/Interface.prog System/Extensions/Interface.prog
 	@Ferramentas/minixfs mkdir ./ptbr.img Programas
 	@Ferramentas/minixfs mkdir ./enus.img Programs
-	@Ferramentas/minixfs add ./ptbr.img Temp/ArquivosPtBr Programas/Arquivos
-	@Ferramentas/minixfs add ./enus.img Temp/ArquivosEnUs Programs/Files
+	@Ferramentas/minixfs add ./ptbr.img Temp/ArquivosPtBr.prog Programas/Arquivos.prog
+	@Ferramentas/minixfs add ./enus.img Temp/ArquivosEnUs.prog Programs/Files.prog
 
 imagem:
 	@echo " -= Gerar imagem inicializavel =-"

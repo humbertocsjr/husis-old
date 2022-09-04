@@ -327,6 +327,11 @@ _multitarefaExecutaArquivo:
     jne .falhaArquivo
     cmp word [Prog.Compatibilidade], Prog._CompatibilidadeNivel
     ja .falhaArquivo
+    push si
+    add si, Prog.PtrTipo
+    cmp word [si], TipoProg.Nucleo
+    pop si
+    je .falhaArquivo
     mov [Prog.Processo], bx
     mov ax, ds
     mov es, ax

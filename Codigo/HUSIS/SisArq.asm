@@ -83,6 +83,18 @@ SisArq: dw _sisarq,0
         ;           | 012 | 004 | Funcao Abre                  |
         ;           | 016 | 037 | Nome do arquivo              |
         ;           | 038 | 001 | Sempre Zero                  |
+    .GeraListaDoEndereco: dw _sisarqGeraListaDoEndereco, 0
+        ; ds:si = Endereco do arquivo
+        ; ret: cf = 1=Ok | 0=Falha
+        ;      ds = Lista de Arquivos (Registro de tamanho 39)
+        ;           Formato:
+        ;           | Pos | Tam | Descricao                    |
+        ;           |-----|-----|------------------------------|
+        ;           | 000 | 008 | Id do Item                   |
+        ;           | 008 | 004 | ObjSisArq                    |
+        ;           | 012 | 004 | Funcao Abre                  |
+        ;           | 016 | 037 | Nome do arquivo              |
+        ;           | 038 | 001 | Sempre Zero                  |
     dw 0
 
 _sisarq:
@@ -422,4 +434,23 @@ _sisarqGeraLista:
     pop cx
     pop bx
     pop ax
+    retf
+
+_sisarqGeraListaDoEndereco:
+    push es
+    push di
+    cs call far [SisArq.AbreEnderecoRemoto]
+    jnc .fim
+    es cmp word [di+ObjSisArq.Tipo], TipoSisArq.Diretorio
+    je .ok
+        clc
+        jmp .fim
+    .ok:
+    cs call far [SisArq.GeraLista]
+    pushf
+    cs call far [SisArq.FechaRemoto]
+    popf
+    .fim:
+    pop di
+    pop es
     retf

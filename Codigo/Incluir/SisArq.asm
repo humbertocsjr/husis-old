@@ -48,4 +48,16 @@ SisArq: dw ._Fim
         ;           | 012 | 004 | Funcao Abre                  |
         ;           | 016 | 037 | Nome do arquivo              |
         ;           | 038 | 001 | Sempre Zero                  |
+    .GeraListaDoEndereco: dw 1, 0
+        ; ds:si = Endereco do arquivo
+        ; ret: cf = 1=Ok | 0=Falha
+        ;      ds = Lista de Arquivos (Registro de tamanho 39)
+        ;           Formato:
+        ;           | Pos | Tam | Descricao                    |
+        ;           |-----|-----|------------------------------|
+        ;           | 000 | 008 | Id do Item                   |
+        ;           | 008 | 004 | ObjSisArq                    |
+        ;           | 012 | 004 | Funcao Abre                  |
+        ;           | 016 | 037 | Nome do arquivo              |
+        ;           | 038 | 001 | Sempre Zero                  |
     ._Fim:
