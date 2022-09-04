@@ -62,12 +62,14 @@ _janprincipal:
         je .dirInicialArg
         .dirRaiz:
             mov si, .constRaiz
+            cs call far [SisArq.GeraListaDoEndereco]
+            jnc .erro
             jmp .fimDirInicial
         .dirInicialArg:
             mov si, Prog.Argumentos
+            cs call far [SisArq.GeraListaDoEndereco]
+            jnc .dirRaiz
         .fimDirInicial:
-        cs call far [SisArq.GeraListaDoEndereco]
-        jnc .dirRaiz
         mov byte [si+4], 'C'
         cs call far [Interface.AlteraPrincipal]
         jnc .erro
