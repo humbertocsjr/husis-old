@@ -56,7 +56,13 @@ _janprincipal:
         cs call far [Interface.AlteraTamanho]
         jnc .erro
         ; Define o conteudo como uma lista
-        mov si, .constRaiz
+        cs cmp byte [Prog.Argumentos], '/'
+        je .dirInicialArg
+            mov si, .constRaiz
+            jmp .fimDirInicial
+        .dirInicialArg:
+            mov si, Prog.Argumentos
+        .fimDirInicial:
         cs call far [SisArq.GeraListaDoEndereco]
         jnc .erro
         mov byte [si+4], 'C'
