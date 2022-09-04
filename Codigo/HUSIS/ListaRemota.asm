@@ -33,6 +33,17 @@ ListaRemota: dw _listaR, 0
         ; es:di = Item atual na Lista
         ; ret: cf = 1=Ok | 0=Inicio da lista
         ;      es:di = Item anterior
+    .NavVaPara: dw _listaRNavVaPara, 0
+        ; Vai para um item
+        ; es = Lista
+        ; cx = Posicao
+        ; ret: cf = 1=Ok | 0=Fim da lista
+        ;      es:di = Item
+    .CalculaTamanho: dw _listaRCalculaTamanho, 0
+        ; Calcula o tamanho de uma lista
+        ; ds = Lista
+        ; ret: cf = 1=Ok | 0=Fim da lista
+        ;      cx = Tamanho
     dw 0
 
 _listaR:
@@ -145,4 +156,59 @@ _listaRNavAnterior:
     pop di
     pop si
     pop ds
+    retf
+
+; Vai para um item
+; es = Lista
+; cx = Posicao
+; ret: cf = 1=Ok | 0=Fim da lista
+;      es:di = Item
+_listaRNavVaPara:
+    push ax
+    push bx
+    push cx
+    push dx
+    cs call far [ListaRemota.NavInicio]
+    jnc .fim
+    cmp cx, 0
+    je .ok
+    .procura:
+        cs call far [ListaRemota.NavProximo]
+        jnc .fim
+        loop .procura
+    .ok:
+    stc
+    .fim:
+    pop dx
+    pop cx
+    pop bx
+    pop ax
+    retf
+
+; Calcula o tamanho de uma lista
+; es = Lista
+; ret: cf = 1=Ok | 0=Fim da lista
+;      cx = Tamanho
+_listaRCalculaTamanho:
+    push ax
+    push bx
+    push dx
+    push es
+    push di
+    xor cx, cx
+    cs call far [ListaRemota.NavInicio]
+    jnc .fim
+    .procura:
+        inc cx
+        cs call far [ListaRemota.NavProximo]
+        jnc .ok
+        jmp .procura
+    .ok:
+    stc
+    .fim:
+    pop di
+    pop es
+    pop dx
+    pop bx
+    pop ax
     retf

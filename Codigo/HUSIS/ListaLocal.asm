@@ -33,6 +33,17 @@ ListaLocal: dw _listaL, 0
         ; ds:si = Item atual na Lista
         ; ret: cf = 1=Ok | 0=Inicio da lista
         ;      ds:si = Item anterior
+    .NavVaPara: dw _listaLNavVaPara, 0
+        ; Vai para um item
+        ; ds = Lista
+        ; cx = Posicao
+        ; ret: cf = 1=Ok | 0=Fim da lista
+        ;      ds:si = Item
+    .CalculaTamanho: dw _listaLCalculaTamanho, 0
+        ; Calcula o tamanho de uma lista
+        ; ds = Lista
+        ; ret: cf = 1=Ok | 0=Fim da lista
+        ;      cx = Tamanho
     dw 0
 
 ObjLista:
@@ -408,5 +419,61 @@ _listaLNavAnterior:
     mov ds, ax
     stc
     .fim:
+    pop ax
+    retf
+
+; Vai para um item
+; ds = Lista
+; cx = Posicao
+; ret: cf = 1=Ok | 0=Fim da lista
+;      ds:si = Item
+_listaLNavVaPara:
+    push ax
+    push bx
+    push cx
+    push dx
+    cs call far [ListaLocal.NavInicio]
+    jnc .fim
+    cmp cx, 0
+    je .ok
+    .procura:
+        cs call far [ListaLocal.NavProximo]
+        jnc .fim
+        loop .procura
+    .ok:
+    stc
+    .fim:
+    pop dx
+    pop cx
+    pop bx
+    pop ax
+    retf
+
+
+; Calcula o tamanho de uma lista
+; ds = Lista
+; ret: cf = 1=Ok | 0=Fim da lista
+;      cx = Tamanho
+_listaLCalculaTamanho:
+    push ax
+    push bx
+    push dx
+    push ds
+    push si
+    xor cx, cx
+    cs call far [ListaLocal.NavInicio]
+    jnc .fim
+    .procura:
+        inc cx
+        cs call far [ListaLocal.NavProximo]
+        jnc .ok
+        jmp .procura
+    .ok:
+    stc
+    .fim:
+    pop si
+    pop ds
+    pop dx
+    pop bx
     pop ax
     retf

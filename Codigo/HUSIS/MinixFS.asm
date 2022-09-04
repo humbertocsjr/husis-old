@@ -249,10 +249,8 @@ __minixfsCarregaDoItemRemoto:
         jae .blocoDuploIndireto
         push si
         add si, ObjSisArqMinixFSRaiz.Itens
-        mov bx, cx
-        shl bx, 1
-        add bx, ax
-        ds mov ax, [si+bx+ObjMinixFSItem.Zonas]
+        mov bx, ax
+        ds mov ax, [si+bx+ObjMinixFSItem.ZonaIndireta]
         cs cmp word [MinixFS.Debug], 0
         je .ignoraDebug
             cs call far [Terminal.Escreva]
@@ -265,6 +263,11 @@ __minixfsCarregaDoItemRemoto:
         add si, ObjSisArqMinixFS.Buffer
         mov bx, cx
         sub bx, 7
+        cs cmp word [MinixFS.Debug], 0
+        je .ignoraDebug2
+            cs call far [Terminal.Escreva]
+            db '[ IND SUB POS %bn ]',0
+        .ignoraDebug2:
         shl bx, 1
         ds mov ax, [si+bx]
         cmp ax, 0

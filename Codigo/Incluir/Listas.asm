@@ -35,6 +35,17 @@ ListaLocal: dw ._Fim
         ; ds:si = Item atual na Lista
         ; ret: cf = 1=Ok | 0=Inicio da lista
         ;      ds:si = Item anterior
+    .NavVaPara: dw 1, 0
+        ; Vai para um item
+        ; es = Lista
+        ; cx = Posicao
+        ; ret: cf = 1=Ok | 0=Fim da lista
+        ;      es:di = Item
+    .CalculaTamanho: dw 1, 0
+        ; Calcula o tamanho de uma lista
+        ; ds = Lista
+        ; ret: cf = 1=Ok | 0=Fim da lista
+        ;      cx = Tamanho
     ._Fim:
 ListaRemota: dw ._Fim
     db 'HUSIS',0
@@ -73,4 +84,15 @@ ListaRemota: dw ._Fim
         ; es:di = Item atual na Lista
         ; ret: cf = 1=Ok | 0=Inicio da lista
         ;      es:di = Item anterior
+    .NavVaPara: dw 1, 0
+        ; Vai para um item
+        ; ds = Lista
+        ; cx = Posicao
+        ; ret: cf = 1=Ok | 0=Fim da lista
+        ;      ds:si = Item
+    .CalculaTamanho: dw 1, 0
+        ; Calcula o tamanho de uma lista
+        ; es = Lista
+        ; ret: cf = 1=Ok | 0=Fim da lista
+        ;      cx = Tamanho
     ._Fim:
